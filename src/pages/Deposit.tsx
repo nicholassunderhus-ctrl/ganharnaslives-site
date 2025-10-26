@@ -5,7 +5,7 @@ import { MobileNav } from "@/components/MobileNav";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Copy } from "lucide-react";
+import { Coins, Copy } from "lucide-react";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -13,7 +13,6 @@ import { toast } from "sonner";
 interface PixData {
   qr_code: string;
   qr_code_base64: string;
-  id: number;
 }
 
 const Deposit = () => {
@@ -26,7 +25,7 @@ const Deposit = () => {
   const [error, setError] = useState<string | null>(null);
   const [pixData, setPixData] = useState<PixData | null>(null);
 
-  const pointsPerReal = 100; // 100 pontos por R$1
+  const pointsPerReal = 600; // 600 pontos por R$1
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -45,14 +44,16 @@ const Deposit = () => {
     setPixData(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/create-payment`, {
+      const amount_points = depositAmount * pointsPerReal;
+
+      const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.id}`, // Enviando o ID do usuário diretamente
         },
         body: JSON.stringify({ 
-          amount: depositAmount, // Enviar o valor em BRL. O user_id é pego no backend.
+          amount_points,
+          user_id: user.id 
         }),
       });
 
@@ -115,7 +116,7 @@ const Deposit = () => {
                 </div>
 
                 <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg">
-                  <img src="/coin.svg" alt="Pontos" className="w-5 h-5" />
+                  <Coins className="w-5 h-5 text-primary" />
                   <span className="text-sm">
                     Cada R$1 depositado = <strong>{pointsPerReal} pontos</strong>
                   </span>
@@ -144,7 +145,7 @@ const Deposit = () => {
 
                 <div className="mt-3 text-center">
                   <div className="inline-flex items-center gap-2 bg-muted/30 px-3 py-2 rounded-lg">
-                    <img src="/coin.svg" alt="Pontos" className="w-4 h-4" />
+                    <Coins className="w-4 h-4 text-primary" />
                     <span className="text-sm">Você receberá:</span>
                     <span className="text-lg font-bold">{(depositAmount * pointsPerReal).toLocaleString('pt-BR')}</span>
                     <span className="text-sm">pontos</span>

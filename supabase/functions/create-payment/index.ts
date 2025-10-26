@@ -13,8 +13,6 @@ interface MercadoPagoPaymentResponse {
   };
 }
 
-const POINTS_PER_REAL = 600; // Taxa de conversão
-
 serve(async (req) => {
   // Trata a requisição pre-flight do CORS
   if (req.method === 'OPTIONS') {
@@ -22,10 +20,10 @@ serve(async (req) => {
   }
 
   try {
-    // 1. Extrai o valor em BRL do corpo da requisição
-    const { amount } = await req.json()
-    if (!amount || typeof amount !== 'number' || amount <= 0) {
-      throw new Error('O valor do depósito (amount) é obrigatório e deve ser um número positivo.')
+    // 1. Extrai o corpo da requisição e o token de autenticação do usuário
+    const { amount_points } = await req.json()
+    if (!amount_points) {
+      throw new Error('A quantidade de pontos (amount_points) é obrigatória.')
     }
 
     // 2. Cria um cliente Supabase para validar o usuário
@@ -45,21 +43,18 @@ serve(async (req) => {
       })
     }
 
-    // 4. Calcula a quantidade de pontos correspondente
-    const amount_points = Math.floor(amount * POINTS_PER_REAL);
-
-    // 5. Cria um cliente Supabase com permissões de administrador
+    // 4. Cria um cliente Supabase com permissões de administrador para interagir com o banco
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // 6. Insere o registro do depósito pendente na tabela (com o valor em PONTOS)
+    // 5. Insere o registro do depósito pendente na tabela
     const { data: depositData, error: depositError } = await supabaseAdmin
       .from('deposits')
       .insert({
         user_id: user.id,
-        amount: amount_points, // Salva a quantidade de pontos
+        amount: amount_points,
         status: 'pending',
       })
       .select()
@@ -69,7 +64,7 @@ serve(async (req) => {
       throw new Error(`Erro ao criar depósito no Supabase: ${depositError.message}`);
     }
 
-    // 7. Prepara para criar o pagamento no Mercado Pago (com o valor em BRL)
+    // 6. Prepara para criar o pagamento no Mercado Pago
     const mercadoPagoAccessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
     if (!mercadoPagoAccessToken) {
       throw new Error('A chave de acesso do Mercado Pago não está configurada.');
@@ -84,8 +79,8 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        transaction_amount: Number(amount.toFixed(2)), // Usa o valor em BRL
-        description: `Depósito de R${amount.toFixed(2)} (${amount_points} pontos) para o usuário ${user.id}`,
+        transaction_amount: Number(amount_points),
+        description: `Depósito de ${amount_points} pontos para o usuário ${user.id}`,
         payment_method_id: 'pix',
         payer: {
           email: user.email || 'payer@email.com', // O email é obrigatório
