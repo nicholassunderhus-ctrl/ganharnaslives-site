@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { PlatformIcon } from "@/components/PlatformIcon";
 import { useUserPoints } from "@/hooks/useUserPoints";
+import { PlatformIcon } from "@/components/PlatformIcon"; 
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -125,6 +126,7 @@ const Watch = () => {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar points={userPoints?.points ?? 0} />
+      <Sidebar />
       <MobileHeader />
       <MobileNav />
       
