@@ -27,7 +27,7 @@ export function Deposit() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate("/login");
+      navigate("/auth");
     }
   }, [user, authLoading, navigate]);
 

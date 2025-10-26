@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./useAuth";
 
 export const useEarnPoints = () => {
-  const user = useAuth.getState().user;
   const [loading, setLoading] = useState(false);
 
-  const earnPoints = async (pointsToEarn: number = 1) => {
-    if (!user) return { success: false, error: "User not authenticated" };
+  const earnPoints = async (userId: string, pointsToEarn: number = 1) => {
+    if (!userId) return { success: false, error: "User not authenticated" };
 
     setLoading(true);
     try {
@@ -15,7 +13,7 @@ export const useEarnPoints = () => {
       const { data: userPoints, error: fetchError } = await supabase
         .from("user_points")
         .select("last_earn_timestamp, points, total_earned")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .single();
 
       if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is "not found"
@@ -38,7 +36,7 @@ export const useEarnPoints = () => {
         const { error: insertError } = await supabase
           .from("user_points")
           .insert({
-            user_id: user.id,
+            user_id: userId,
             points: pointsToEarn,
             total_earned: pointsToEarn,
             last_earn_timestamp: now.toISOString()
@@ -60,7 +58,7 @@ export const useEarnPoints = () => {
           total_earned: newTotalEarned,
           last_earn_timestamp: now.toISOString()
         })
-        .eq("user_id", user.id);
+        .eq("user_id", userId);
 
       if (updateError) throw updateError;
 

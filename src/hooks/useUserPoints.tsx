@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -9,7 +10,7 @@ interface UserPointsState {
   fetchUserPoints: () => Promise<void>;
 }
 
-export const useUserPoints = create<UserPointsState>((set, get) => ({
+export const useUserPoints = create(subscribeWithSelector<UserPointsState>((set, get) => ({
   userPoints: null,
   loading: true,
   pointsPerReal: 600,
@@ -37,5 +38,11 @@ export const useUserPoints = create<UserPointsState>((set, get) => ({
       set({ userPoints: { points: totalPoints, total_earned: totalPoints }, loading: false });
     }
   },
-}));
+})));
 
+// Ouve mudanças no estado de autenticação para buscar os pontos do usuário.
+useAuth.subscribe(
+  (state) => state.user,
+  () => useUserPoints.getState().fetchUserPoints(),
+  { fireImmediately: true }
+);
