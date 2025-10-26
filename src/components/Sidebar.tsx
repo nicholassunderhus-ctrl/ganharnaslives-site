@@ -3,14 +3,16 @@ import { Home, Eye, Upload, Wallet, User, LogOut, Coins, PiggyBank } from "lucid
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
-import { signOut, useAuth } from "@/hooks/useAuth";
-import { useUserPoints } from "@/hooks/useUserPoints";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-export const Sidebar = () => { // A assinatura já estava correta, sem props.
+interface SidebarProps {
+  points?: number;
+}
+
+export const Sidebar = ({ points = 0 }: SidebarProps) => {
   const location = useLocation();
-  const { userPoints, loading } = useUserPoints();
-  const points = userPoints?.points ?? 0;
+  const { signOut } = useAuth();
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -48,11 +50,7 @@ export const Sidebar = () => { // A assinatura já estava correta, sem props.
             <span className="text-sm text-muted-foreground">Seus Pontos</span>
             <Coins className="w-4 h-4 text-primary" />
           </div>
-          {loading ? (
-            <div className="text-lg font-bold text-primary animate-pulse">...</div>
-          ) : (
-            <div className="text-2xl font-bold text-primary">{points.toLocaleString()}</div>
-          )}
+          <div className="text-2xl font-bold text-primary">{points.toLocaleString()}</div>
           <div className="text-xs text-muted-foreground mt-1">
             ≈ R$ {(points * 0.01).toFixed(2)}
           </div>

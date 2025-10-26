@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { MobileNav } from "@/components/MobileNav";
-import { StreamViewer } from "@/components/StreamViewer";
 import { MobileHeader } from "@/components/MobileHeader";
 import { StreamCard } from "@/components/StreamCard";
 import { Stream, Platform } from "@/types";
@@ -18,7 +17,6 @@ const Watch = () => {
   const { isAdmin } = useAdmin();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
 
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,16 +118,13 @@ const Watch = () => {
   });
 
   const handleWatch = (stream: Stream) => {
-    setSelectedStream(stream);
-  };
-
-  const handleCloseViewer = () => {
-    setSelectedStream(null);
+    // TODO: Implement watch functionality
+    window.open(stream.streamUrl, "_blank");
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
+      <Sidebar points={userPoints?.points ?? 0} />
       <MobileHeader />
       <MobileNav />
       
@@ -211,10 +206,6 @@ const Watch = () => {
           ) : null}
         </div>
       </main>
-
-      {selectedStream && (
-        <StreamViewer stream={selectedStream} onClose={handleCloseViewer} />
-      )}
     </div>
   );
 };

@@ -8,19 +8,21 @@ const ADMIN_EMAILS = [
 ];
 
 export const useAdmin = () => {
-  const { session, loading: authLoading } = useAuth();
+  const { session } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (authLoading) return;
-
-    if (!session?.user?.email) {
+    if (!session) {
       setIsAdmin(false);
+      setIsLoading(false);
       return;
     }
 
-    setIsAdmin(ADMIN_EMAILS.includes(session.user.email));
-  }, [session, authLoading]);
+    const email = session.user.email;
+    setIsAdmin(email ? ADMIN_EMAILS.includes(email) : false);
+    setIsLoading(false);
+  }, [session]);
 
-  return { isAdmin, isLoading: authLoading };
+  return { isAdmin, isLoading };
 };

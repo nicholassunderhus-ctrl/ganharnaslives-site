@@ -1,50 +1,63 @@
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
 
-interface UserPointsState {
-  userPoints: { points: number; total_earned: number } | null;
-  loading: boolean;
-  pointsPerReal: number;
-  fetchUserPoints: () => Promise<void>;
+interface UserPoints {
+  points: number;
+  total_earned: number;
 }
 
-export const useUserPoints = create(subscribeWithSelector<UserPointsState>((set, get) => ({
-  userPoints: null,
-  loading: true,
-  pointsPerReal: 600,
-  fetchUserPoints: async () => {
-    const user = useAuth.getState().user;
-    if (!user) {
-      set({ userPoints: null, loading: false });
-      return;
-    }
+export const useUserPoints = () => {
+  const { user } = useAuth();
+  const [userPoints, setUserPoints] = useState<UserPoints | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    set({ loading: true });
-    const { data, error } = await supabase
-      .from('user_points')
-      .select('points, total_earned')
-      .eq('user_id', user.id)
-      .single();
-
-    if (error) {
-      // Se o erro for 'PGRST116', significa que o usuário ainda não tem uma linha na tabela. Isso é normal.
-      if (error.code === 'PGRST116') {
-        set({ userPoints: { points: 0, total_earned: 0 }, loading: false });
+  useEffect(() => {
+    const fetchPoints = async () => {
+      if (!user) {
+        setLoading(false);
         return;
       }
-      console.error('Error fetching user points:', error);
-      set({ userPoints: { points: 0, total_earned: 0 }, loading: false });
-    } else {
-      set({ userPoints: data, loading: false });
-    }
-  },
-})));
 
-// Ouve mudanças no estado de autenticação para buscar os pontos do usuário.
-useAuth.subscribe(
-  (state) => state.user,
-  () => useUserPoints.getState().fetchUserPoints(),
-  { fireImmediately: true }
-);
+      const { data, error } = await (supabase as any).from("user_points").select("points, total_earned").eq("user_id", user.id).single();
+
+      if (error) {
+        console.error("Error fetching user points:", error);
+      } else {
+        setUserPoints(data);
+      }
+      
+      setLoading(false);
+    };
+
+    fetchPoints();
+
+    // Set up realtime subscription
+    const channel = (supabase as any)
+      .channel("user_points_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_points",
+          filter: `user_id=eq.${user?.id}`,
+        },
+        (payload: any) => {
+          if (payload.new && typeof payload.new === "object") {
+            setUserPoints({
+              points: payload.new.points,
+              total_earned: payload.new.total_earned,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user]);
+
+  return { userPoints, loading };
+};

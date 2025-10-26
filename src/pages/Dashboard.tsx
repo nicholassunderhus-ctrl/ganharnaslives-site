@@ -42,7 +42,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
+      <Sidebar points={stats.points} />
       <MobileHeader />
       <MobileNav />
 

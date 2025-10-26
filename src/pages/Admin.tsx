@@ -143,7 +143,7 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
+      <Sidebar points={userPoints?.points ?? 0} />
       
       <main className="md:ml-64 ml-0 pt-20 pb-24 md:pb-8 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-6">
