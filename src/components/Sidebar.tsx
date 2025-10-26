@@ -3,11 +3,11 @@ import { Home, Eye, Upload, Wallet, User, LogOut, Coins, PiggyBank } from "lucid
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/hooks/useAuth";
+import { signOut, useAuth } from "@/hooks/useAuth";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { toast } from "sonner";
 
-export const Sidebar = () => {
+export const Sidebar = () => { // A assinatura já estava correta, sem props.
   const location = useLocation();
   const { userPoints, loading } = useUserPoints();
   const points = userPoints?.points ?? 0;

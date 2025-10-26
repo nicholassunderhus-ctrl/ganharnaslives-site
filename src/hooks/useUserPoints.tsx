@@ -23,7 +23,7 @@ export const useUserPoints = create(subscribeWithSelector<UserPointsState>((set,
 
     set({ loading: true });
     const { data, error } = await supabase
-      .from('user_points') // A tabela está correta, mas a lógica de tratamento de erro pode ser melhorada.
+      .from('user_points')
       .select('points, total_earned')
       .eq('user_id', user.id)
       .single();
@@ -37,7 +37,7 @@ export const useUserPoints = create(subscribeWithSelector<UserPointsState>((set,
       console.error('Error fetching user points:', error);
       set({ userPoints: { points: 0, total_earned: 0 }, loading: false });
     } else {
-      set({ userPoints: data ? { points: data.points || 0, total_earned: data.total_earned || 0 } : { points: 0, total_earned: 0 }, loading: false });
+      set({ userPoints: data, loading: false });
     }
   },
 })));
