@@ -3,7 +3,7 @@ import { Home, Eye, Upload, Wallet, User, LogOut, Coins, PiggyBank } from "lucid
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
+import { signOut } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 interface SidebarProps {
@@ -12,7 +12,6 @@ interface SidebarProps {
 
 export const Sidebar = ({ points = 0 }: SidebarProps) => {
   const location = useLocation();
-  const { signOut } = useAuth();
 
   const handleSignOut = async () => {
     const { error } = await signOut();

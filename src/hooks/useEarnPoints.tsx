@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserPoints } from "./useUserPoints";
 
 export const useEarnPoints = () => {
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,9 @@ export const useEarnPoints = () => {
 
         if (insertError) throw insertError;
 
+        // Atualiza o estado global de pontos
+        useUserPoints.getState().fetchUserPoints();
+
         return { success: true, pointsEarned: pointsToEarn };
       }
 
@@ -61,6 +65,9 @@ export const useEarnPoints = () => {
         .eq("user_id", userId);
 
       if (updateError) throw updateError;
+
+      // Atualiza o estado global de pontos
+      useUserPoints.getState().fetchUserPoints();
 
       return { success: true, pointsEarned: pointsToEarn };
 

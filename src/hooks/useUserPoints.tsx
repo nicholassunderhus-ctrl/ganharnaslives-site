@@ -23,19 +23,21 @@ export const useUserPoints = create(subscribeWithSelector<UserPointsState>((set,
 
     set({ loading: true });
     const { data, error } = await supabase
-      .from('deposits') // CORREÇÃO: Tabela 'deposits' em vez de 'user_points'
-      .select('amount_points, status')
+      .from('user_points')
+      .select('points, total_earned')
       .eq('user_id', user.id)
-      .eq('status', 'completed');
+      .single();
 
     if (error) {
+      // Se o erro for 'PGRST116', significa que o usuário ainda não tem uma linha na tabela. Isso é normal.
+      if (error.code === 'PGRST116') {
+        set({ userPoints: { points: 0, total_earned: 0 }, loading: false });
+        return;
+      }
       console.error('Error fetching user points:', error);
       set({ userPoints: { points: 0, total_earned: 0 }, loading: false });
     } else {
-      const totalPoints = data.reduce((acc, deposit) => acc + deposit.amount_points, 0);
-      // Nota: A lógica para 'total_earned' pode precisar de ajuste dependendo de como você a calcula.
-      // Por agora, vamos focar em fazer os pontos funcionarem.
-      set({ userPoints: { points: totalPoints, total_earned: totalPoints }, loading: false });
+      set({ userPoints: data, loading: false });
     }
   },
 })));
