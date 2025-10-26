@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
 export const useEarnPoints = () => {
-  const { user } = useAuth();
+  const user = useAuth.getState().user;
   const [loading, setLoading] = useState(false);
 
   const earnPoints = async (pointsToEarn: number = 1) => {

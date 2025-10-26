@@ -6,13 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
-import { Mail, Lock, User, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User as UserIcon, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, signIn, signUp } from "@/hooks/useAuth";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { signUp, signIn, user, loading } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,13 +28,15 @@ const Auth = () => {
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const username = formData.get("username") as string;
+    const username = formData.get("username") as string; // Renomeado para evitar conflito
 
     const { error } = await signUp(email, password, username);
     
     if (error) {
       if (error.message.includes("already registered")) {
         toast.error("Este email já está cadastrado. Faça login!");
+      } else if (error.message.includes("weak password")) {
+        toast.error("Senha muito fraca. Tente uma senha mais forte.");
       } else {
         toast.error(error.message);
       }
@@ -42,6 +44,7 @@ const Auth = () => {
       toast.success("Conta criada com sucesso!");
     }
     
+    navigate("/dashboard");
     setIsLoading(false);
   };
 
@@ -63,6 +66,7 @@ const Auth = () => {
       }
     } else {
       toast.success("Login realizado com sucesso!");
+      navigate("/dashboard");
     }
     
     setIsLoading(false);
@@ -154,7 +158,7 @@ const Auth = () => {
                 <div className="space-y-2">
                   <Label htmlFor="signup-username">Nome de Usuário</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="signup-username"
                       name="username"

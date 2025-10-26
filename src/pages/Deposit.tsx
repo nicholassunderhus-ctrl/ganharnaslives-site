@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MobileNav } from "@/components/MobileNav";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, FormEvent } from "react";
 import { Coins, Copy } from "lucide-react";
@@ -9,6 +8,7 @@ import { useUserPoints } from "@/hooks/useUserPoints";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Sidebar } from "@/components/Sidebar";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PixData {
   payment_id: number;
@@ -17,7 +17,7 @@ interface PixData {
 }
 
 export function Deposit() {
-  const { user, authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { userPoints, pointsPerReal } = useUserPoints();
   const [depositAmount, setDepositAmount] = useState(10);
@@ -44,8 +44,8 @@ export function Deposit() {
 
     try {
       const amount_brl = depositAmount;
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const session = (await useAuth.getState().supabase.auth.getSession()).data.session;
+      const session = useAuth.getState().session;
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;      
 
       if (!session || !supabaseUrl) {
         throw new Error("Sessão ou URL do Supabase não encontrada. Faça login novamente.");

@@ -1,83 +1,63 @@
-import { useEffect, useState } from "react";
+import { create } from 'zustand';
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
-export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+interface AuthState {
+  session: Session | null;
+  user: User | null;
+  loading: boolean;
+  setSession: (session: Session | null) => void;
+  setUser: (user: User | null) => void;
+  setLoading: (loading: boolean) => void;
+  initialize: () => () => void;
+}
 
-  useEffect(() => {
-    // Set up auth state listener FIRST
+export const useAuth = create<AuthState>((set) => ({
+  session: null,
+  user: null,
+  loading: true,
+  setSession: (session) => set({ session }),
+  setUser: (user) => set({ user }),
+  setLoading: (loading) => set({ loading }),
+  initialize: () => {
+    set({ loading: true });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      set({ session, user: session?.user ?? null, loading: false });
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+      (_event, session) => {
+        set({ session, user: session?.user ?? null, loading: false });
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
     return () => subscription.unsubscribe();
-  }, []);
+  },
+}));
 
-  const signUp = async (email: string, password: string, username: string) => {
-    const redirectUrl = `${window.location.origin}/dashboard`;
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          username: username
-        }
+// Funções de ação que podem ser chamadas de qualquer lugar
+export const signUp = async (email: string, password: string, username: string) => {
+  const redirectUrl = `${window.location.origin}/dashboard`;
+  return await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: redirectUrl,
+      data: {
+        username: username
       }
-    });
-    
-    if (!error && data.user) {
-      navigate("/dashboard");
     }
-    
-    return { data, error };
-  };
+  });
+};
 
-  const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (!error && data.user) {
-      navigate("/dashboard");
-    }
-    
-    return { data, error };
-  };
+export const signIn = async (email: string, password: string) => {
+  return await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+};
 
-
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      navigate("/");
-    }
-    return { error };
-  };
-
-  return {
-    user,
-    session,
-    loading,
-    signUp,
-    signIn,
-    signOut,
-  };
+export const signOut = async () => {
+  return await supabase.auth.signOut();
 };
