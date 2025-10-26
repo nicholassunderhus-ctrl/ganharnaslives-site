@@ -9,6 +9,7 @@ import { Coins, Copy } from "lucide-react";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PixData {
   qr_code: string;
@@ -43,17 +44,21 @@ const Deposit = () => {
     setError(null);
     setPixData(null);
 
-    try {
-      const amount_points = depositAmount * pointsPerReal;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error("Sua sessão expirou. Por favor, faça login novamente.");
+      return;
+    }
 
-      const response = await fetch('/api/create-payment', {
+    try {
+      const response = await fetch('/api/create-payment-v2', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ 
-          amount_points,
-          user_id: user.id 
+          amount: depositAmount, // Enviar o valor em BRL. O user_id é pego no backend.
         }),
       });
 

@@ -29,7 +29,6 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
     { to: "/dashboard/my-streams", icon: Upload, label: "Streamer" },
     { to: "/dashboard/withdraw", icon: Wallet, label: "Sacar" },
     { to: "/dashboard/deposit", icon: PiggyBank, label: "Depositar" },
-    { to: "/dashboard/profile", icon: User, label: "Perfil" },
   ];
 
   return (
