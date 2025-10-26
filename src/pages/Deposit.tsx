@@ -8,7 +8,7 @@ import { Coins, Copy } from "lucide-react";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sidebar } from "@/components/Sidebar";
+import { Zs as Sidebar } from "./Dashboard-C5y5o4fT.js";
 
 interface PixData {
   payment_id: number;
