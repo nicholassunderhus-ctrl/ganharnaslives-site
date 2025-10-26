@@ -24,6 +24,9 @@ serve(async (req) => {
     const { amount_points } = await req.json()
     if (!amount_points) {
       throw new Error('A quantidade de pontos (amount_points) é obrigatória.')
+    const { amount_brl } = await req.json()
+    if (!amount_brl || typeof amount_brl !== 'number' || amount_brl <= 0) {
+      throw new Error('O valor do depósito (amount_brl) é obrigatório e deve ser um número positivo.')
     }
 
     // 2. Cria um cliente Supabase para validar o usuário
@@ -55,6 +58,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         amount: amount_points,
+        amount: amount_brl, // Armazena o valor em BRL
         status: 'pending',
       })
       .select()
@@ -81,6 +85,8 @@ serve(async (req) => {
       body: JSON.stringify({
         transaction_amount: Number(amount_points),
         description: `Depósito de ${amount_points} pontos para o usuário ${user.id}`,
+        transaction_amount: Number(amount_brl),
+        description: `Depósito de R$${amount_brl.toFixed(2)} para o usuário ${user.id}`,
         payment_method_id: 'pix',
         payer: {
           email: user.email || 'payer@email.com', // O email é obrigatório

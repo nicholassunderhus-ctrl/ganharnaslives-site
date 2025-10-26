@@ -1,63 +1,41 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./useAuth";
+import { create } from 'zustand';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './useAuth';
 
-interface UserPoints {
-  points: number;
-  total_earned: number;
+interface UserPointsState {
+  userPoints: { points: number; total_earned: number } | null;
+  loading: boolean;
+  pointsPerReal: number;
+  fetchUserPoints: () => Promise<void>;
 }
 
-export const useUserPoints = () => {
-  const { user } = useAuth();
-  const [userPoints, setUserPoints] = useState<UserPoints | null>(null);
-  const [loading, setLoading] = useState(true);
+export const useUserPoints = create<UserPointsState>((set, get) => ({
+  userPoints: null,
+  loading: true,
+  pointsPerReal: 600,
+  fetchUserPoints: async () => {
+    const user = useAuth.getState().user;
+    if (!user) {
+      set({ userPoints: null, loading: false });
+      return;
+    }
 
-  useEffect(() => {
-    const fetchPoints = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+    set({ loading: true });
+    const { data, error } = await supabase
+      .from('deposits') // CORREÇÃO: Tabela 'deposits' em vez de 'user_points'
+      .select('amount_points, status')
+      .eq('user_id', user.id)
+      .eq('status', 'completed');
 
-      const { data, error } = await (supabase as any).from("user_points").select("points, total_earned").eq("user_id", user.id).single();
+    if (error) {
+      console.error('Error fetching user points:', error);
+      set({ userPoints: { points: 0, total_earned: 0 }, loading: false });
+    } else {
+      const totalPoints = data.reduce((acc, deposit) => acc + deposit.amount_points, 0);
+      // Nota: A lógica para 'total_earned' pode precisar de ajuste dependendo de como você a calcula.
+      // Por agora, vamos focar em fazer os pontos funcionarem.
+      set({ userPoints: { points: totalPoints, total_earned: totalPoints }, loading: false });
+    }
+  },
+}));
 
-      if (error) {
-        console.error("Error fetching user points:", error);
-      } else {
-        setUserPoints(data);
-      }
-      
-      setLoading(false);
-    };
-
-    fetchPoints();
-
-    // Set up realtime subscription
-    const channel = (supabase as any)
-      .channel("user_points_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "user_points",
-          filter: `user_id=eq.${user?.id}`,
-        },
-        (payload: any) => {
-          if (payload.new && typeof payload.new === "object") {
-            setUserPoints({
-              points: payload.new.points,
-              total_earned: payload.new.total_earned,
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [user]);
-
-  return { userPoints, loading };
-};
