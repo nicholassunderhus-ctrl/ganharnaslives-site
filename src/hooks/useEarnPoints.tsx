@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserPoints } from "./useUserPoints";
 
 export const useEarnPoints = () => {
   const [loading, setLoading] = useState(false);

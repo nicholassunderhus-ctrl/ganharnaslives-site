@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/hooks/useAuth";
+import { useUserPoints } from "@/hooks/useUserPoints";
 import { toast } from "sonner";
 
-interface SidebarProps {
-  points?: number;
-}
-
-export const Sidebar = ({ points = 0 }: SidebarProps) => {
+export const Sidebar = () => {
   const location = useLocation();
+  const { userPoints, loading } = useUserPoints();
+  const points = userPoints?.points ?? 0;
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -49,7 +48,11 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
             <span className="text-sm text-muted-foreground">Seus Pontos</span>
             <Coins className="w-4 h-4 text-primary" />
           </div>
-          <div className="text-2xl font-bold text-primary">{points?.toLocaleString() ?? 0}</div>
+          {loading ? (
+            <div className="text-lg font-bold text-primary animate-pulse">...</div>
+          ) : (
+            <div className="text-2xl font-bold text-primary">{points.toLocaleString()}</div>
+          )}
           <div className="text-xs text-muted-foreground mt-1">
             ≈ R$ {(points * 0.01).toFixed(2)}
           </div>
