@@ -49,7 +49,7 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
             <span className="text-sm text-muted-foreground">Seus Pontos</span>
             <Coins className="w-4 h-4 text-primary" />
           </div>
-          <div className="text-2xl font-bold text-primary">{points.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-primary">{points?.toLocaleString() ?? 0}</div>
           <div className="text-xs text-muted-foreground mt-1">
             ≈ R$ {(points * 0.01).toFixed(2)}
           </div>

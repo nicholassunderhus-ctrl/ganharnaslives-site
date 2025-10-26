@@ -129,7 +129,7 @@ const Watch = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar points={userPoints?.points ?? 0} />
+      <Sidebar />
       <MobileHeader />
       <MobileNav />
       
