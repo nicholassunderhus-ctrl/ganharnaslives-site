@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 220 15% 12%;
+    --foreground: 0 0% 95%;
+
+    --card: 220 14% 16%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 220 14% 16%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 346 77% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 18%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 220 14% 20%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 346 77% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 22%;
+    --input: 220 14% 22%;
+    --ring: 346 77% 60%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 220 16% 10%;
+    --sidebar-foreground: 0 0% 80%;
+    --sidebar-primary: 346 77% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 16%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 14% 18%;
+    --sidebar-ring: 346 77% 60%;
+
+    /* Platform colors */
+    --kick-green: 110 100% 54%;
+    --twitch-purple: 265 100% 64%;
+    --youtube-red: 0 100% 50%;
+
+    /* Custom gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(346 77% 60%), hsl(265 100% 64%));
+    --gradient-success: linear-gradient(135deg, hsl(110 100% 54%), hsl(142 76% 36%));
+    
+    /* Shadows */
+    --shadow-primary: 0 10px 40px -10px hsl(346 77% 60% / 0.4);
+    --shadow-card: 0 4px 20px hsl(220 14% 8% / 0.5);
+    
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
