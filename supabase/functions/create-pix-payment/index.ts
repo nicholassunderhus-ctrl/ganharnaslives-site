@@ -26,12 +26,21 @@ serve(async (req) => {
   try {
     // 1. Extrai o corpo da requisição
     const { monetaryAmount, firstName, lastName, cpf }: PayerData = await req.json();
+
+    // Limpa e valida os dados de entrada
+    const cleanFirstName = firstName?.trim();
+    const cleanLastName = lastName?.trim();
+    const cleanCpf = cpf?.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+
     // Validações básicas
     if (!monetaryAmount || monetaryAmount <= 0) {
       throw new Error('O valor monetário (monetaryAmount) é obrigatório e deve ser maior que zero.');
     }
-    if (!firstName || !lastName || !cpf) {
+    if (!cleanFirstName || !cleanLastName || !cleanCpf) {
       throw new Error('Nome, sobrenome e CPF do pagador são obrigatórios.');
+    }
+    if (cleanCpf.length !== 11) {
+      throw new Error('O CPF deve conter 11 dígitos.');
     }
     // 2. Cria um cliente Supabase para validar o usuário
     const authHeader = req.headers.get('Authorization')!
@@ -89,11 +98,11 @@ serve(async (req) => {
         payment_method_id: 'pix',
         payer: {
           email: user.email,
-          first_name: firstName,
-          last_name: lastName,
+          first_name: cleanFirstName,
+          last_name: cleanLastName,
           identification: {
             type: 'CPF',
-            number: cpf.replace(/\D/g, ''), // Remove caracteres não numéricos
+            number: cleanCpf,
           },
         },
         notification_url: webhookUrl,
@@ -102,7 +111,9 @@ serve(async (req) => {
     });
     if (!paymentResponse.ok) {
       const errorBody = await paymentResponse.json();
-      throw new Error(`Erro ao criar pagamento no Mercado Pago: ${JSON.stringify(errorBody)}`);
+      // Log detalhado do erro do Mercado Pago
+      console.error("Erro do Mercado Pago:", JSON.stringify(errorBody, null, 2));
+      throw new Error(errorBody.message || `Erro ao criar pagamento no Mercado Pago.`);
     }
     const paymentResult = await paymentResponse.json() as MercadoPagoPaymentResponse;
     // Opcional: Atualizar o registro de depósito com o ID do pagamento do Mercado Pago
