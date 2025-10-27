@@ -70,7 +70,7 @@ serve(async (req) => {
       .from('deposits')
       .insert({
         user_id: user.id,
-        monetary_amount: monetaryAmount,
+        amount_brl: monetaryAmount,
         points_awarded: pointsAwarded,
         status: 'pending',
       })
