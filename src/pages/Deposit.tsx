@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/Sidebar";
 import { MobileNav } from "@/components/MobileNav";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client"; // Importar supabase para pegar o email do usuário
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Coins, Copy } from "lucide-react";
@@ -21,6 +22,9 @@ const Deposit = () => {
   const navigate = useNavigate();
 
   const [depositAmount, setDepositAmount] = useState<number>(10);
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const [cpf, setCpf] = useState<string>('');
   const [loadingPayment, setLoadingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pixData, setPixData] = useState<PixData | null>(null);
@@ -31,11 +35,21 @@ const Deposit = () => {
     if (!authLoading && !user) {
       navigate("/auth");
     }
+    // Preenche o email e, se disponível, nome e sobrenome do usuário autenticado
+    if (user) {
+      // O email já está disponível em user.email
+      // Se você tiver nome/sobrenome no perfil do usuário, pode carregá-los aqui
+      // Ex: setFirstName(user.user_metadata?.first_name || '');
+    }
   }, [user, authLoading, navigate]);
 
   const handleCreatePayment = async () => {
     if (!user) {
       toast.error("Você precisa estar logado para fazer um depósito.");
+      return;
+    }
+    if (!firstName || !lastName || !cpf) {
+      toast.error("Por favor, preencha seu nome, sobrenome e CPF.");
       return;
     }
 
@@ -44,16 +58,24 @@ const Deposit = () => {
     setPixData(null);
 
     try {
-      const amount_points = depositAmount * pointsPerReal;
+      // Obtém o token de sessão para autenticar a chamada da Edge Function
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Sessão de usuário não encontrada.");
+      }
 
-      const response = await fetch('/api/create-payment', {
+      // Chama a nova Edge Function para criar o pagamento PIX
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-pix-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`, // Envia o token de autenticação
         },
         body: JSON.stringify({ 
-          amount_points,
-          user_id: user.id 
+          monetaryAmount: depositAmount, // Valor em Reais
+          firstName,
+          lastName,
+          cpf,
         }),
       });
 
@@ -150,6 +172,43 @@ const Deposit = () => {
                     <span className="text-lg font-bold">{(depositAmount * pointsPerReal).toLocaleString('pt-BR')}</span>
                     <span className="text-sm">pontos</span>
                   </div>
+                </div>
+
+                {/* Campos para Nome, Sobrenome e CPF */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="firstName" className="text-sm font-medium">Nome</label>
+                    <Input
+                      id="firstName"
+                      type="text"
+                      placeholder="Seu nome"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="lastName" className="text-sm font-medium">Sobrenome</label>
+                    <Input
+                      id="lastName"
+                      type="text"
+                      placeholder="Seu sobrenome"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="cpf" className="text-sm font-medium">CPF</label>
+                  <Input
+                    id="cpf"
+                    type="text" // Pode usar um input mask para formatar o CPF
+                    placeholder="000.000.000-00"
+                    value={cpf}
+                    onChange={(e) => setCpf(e.target.value)}
+                    required
+                  />
                 </div>
 
                 <div className="pt-4">
