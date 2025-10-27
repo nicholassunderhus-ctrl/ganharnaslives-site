@@ -1,10 +1,16 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
-
-// Definindo a interface para os dados do pagamento do Mercado Pago
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { corsHeaders } from '../_shared/cors.ts';
+// Interface para os dados recebidos do frontend
+interface PayerData {
+  monetaryAmount: number;
+  firstName: string;
+  lastName: string;
+  cpf: string;
+}
+// Interface para a resposta do Mercado Pago
 interface MercadoPagoPaymentResponse {
-  id: number;
+  id: string; // O ID do pagamento é uma string
   point_of_interaction: {
     transaction_data: {
       qr_code: string;
@@ -12,20 +18,21 @@ interface MercadoPagoPaymentResponse {
     };
   };
 }
-
 serve(async (req) => {
   // Trata a requisição pre-flight do CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
-
   try {
-    // 1. Extrai o corpo da requisição e o token de autenticação do usuário
-    const { amount_points } = await req.json()
-    if (!amount_points) {
-      throw new Error('A quantidade de pontos (amount_points) é obrigatória.')
+    // 1. Extrai o corpo da requisição
+    const { monetaryAmount, firstName, lastName, cpf }: PayerData = await req.json();
+    // Validações básicas
+    if (!monetaryAmount || monetaryAmount <= 0) {
+      throw new Error('O valor monetário (monetaryAmount) é obrigatório e deve ser maior que zero.');
     }
-
+    if (!firstName || !lastName || !cpf) {
+      throw new Error('Nome, sobrenome e CPF do pagador são obrigatórios.');
+    }
     // 2. Cria um cliente Supabase para validar o usuário
     const authHeader = req.headers.get('Authorization')!
     const supabaseClient = createClient(
@@ -33,7 +40,6 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader } } }
     )
-
     // 3. Obtém os dados do usuário autenticado
     const { data: { user } } = await supabaseClient.auth.getUser()
     if (!user) {
@@ -42,61 +48,68 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-
-    // 4. Cria um cliente Supabase com permissões de administrador para interagir com o banco
+    // 4. Cria um cliente Supabase com permissões de administrador
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-
-    // 5. Insere o registro do depósito pendente na tabela
+    // Define a taxa de conversão (ex: 600 pontos por R$1)
+    const pointsPerReal = 600;
+    const pointsAwarded = Math.floor(monetaryAmount * pointsPerReal);
+    // 5. Insere o registro do depósito pendente na tabela 'deposits'
     const { data: depositData, error: depositError } = await supabaseAdmin
       .from('deposits')
       .insert({
         user_id: user.id,
-        amount: amount_points,
+        monetary_amount: monetaryAmount,
+        points_awarded: pointsAwarded,
         status: 'pending',
       })
       .select()
       .single();
-
     if (depositError) {
       throw new Error(`Erro ao criar depósito no Supabase: ${depositError.message}`);
     }
-
     // 6. Prepara para criar o pagamento no Mercado Pago
     const mercadoPagoAccessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
     if (!mercadoPagoAccessToken) {
       throw new Error('A chave de acesso do Mercado Pago não está configurada.');
     }
-
-    const webhookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/payment-webhook`;
-
+    const webhookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/mercado-pago-webhook`;
     const paymentResponse = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${mercadoPagoAccessToken}`,
         'Content-Type': 'application/json',
+        'X-Idempotency-Key': `deposit-${depositData.id}`, // Evita pagamentos duplicados
       },
       body: JSON.stringify({
-        transaction_amount: Number(amount_points),
-        description: `Depósito de ${amount_points} pontos para o usuário ${user.id}`,
+        transaction_amount: Number(monetaryAmount),
+        description: `Depósito de ${pointsAwarded} pontos para o usuário ${user.id}`,
         payment_method_id: 'pix',
         payer: {
-          email: user.email || 'payer@email.com', // O email é obrigatório
+          email: user.email,
+          first_name: firstName,
+          last_name: lastName,
+          identification: {
+            type: 'CPF',
+            number: cpf.replace(/\D/g, ''), // Remove caracteres não numéricos
+          },
         },
         notification_url: webhookUrl,
-        external_reference: depositData.id,
+        external_reference: String(depositData.id),
       }),
     });
-
     if (!paymentResponse.ok) {
       const errorBody = await paymentResponse.json();
       throw new Error(`Erro ao criar pagamento no Mercado Pago: ${JSON.stringify(errorBody)}`);
     }
-
     const paymentResult = await paymentResponse.json() as MercadoPagoPaymentResponse;
-
+    // Opcional: Atualizar o registro de depósito com o ID do pagamento do Mercado Pago
+    await supabaseAdmin
+      .from('deposits')
+      .update({ mp_payment_id: String(paymentResult.id) }) // Garante que o ID seja string
+      .eq('id', depositData.id);
     // 7. Retorna os dados do PIX para o frontend
     return new Response(JSON.stringify({
       payment_id: paymentResult.id,
@@ -106,8 +119,8 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
-
   } catch (error) {
+    console.error('Erro em create-pix-payment:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
