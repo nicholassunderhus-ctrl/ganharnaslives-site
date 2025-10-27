@@ -230,7 +230,7 @@ const Deposit = () => {
                   <p className="text-muted-foreground">Escaneie o QR Code ou copie o código abaixo.</p>
                 </div>
                 <div className="flex justify-center">
-                    <img src={`data:image/png;base64,${pixData.qr_code_base64}`} alt="PIX QR Code" className="rounded-lg border p-2" />
+                    <img src={`data:image/png;base64,${pixData.qr_code_base64}`} alt="PIX QR Code" className="rounded-lg border p-2 w-56 h-56" />
                 </div>
                 <div className="space-y-2">
                     <label className="text-sm font-medium">PIX Copia e Cola</label>
