@@ -119,7 +119,7 @@ serve(async (req) => {
     // Opcional: Atualizar o registro de depósito com o ID do pagamento do Mercado Pago
     await supabaseAdmin
       .from('deposits')
-      .update({ mp_payment_id: String(paymentResult.id) }) // Garante que o ID seja string
+      .update({ gateway_payment_id: String(paymentResult.id) }) // Garante que o ID seja string
       .eq('id', depositData.id);
     // 7. Retorna os dados do PIX para o frontend
     return new Response(JSON.stringify({

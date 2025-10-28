@@ -94,7 +94,7 @@ serve(async (req) => {
     // 3. Atualize o status do depósito no Supabase
     const { error: updateError } = await supabaseAdmin
       .from('deposits')
-      .update({ status: paymentStatus, mp_payment_id: paymentId })
+      .update({ status: paymentStatus, gateway_payment_id: paymentId })
       .eq('id', externalReference)
       .select(); // Adiciona .select() para executar a query de atualização
 
