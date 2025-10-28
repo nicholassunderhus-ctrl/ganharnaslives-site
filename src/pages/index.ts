@@ -82,7 +82,7 @@ serve(async (req) => {
     if (paymentStatus === 'approved' && deposit.status === 'pending') {
       // Chama a função SQL para adicionar os pontos ao usuário
       const { error: rpcError } = await supabaseAdmin.rpc('add_points', {
-        user_id_to_update: deposit.user_id,
+        user_id_input: deposit.user_id,
         points_to_add: deposit.points_awarded,
       });
 
