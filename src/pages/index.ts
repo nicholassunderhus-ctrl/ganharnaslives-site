@@ -95,7 +95,8 @@ serve(async (req) => {
     const { error: updateError } = await supabaseAdmin
       .from('deposits')
       .update({ status: paymentStatus, mp_payment_id: paymentId })
-      .eq('id', externalReference);
+      .eq('id', externalReference)
+      .select(); // Adiciona .select() para executar a query de atualização
 
     if (updateError) {
       // Mesmo que a atualização de status falhe, os pontos já foram creditados.
