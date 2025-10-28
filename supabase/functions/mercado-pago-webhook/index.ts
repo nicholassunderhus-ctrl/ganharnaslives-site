@@ -66,12 +66,39 @@ serve(async (req) => {
     const externalReference = paymentDetails.external_reference; // Nosso ID do depósito
 
     // Atualize o status do depósito no Supabase
+    // 1. Encontra o depósito correspondente para obter user_id e points_awarded
+    const { data: deposit, error: findError } = await supabaseAdmin
+      .from('deposits')
+      .select('user_id, points_awarded, status')
+      .eq('id', externalReference)
+      .single();
+
+    if (findError) {
+      throw new Error(`Depósito com external_reference ${externalReference} não encontrado.`);
+    }
+
+    // 2. Se o pagamento foi aprovado E o depósito ainda está pendente, credita os pontos.
+    if (paymentStatus === 'approved' && deposit.status === 'pending') {
+      const { error: rpcError } = await supabaseAdmin.rpc('add_points', {
+        user_id_input: deposit.user_id,
+        points_to_add: deposit.points_awarded,
+      });
+
+      if (rpcError) {
+        throw new Error(`Erro ao chamar a função 'add_points': ${rpcError.message}`);
+      }
+    }
+
+    // 3. Atualize o status do depósito no Supabase
     const { error: updateError } = await supabaseAdmin
       .from('deposits')
-      .update({ status: paymentStatus, mp_payment_id: paymentId })
-      .eq('id', externalReference); // Use externalReference para encontrar o depósito
+      .update({ status: paymentStatus, gateway_payment_id: paymentId })
+      .eq('id', externalReference)
+      .select(); // Adiciona .select() para garantir a execução e facilitar a depuração
 
     if (updateError) {
+      // Mesmo que a atualização de status falhe, os pontos podem já ter sido creditados.
+      // O ideal é logar este erro para investigação manual.
       throw new Error(`Erro ao atualizar status do depósito no Supabase: ${updateError.message}`);
     }
 
