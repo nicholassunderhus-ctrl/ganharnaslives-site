@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Coins, Wallet, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
 import { toast } from "sonner";
-import { convertPointsToReal, WITHDRAW_POINTS_PER_REAL } from "@/utils/conversions";
 import { useUserPoints } from "@/hooks/useUserPoints";
 
 const Withdraw = () => {
@@ -16,7 +15,8 @@ const Withdraw = () => {
 
   const { userPoints: userPointsData, loading: pointsLoading } = useUserPoints();
   const userPoints = userPointsData?.points ?? 0;
-  const minWithdraw = 7000; // Mínimo de 7000 pontos = R$ 10,00 (R$10 * 700)
+  const minWithdraw = 7000; // Mínimo de 7000 pontos = R$ 10,00
+  const pointsToReal = (points: number) => (points / 700).toFixed(2); // 700 pontos = R$ 1,00
   const pixLogo = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0yNTYgMEMxMTQuNiAwIDAgMTE0LjYgMCAyNTZDMCA0MjkuNCAxMTQuNiA1MTIgMjU2IDUxMkM0MjkuNCA1MTIgNTEyIDM5Ny40IDUxMiAyNTZDNTEyIDExNC42IDM5Ny40IDAgMjU2IDBaIiBmaWxsPSIjMzJCQ0FEIi8+CjxwYXRoIGQ9Ik0zNjYgMjIzTDI4OSAxNDZMMjU2IDExM0wyMjMgMTQ2TDE0NiAyMjNMMTEzIDI1NkwxNDYgMjg5TDIyMyAzNjZMMjU2IDM5OUwyODkgMzY2TDM2NiAyODlMMzk5IDI1NkwzNjYgMjIzWk0yNTYgMzI4TDI1NiAzMjhMMTg0IDI1NkwyNTYgMTg0TDMyOCAyNTZMMjU2IDMyOFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=";
 
   const handleWithdraw = async (e: React.FormEvent) => {
@@ -72,7 +72,7 @@ const Withdraw = () => {
               </div>
               <div className="text-2xl font-bold">{userPoints} pontos</div>
               <div className="text-sm text-muted-foreground mt-1">
-                ≈ R$ {convertPointsToReal(userPoints)}
+                ≈ R$ {pointsToReal(userPoints)}
               </div>
 
               <div className="mt-4 border-t border-border pt-3">
@@ -80,7 +80,7 @@ const Withdraw = () => {
                   <span className="text-sm text-muted-foreground">Mínimo para saque</span>
                   <span className="text-sm font-semibold">{minWithdraw} pontos</span>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">R$ {convertPointsToReal(minWithdraw)}</div>
+                <div className="text-xs text-muted-foreground mt-1">R$ {pointsToReal(minWithdraw)}</div>
               </div>
             </Card>
           </div>
@@ -94,7 +94,7 @@ const Withdraw = () => {
               </div>
               <div className="text-3xl font-extrabold">{userPoints} pontos</div>
               <div className="text-sm text-muted-foreground mt-2">
-                ≈ R$ {convertPointsToReal(userPoints)}
+                ≈ R$ {pointsToReal(userPoints)}
               </div>
             </Card>
 
@@ -105,7 +105,7 @@ const Withdraw = () => {
               </div>
               <div className="text-3xl font-extrabold">{minWithdraw} pontos</div>
               <div className="text-sm text-muted-foreground mt-2">
-                R$ {convertPointsToReal(minWithdraw)}
+                R$ {pointsToReal(minWithdraw)}
               </div>
             </Card>
 
@@ -148,7 +148,7 @@ const Withdraw = () => {
                 {amount && parseInt(amount) >= minWithdraw && (
                   <p className="text-sm text-muted-foreground">
                     Você receberá: <span className="text-primary font-semibold">
-                      R$ {convertPointsToReal(parseInt(amount))}
+                      R$ {pointsToReal(parseInt(amount))}
                     </span>
                   </p>
                 )}
@@ -157,7 +157,7 @@ const Withdraw = () => {
               <div className="bg-muted/50 rounded-lg p-4">
                 <h3 className="font-semibold mb-2">Taxa de Conversão</h3>
                 <p className="text-sm text-muted-foreground">
-                  {WITHDRAW_POINTS_PER_REAL} pontos = R$ 1,00
+                  700 pontos = R$ 1,00
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Saque mínimo: 7000 pontos (R$ 10,00)

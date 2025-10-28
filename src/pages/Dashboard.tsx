@@ -3,7 +3,6 @@ import { MobileNav } from "@/components/MobileNav";
 import { MobileHeader } from "@/components/MobileHeader";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, Eye, Coins, Users } from "lucide-react";
-import { convertPointsToReal } from "@/utils/conversions";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +30,8 @@ const Dashboard = () => {
   if (!user) {
     return null;
   }
+
+  const pointsToReal = (points: number) => (points / 700).toFixed(2); // 700 pontos = R$ 1,00
 
   const stats = {
     points: userPoints?.points ?? 0,
@@ -64,7 +65,7 @@ const Dashboard = () => {
                 {stats.points.toLocaleString()}
               </div>
               <div className="text-xs text-muted-foreground">
-                ≈ R$ {convertPointsToReal(stats.points)}
+                ≈ R$ {pointsToReal(stats.points)}
               </div>
             </Card>
 
