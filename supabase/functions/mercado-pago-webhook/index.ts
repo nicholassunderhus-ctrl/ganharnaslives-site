@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
+import { createHmac } from 'https://deno.land/std@0.168.0/node/crypto.ts';
 
 // Interface para os dados de notificação do Mercado Pago
 interface MercadoPagoWebhookNotification {
@@ -18,13 +19,68 @@ interface MercadoPagoWebhookNotification {
   };
 }
 
+async function verifyMercadoPagoSignature(req: Request, rawBody: string): Promise<boolean> {
+  const signatureHeader = req.headers.get('x-signature');
+  const webhookSecret = Deno.env.get('MERCADO_PAGO_WEBHOOK_SECRET');
+
+  if (!signatureHeader || !webhookSecret) {
+    console.warn('Assinatura do webhook ou segredo não encontrados.');
+    return false;
+  }
+
+  // O formato do header é: ts=<timestamp>,v1=<hash>
+  const parts = signatureHeader.split(',').reduce((acc, part) => {
+    const [key, value] = part.split('=');
+    acc[key.trim()] = value.trim();
+    return acc;
+  }, {} as Record<string, string>);
+
+  const timestamp = parts['ts'];
+  const receivedHash = parts['v1'];
+
+  if (!timestamp || !receivedHash) {
+    console.warn('Formato de assinatura inválido.');
+    return false;
+  }
+
+  const manifest = `id:${(JSON.parse(rawBody) as MercadoPagoWebhookNotification).data.id};request-id:${req.headers.get('x-request-id')};ts:${timestamp};`;
+
+  const hmac = createHmac('sha256', webhookSecret);
+  hmac.update(manifest);
+  const calculatedHash = hmac.digest('hex');
+
+  return calculatedHash === receivedHash;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const notification: MercadoPagoWebhookNotification = await req.json();
+    // Precisamos do corpo bruto (raw body) para verificar a assinatura
+    const rawBody = await req.text();
+    const notification: MercadoPagoWebhookNotification = JSON.parse(rawBody);
+
+    // Adicionado: Identifica e ignora notificações de teste do Webhook.
+    // O Mercado Pago envia uma notificação falsa para validar o endpoint.
+    // Se tentarmos processá-la, a busca pelo paymentId falhará.
+    // Respondendo com 200 OK, informamos que o endpoint está pronto para receber notificações.
+    if (notification.action === 'payment.updated' && notification.data.id === '123456') {
+      return new Response(JSON.stringify({ message: 'Notificação de teste recebida com sucesso.' }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Valida a assinatura do webhook para garantir que a requisição é legítima
+    const isSignatureValid = await verifyMercadoPagoSignature(req, rawBody);
+    if (!isSignatureValid) {
+      return new Response(JSON.stringify({ error: 'Assinatura inválida.' }), {
+        status: 401, // Unauthorized
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     // Verifique se é uma notificação de pagamento e se o ID do pagamento está presente
     if (notification.type !== 'payment' || !notification.data || !notification.data.id) {
