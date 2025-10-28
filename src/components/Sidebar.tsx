@@ -5,6 +5,7 @@ import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { convertPointsToReal } from "@/utils/conversions";
 
 interface SidebarProps {
   points?: number;
@@ -52,7 +53,7 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
           </div>
           <div className="text-2xl font-bold text-primary">{points.toLocaleString()}</div>
           <div className="text-xs text-muted-foreground mt-1">
-            ≈ R$ {(points * 0.01).toFixed(2)}
+            ≈ R$ {convertPointsToReal(points)}
           </div>
         </div>
       </div>
