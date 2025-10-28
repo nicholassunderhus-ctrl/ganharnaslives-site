@@ -1,58 +1,31 @@
 -- Migration: 20251025074900_restrict_deposits_rles.sql
--- Objetivo: adicionar políticas RESTRITIVAS que negam UPDATE e DELETE na tabela public.deposits
--- para usuários regulares. Apenas administradores (is_admin = true) e o papel de serviço
--- do Supabase devem poder executar UPDATE e DELETE.
+-- Objetivo: Garantir que apenas o backend (usando a service_role_key) possa modificar depósitos.
+-- Usuários normais (anon, authenticated) não devem poder alterar ou deletar depósitos.
 
 -- Habilitar Row Level Security (idempotente)
 ALTER TABLE IF EXISTS public.deposits ENABLE ROW LEVEL SECURITY;
 
--- Remover policies permissivas existentes (se houver)
+-- Remover policies de UPDATE/DELETE antigas para evitar conflitos.
 DROP POLICY IF EXISTS "Allow update deposits" ON public.deposits;
 DROP POLICY IF EXISTS "Allow delete deposits" ON public.deposits;
 DROP POLICY IF EXISTS "public_deposits_update" ON public.deposits;
 DROP POLICY IF EXISTS "public_deposits_delete" ON public.deposits;
-
--- Política: permitir UPDATE apenas para administradores (is_admin = true)
--- e para o role service (caso o backend utilize a service_role JWT).
--- NOTE: auth.role() é suportado para verificar roles do JWT no Supabase.
-CREATE POLICY "Admins or service role can update deposits"
-ON public.deposits
-FOR UPDATE
-USING (
-  (
-    -- Usuários admin (flag is_admin na tabela auth.users)
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.uid() = id AND is_admin = true
-    )
-  )
-  OR auth.role() = 'service_role'
-);
-
--- Política: permitir DELETE apenas para administradores e service_role
-CREATE POLICY "Admins or service role can delete deposits"
-ON public.deposits
-FOR DELETE
-USING (
-  (
-    EXISTS (
-      SELECT 1 FROM auth.users
-      WHERE auth.uid() = id AND is_admin = true
-    )
-  )
-  OR auth.role() = 'service_role'
-);
+DROP POLICY IF EXISTS "Admins or service role can update deposits" ON public.deposits;
+DROP POLICY IF EXISTS "Admins or service role can delete deposits" ON public.deposits;
 
 -- Observações e segurança:
--- 1) Se não existir nenhuma outra policy que permita UPDATE/DELETE para outros
---    usuários, estas policies tornam o comportamento restritivo por design —
---    usuários regulares não poderão atualizar nem deletar registros em
---    public.deposits.
--- 2) Incluí também a checagem por auth.role() = 'service_role' para permitir que
---    chamadas autenticadas com a service role (usadas pelo backend/cron jobs)
---    continuem a funcionar. Se você não utiliza a service_role JWT para alterações,
---    pode remover essa verificação.
--- 3) Após aplicar a migration, teste com um usuário normal e com um admin para
---    validar o comportamento.
+-- 1. A segurança de Nível de Linha (RLS) no Supabase é restritiva por padrão.
+--    Se RLS está ATIVADO e não existe nenhuma política PERMISSIVA para uma ação (SELECT, INSERT, UPDATE, DELETE),
+--    essa ação é NEGADA para todos, exceto para a 'service_role_key'.
+--
+-- 2. Ao não criar nenhuma política para UPDATE ou DELETE, estamos efetivamente
+--    bloqueando essas operações para qualquer usuário que não esteja usando a
+--    'service_role_key'. Isso é exatamente o que queremos.
+--
+-- 3. A função de webhook 'mercado-pago-webhook' usa a 'service_role_key',
+--    então ela terá permissão para atualizar os depósitos.
+--
+-- 4. É importante garantir que exista uma política para INSERT e SELECT, se os usuários
+--    precisarem criar ou ver seus próprios depósitos.
 
 -- FIM

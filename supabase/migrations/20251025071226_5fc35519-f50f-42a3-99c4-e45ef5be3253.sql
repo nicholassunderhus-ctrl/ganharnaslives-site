@@ -17,10 +17,7 @@ ON public.user_points
 FOR SELECT 
 USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can update their own points" 
-ON public.user_points 
-FOR UPDATE 
-USING (auth.uid() = user_id);
+-- A política de UPDATE foi removida. Apenas o backend (usando a service_role_key) deve poder modificar os pontos.
 
 -- Create function to automatically create user_points when user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user_points()
