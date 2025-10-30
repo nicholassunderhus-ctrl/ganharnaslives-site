@@ -26,7 +26,7 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
   const navItems = [
     { to: "/dashboard", icon: Home, label: "Início" },
     { to: "/dashboard/watch", icon: Eye, label: "Assistir" },
-    { to: "/dashboard/my-streams", icon: Upload, label: "Streamer" },
+    { to: "/dashboard/create-stream", icon: Upload, label: "Streamer" },
     { to: "/dashboard/withdraw", icon: Wallet, label: "Sacar" },
     { to: "/dashboard/deposit", icon: PiggyBank, label: "Depositar" },
   ];

@@ -7,7 +7,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Watch from "./pages/Watch";
-import MyStreams from "./pages/MyStreams";
+import CreateStream from "./pages/CreateStream";
 import Withdraw from "./pages/Withdraw";
 import Deposit from "./pages/Deposit";
 import Admin from "./pages/Admin";
@@ -32,8 +32,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/watch" element={<Watch />} />
-          <Route path="/dashboard/my-streams" element={<MyStreams />} />
+          <Route path="/dashboard/watch" element={<Watch />} />          
+          <Route path="/dashboard/create-stream" element={<CreateStream />} />
           <Route path="/dashboard/withdraw" element={<Withdraw />} />
           <Route path="/dashboard/deposit" element={<Deposit />} />
           <Route 
