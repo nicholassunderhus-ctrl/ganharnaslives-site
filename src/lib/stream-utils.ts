@@ -49,7 +49,7 @@ export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): s
     }
 
     if (platform === Platform.Kick) {
-      // Ex: https://kick.com/CHANNEL
+      // Para Kick, sempre usa a imagem de background padrão da pasta /public
       return '/kick-bg.png';
     }
 
