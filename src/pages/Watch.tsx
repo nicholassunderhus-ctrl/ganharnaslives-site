@@ -12,6 +12,7 @@ import { PlatformIcon } from "@/components/PlatformIcon";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
+import { getPlatformThumbnail } from "@/lib/stream-utils";
 
 const Watch = () => {
   const { userPoints } = useUserPoints();
@@ -64,7 +65,7 @@ const Watch = () => {
           viewers: stream.current_viewers, // Mantido por compatibilidade
           currentViewers: stream.current_viewers,
           maxViewers: stream.max_viewers,
-          thumbnailUrl: `https://source.unsplash.com/random/800x450?gaming,live,stream`, // Placeholder genérico
+          thumbnailUrl: getPlatformThumbnail(stream.platform), // <-- CORREÇÃO AQUI
           streamUrl: stream.stream_url,
           pointsPerMinute: 1, // Placeholder, já que não estamos buscando esses dados
           durationMinutes: stream.duration_minutes,
