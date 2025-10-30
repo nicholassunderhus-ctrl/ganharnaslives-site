@@ -6,6 +6,7 @@ import { Stream } from "@/types";
 import { PlatformIcon } from "./PlatformIcon";
 import { Eye, Clock, Users } from "lucide-react";
 import { Input } from "./ui/input";
+import { StreamTimer } from "./StreamTimer";
 import { supabase } from "@/integrations/supabase/client";
 
 interface StreamCardProps {
@@ -80,7 +81,10 @@ export const StreamCard = ({ stream, onWatch, isAdmin = false }: StreamCardProps
             </span>
           </div>
           <div className="bg-black/70 rounded px-2 py-1 text-xs font-medium whitespace-nowrap">
-            {stream.durationMinutes} minutos
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              <StreamTimer createdAt={stream.createdAt} durationMinutes={stream.durationMinutes} />
+            </div>
           </div>
         </div>
       </div>
