@@ -7,6 +7,7 @@ import { PlatformIcon } from "./PlatformIcon";
 import { Eye, Clock, Coins } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
 import { getEmbedUrl } from "@/lib/stream-utils";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -17,6 +18,7 @@ interface StreamViewerProps {
 
 export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { earnPoints, loading } = useEarnPoints();
   const [timeWatched, setTimeWatched] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
@@ -65,6 +67,8 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
             if (result.success) {
               setEarnedPoints(prev => prev + result.pointsEarned!);
               setLastEarnTime(now);
+              // Invalida a query de pontos do usuário para forçar a atualização do saldo
+              queryClient.invalidateQueries({ queryKey: ['userPoints', user?.id] });
             } else {
               console.warn("Failed to earn points:", result.error);
             }
