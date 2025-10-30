@@ -2,7 +2,6 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { createHmac } from 'https://deno.land/std@0.168.0/node/crypto.ts';
-import { POINTS_PER_REAL_DEPOSIT } from '../_shared/constants.ts';
 
 // Interface para os dados de notificação do Mercado Pago
 interface MercadoPagoWebhookNotification {
@@ -137,8 +136,8 @@ serve(async (req) => {
     // 2. Se o pagamento foi aprovado E o depósito ainda está pendente, credita os pontos.
     if (paymentStatus === 'approved' && deposit.status === 'pending') {
       const { error: rpcError } = await supabaseAdmin.rpc('add_points', {
-        user_id_input: deposit.user_id, // user_id_input é o nome do parâmetro na sua função add_points
-        points_to_add: deposit.points_awarded, // points_to_add é o nome do parâmetro na sua função add_points
+        user_id_input: deposit.user_id,
+        points_to_add: deposit.points_awarded,
       });
 
       if (rpcError) {

@@ -6,12 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Platform } from "@/types";
 import { PlatformIcon } from "@/components/PlatformIcon";
 import { supabase } from "@/integrations/supabase/client";
-import { Eye, Users, RefreshCcw, Check, X } from "lucide-react";
+import { Eye, Users, RefreshCcw } from "lucide-react";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
 
 interface AdminStream {
   id: string;
@@ -24,25 +23,12 @@ interface AdminStream {
   streamUrl: string;
 }
 
-interface Withdrawal {
-  id: string;
-  created_at: string;
-  user_email: string; // Vamos buscar o email do usuário
-  amount_brl: number;
-  pix_key_type: string;
-  pix_key: string;
-  status: string;
-}
-
 const Admin = () => {
   const { userPoints } = useUserPoints();
   const [streams, setStreams] = useState<AdminStream[]>([]);
   const [users, setUsers] = useState<Array<{ id: string; email?: string | null; created_at: string }>>([]);
-  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingUsers, setLoadingUsers] = useState(true);
-  const [loadingWithdrawals, setLoadingWithdrawals] = useState(true);
-  const [processingWithdrawal, setProcessingWithdrawal] = useState<string | null>(null);
   const [viewersInput, setViewersInput] = useState<{ [key: string]: string }>({});
 
   const fetchStreams = async () => {
@@ -112,58 +98,9 @@ const Admin = () => {
     }
   };
 
-  const fetchWithdrawals = async () => {
-    setLoadingWithdrawals(true);
-    try {
-      // Usamos RPC para buscar saques e juntar com o email do usuário de forma segura
-      const { data, error } = await supabase.rpc('get_all_withdrawals_with_user_email');
-
-      if (error) throw error;
-      setWithdrawals(data as Withdrawal[]);
-    } catch (error: any) {
-      console.error('Erro ao buscar saques:', error);
-      toast.error("Erro ao buscar saques: " + error.message);
-    } finally {
-      setLoadingWithdrawals(false);
-    }
-  };
-
-  const handleWithdrawalAction = async (withdrawalId: string, action: 'approve' | 'reject') => {
-    if (!confirm(`Tem certeza que deseja ${action === 'approve' ? 'APROVAR' : 'REJEITAR'} este saque?`)) {
-      return;
-    }
-
-    setProcessingWithdrawal(withdrawalId);
-    try {
-      // Esta Edge Function fará a lógica de aprovação/rejeição
-      const { data, error } = await supabase.functions.invoke('handle-withdrawal', {
-        body: { withdrawalId, action },
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      toast.success(data.message || `Saque ${action === 'approve' ? 'aprovado' : 'rejeitado'} com sucesso!`);
-      // Atualiza a lista após a ação
-      await fetchWithdrawals();
-
-    } catch (error: any) {
-      toast.error(`Erro ao processar saque: ${error.message}`);
-      console.error("Erro no handleWithdrawalAction:", error);
-    } finally {
-      setProcessingWithdrawal(null);
-    }
-  };
-
   useEffect(() => {
     fetchStreams();
     fetchUsers();
-    fetchWithdrawals();
 
     // Subscrever para atualizações em tempo real
     const subscription = supabase
@@ -180,21 +117,8 @@ const Admin = () => {
         }
       )
       .subscribe();
-    
-    const withdrawalsSubscription = supabase
-      .channel('admin_withdrawals_changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'withdrawals' },
-        async () => {
-          await fetchWithdrawals();
-        }
-      )
-      .subscribe();
 
     return () => {
-      supabase.removeChannel(subscription);
-      supabase.removeChannel(withdrawalsSubscription);
       subscription.unsubscribe();
     };
   }, []);
@@ -229,10 +153,9 @@ const Admin = () => {
           </div>
 
           <Tabs defaultValue="streams" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="streams">Lives</TabsTrigger>
               <TabsTrigger value="users">Usuários</TabsTrigger>
-              <TabsTrigger value="withdrawals">Saques</TabsTrigger>
             </TabsList>
 
             <TabsContent value="streams">
@@ -368,76 +291,6 @@ const Admin = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
-            <TabsContent value="withdrawals">
-              <Card className="mt-6">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Solicitações de Saque</CardTitle>
-                    <Button variant="outline" size="sm" onClick={fetchWithdrawals} disabled={loadingWithdrawals}>
-                      <RefreshCcw className={`w-4 h-4 mr-2 ${loadingWithdrawals ? 'animate-spin' : ''}`} />
-                      Atualizar Saques
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {loadingWithdrawals ? (
-                    <div className="text-center py-20">
-                      <p className="text-muted-foreground">Carregando solicitações de saque...</p>
-                    </div>
-                  ) : withdrawals.length === 0 ? (
-                     <div className="text-center py-20">
-                      <p className="text-muted-foreground">Nenhuma solicitação de saque no momento.</p>
-                    </div>
-                  ) : (
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Data</TableHead>
-                            <TableHead>Usuário</TableHead>
-                            <TableHead>Valor (R$)</TableHead>
-                            <TableHead>Chave PIX</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Ações</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {withdrawals.map((w) => (
-                            <TableRow key={w.id}>
-                              <TableCell>{new Date(w.created_at).toLocaleString('pt-BR')}</TableCell>
-                              <TableCell>{w.user_email}</TableCell>
-                              <TableCell>R$ {Number(w.amount_brl).toFixed(2)}</TableCell>
-                              <TableCell className="font-mono text-xs">
-                                <span className="font-bold">{w.pix_key_type}:</span> {w.pix_key}
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant={w.status === 'pending' ? 'default' : w.status === 'completed' ? 'success' : 'destructive'}>
-                                  {w.status}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right">
-                                {w.status === 'pending' && (
-                                  <div className="flex gap-2 justify-end">
-                                    <Button size="sm" variant="success" onClick={() => handleWithdrawalAction(w.id, 'approve')} disabled={processingWithdrawal === w.id}>
-                                      <Check className="w-4 h-4 mr-1" /> {processingWithdrawal === w.id ? 'Aprovando...' : 'Aprovar'}
-                                    </Button>
-                                    <Button size="sm" variant="destructive" onClick={() => handleWithdrawalAction(w.id, 'reject')} disabled={processingWithdrawal === w.id}>
-                                      <X className="w-4 h-4 mr-1" /> Rejeitar
-                                    </Button>
-                                  </div>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
           </Tabs>
         </div>
       </main>
