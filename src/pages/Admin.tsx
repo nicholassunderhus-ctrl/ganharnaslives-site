@@ -59,7 +59,7 @@ const Admin = () => {
           duration_minutes,
           stream_url
         `)
-        .eq('status', 'active')
+        .eq('status', 'live')
         .eq('is_paid', true)
         .returns<{
           id: string;
