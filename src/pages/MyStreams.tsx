@@ -5,17 +5,24 @@ import { Button } from "@/components/ui/button";
 import { PlatformIcon } from "@/components/PlatformIcon";
 import { Platform } from "@/types";
 import { useUserPoints } from "@/hooks/useUserPoints";
+import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Eye, Link as LinkIcon, Users } from "lucide-react";
+import { Eye, Link as LinkIcon, Users, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const MyStreams = () => {
   const { userPoints } = useUserPoints();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
   const [liveLink, setLiveLink] = useState("");
   const [maxQuantity, setMaxQuantity] = useState("");
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const calculateCost = () => {
     const quantity = parseInt(maxQuantity) || 0;
@@ -73,6 +80,47 @@ const MyStreams = () => {
   const handleSelectService = (duration: number) => {
     setSelectedDuration(duration);
     console.log("Selected service:", duration, "minutes for", selectedPlatform);
+  };
+
+  const handleStartStream = async () => {
+    if (!user || !selectedPlatform || !liveLink || !maxQuantity || !selectedDuration) {
+      toast.error("Por favor, preencha todos os campos antes de começar.");
+      return;
+    }
+
+    setIsLoading(true);
+    toast.info("Iniciando sua stream...");
+
+    const cost = calculateCost();
+    const currentUserPoints = userPoints?.points ?? 0;
+
+    if (currentUserPoints < cost) {
+      toast.error("Você não tem pontos suficientes para iniciar esta stream.", {
+        description: `Custo: ${cost} pontos. Você tem: ${currentUserPoints} pontos.`,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.from("streams").insert({
+      user_id: user.id,
+      platform: selectedPlatform,
+      stream_url: liveLink,
+      max_viewers: parseInt(maxQuantity, 10),
+      duration_minutes: selectedDuration,
+      status: 'active', // ou 'pending_payment' se precisar de confirmação
+      is_paid: true, // Assumindo que o pagamento é com pontos
+      // TODO: Adicionar título e categoria se quiser coletar esses dados
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      toast.error("Erro ao iniciar a stream.", { description: error.message });
+    } else {
+      toast.success("Sua stream foi iniciada e já está visível para outros usuários!");
+      navigate("/dashboard/watch");
+    }
   };
 
   return (
@@ -207,6 +255,22 @@ const MyStreams = () => {
                                   </div>
                                 </CardContent>
                               </Card>
+                            </div>
+                          )}
+
+                          {/* Botão de Começar Live */}
+                          {liveLink.trim() !== "" && maxQuantity && selectedDuration && (
+                            <div className="pt-4">
+                              <Button
+                                variant="gradient"
+                                size="lg"
+                                className="w-full"
+                                onClick={handleStartStream}
+                                disabled={isLoading}
+                              >
+                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                Começar Live
+                              </Button>
                             </div>
                           )}
                         </div>
