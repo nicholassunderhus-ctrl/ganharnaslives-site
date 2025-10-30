@@ -35,14 +35,10 @@ const Watch = () => {
             id,
             user_id,
             platform,
-            title,
-            category,
             stream_url,
             max_viewers,
             current_viewers,
-            viewers_per_minute,
-            points_per_viewer,
-            duration_minutes,
+            duration_minutes
           `)
           .eq('status', 'live')
           .eq('is_paid', true)
@@ -50,13 +46,9 @@ const Watch = () => {
             id: string;
             user_id: string;
             platform: Platform;
-            title: string;
-            category: string;
             stream_url: string;
             max_viewers: number;
             current_viewers: number;
-            viewers_per_minute: number;
-            points_per_viewer: number;
             duration_minutes: number;
           }[]>(); // Adicionado o ponto e vírgula que faltava aqui
 
@@ -66,15 +58,15 @@ const Watch = () => {
         const formattedStreams: Stream[] = data.map(stream => ({
           id: stream.id,
           platform: stream.platform as Platform,
-          streamer: stream.user_id, // TODO: Buscar nome do usuário
-          title: stream.title,
-          category: stream.category,
+          streamer: `Streamer #${stream.user_id.substring(0, 8)}`, // Placeholder para o nome do streamer
+          title: `Live na plataforma ${stream.platform}`, // Placeholder para o título
+          category: "Ao Vivo", // Placeholder para a categoria
           viewers: stream.current_viewers, // Mantido por compatibilidade
           currentViewers: stream.current_viewers,
           maxViewers: stream.max_viewers,
-          thumbnailUrl: `https://source.unsplash.com/random/800x450?${stream.category.toLowerCase().replace(/\s+/g, '-')}`, // Placeholder
+          thumbnailUrl: `https://source.unsplash.com/random/800x450?gaming,live,stream`, // Placeholder genérico
           streamUrl: stream.stream_url,
-          pointsPerMinute: stream.points_per_viewer * stream.viewers_per_minute,
+          pointsPerMinute: 1, // Placeholder, já que não estamos buscando esses dados
           durationMinutes: stream.duration_minutes,
           isFull: stream.current_viewers >= stream.max_viewers
         }));
