@@ -4,53 +4,81 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Coins, Wallet, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useUserPoints } from "@/hooks/useUserPoints";
+import { WITHDRAW_POINTS_PER_REAL, MIN_WITHDRAW_POINTS } from "@/pages/conversions"; // Importar as constantes
+import { supabase } from "@/integrations/supabase/client";
 
 const Withdraw = () => {
   const [pixKey, setPixKey] = useState("");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  
   const { userPoints: userPointsData, loading: pointsLoading } = useUserPoints();
+  const [pixKeyType, setPixKeyType] = useState("cpf"); // Estado para o tipo de chave
   const userPoints = userPointsData?.points ?? 0;
-  const minWithdraw = 7000; // Mínimo de 7000 pontos = R$ 10,00
-  const pointsToReal = (points: number) => (points / 700).toFixed(2); // 700 pontos = R$ 1,00
+  // Removemos as constantes locais e usaremos as importadas
+  const pointsToReal = (points: number) => (points / WITHDRAW_POINTS_PER_REAL).toFixed(2);
   const pixLogo = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0yNTYgMEMxMTQuNiAwIDAgMTE0LjYgMCAyNTZDMCA0MjkuNCAxMTQuNiA1MTIgMjU2IDUxMkM0MjkuNCA1MTIgNTEyIDM5Ny40IDUxMiAyNTZDNTEyIDExNC42IDM5Ny40IDAgMjU2IDBaIiBmaWxsPSIjMzJCQ0FEIi8+CjxwYXRoIGQ9Ik0zNjYgMjIzTDI4OSAxNDZMMjU2IDExM0wyMjMgMTQ2TDE0NiAyMjNMMTEzIDI1NkwxNDYgMjg5TDIyMyAzNjZMMjU2IDM5OUwyODkgMzY2TDM2NiAyODlMMzk5IDI1NkwzNjYgMjIzWk0yNTYgMzI4TDI1NiAzMjhMMTg0IDI1NkwyNTYgMTg0TDMyOCAyNTZMMjU2IDMyOFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=";
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!pixKey) {
-      toast.error("Digite sua chave PIX");
+
+    if (!pixKey || !pixKeyType) {
+      toast.error("Preencha o tipo e a chave PIX");
       return;
     }
-    
-    const pointsToWithdraw = Number(amount.replace(/\D/g, ''));
-    
-    if (isNaN(pointsToWithdraw) || pointsToWithdraw < minWithdraw) {
-      toast.error(`O valor mínimo para saque é ${minWithdraw} pontos`);
+
+    const pointsToWithdraw = Number(amount);
+
+    if (isNaN(pointsToWithdraw) || pointsToWithdraw < MIN_WITHDRAW_POINTS) {
+      toast.error(`O valor mínimo para saque é ${MIN_WITHDRAW_POINTS} pontos`);
       return;
     }
-    
+
     if (pointsToWithdraw > userPoints) {
       toast.error("Você não tem pontos suficientes");
       return;
     }
 
     setIsLoading(true);
-    
-    // TODO: Integrate with backend
-    setTimeout(() => {
-      toast.success("Solicitação de saque enviada! Você receberá em até 24h.");
-      setPixKey("");
-      setAmount("");
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        throw new Error("Sessão inválida. Faça login novamente.");
+      }
+
+      const realAmount = parseFloat(pointsToReal(pointsToWithdraw));
+
+      // CORREÇÃO: Chamar a Edge Function 'withdrawal-request' em vez da RPC direta.
+      // Isso garante que a lógica de segurança do backend seja executada.
+      const { data, error } = await supabase.functions.invoke('withdrawal-request', {
+        body: {
+          amountPoints: pointsToWithdraw,
+          pixKeyType: pixKeyType,
+          pixKey: pixKey,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      toast.success(data.message || "Solicitação de saque enviada com sucesso!");
+      // O hook useUserPoints deve ser atualizado automaticamente via Realtime ou você pode chamar userPointsData.refetch()
+
+    } catch (error: any) {
+      toast.error(error.message || "Ocorreu um erro ao solicitar o saque.");
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   const recentWithdrawals = [];
+  const minWithdrawReal = pointsToReal(MIN_WITHDRAW_POINTS);
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,9 +106,9 @@ const Withdraw = () => {
               <div className="mt-4 border-t border-border pt-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Mínimo para saque</span>
-                  <span className="text-sm font-semibold">{minWithdraw} pontos</span>
+                  <span className="text-sm font-semibold">{MIN_WITHDRAW_POINTS} pontos</span>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">R$ {pointsToReal(minWithdraw)}</div>
+                <div className="text-xs text-muted-foreground mt-1">R$ {pointsToReal(MIN_WITHDRAW_POINTS)}</div>
               </div>
             </Card>
           </div>
@@ -102,10 +130,10 @@ const Withdraw = () => {
               <div className="flex items-center gap-3 mb-3">
                 <Wallet className="w-6 h-6 text-[hsl(var(--kick-green))]" />
                 <span className="text-sm text-muted-foreground">Mínimo</span>
-              </div>
-              <div className="text-3xl font-extrabold">{minWithdraw} pontos</div>
+              </div> 
+              <div className="text-3xl font-extrabold">{MIN_WITHDRAW_POINTS} pontos</div>
               <div className="text-sm text-muted-foreground mt-2">
-                R$ {pointsToReal(minWithdraw)}
+                R$ {pointsToReal(MIN_WITHDRAW_POINTS)}
               </div>
             </Card>
 
@@ -125,27 +153,39 @@ const Withdraw = () => {
 
             <form onSubmit={handleWithdraw} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="pixKey">Chave PIX</Label>
-                <Input
-                  id="pixKey"
-                  placeholder="CPF, telefone, email ou chave aleatória"
-                  value={pixKey}
-                  onChange={(e) => setPixKey(e.target.value)}
-                  required
-                />
+                <Label>Tipo de Chave PIX</Label>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="col-span-1">
+                    <Select value={pixKeyType} onValueChange={setPixKeyType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cpf">CPF</SelectItem>
+                        <SelectItem value="phone">Celular</SelectItem>
+                        <SelectItem value="email">E-mail</SelectItem>
+                        <SelectItem value="random">Aleatória</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="col-span-2">
+                    <Label htmlFor="pixKey" className="sr-only">Chave PIX</Label>
+                    <Input id="pixKey" placeholder="Sua chave PIX" value={pixKey} onChange={(e) => setPixKey(e.target.value)} required />
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="amount">Quantidade de Pontos</Label>
                 <Input
                   id="amount"
-                  inputMode="numeric"
-                  placeholder={`Mínimo ${minWithdraw} pontos`}
+                  type="number" // Alterado para type="number" para melhor UX
+                  placeholder={`Mínimo ${MIN_WITHDRAW_POINTS} pontos`}
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   required
                 />
-                {amount && parseInt(amount) >= minWithdraw && (
+                {amount && parseInt(amount) >= MIN_WITHDRAW_POINTS && (
                   <p className="text-sm text-muted-foreground">
                     Você receberá: <span className="text-primary font-semibold">
                       R$ {pointsToReal(parseInt(amount))}
@@ -160,7 +200,7 @@ const Withdraw = () => {
                   700 pontos = R$ 1,00
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Saque mínimo: 7000 pontos (R$ 10,00)
+                  Saque mínimo: {MIN_WITHDRAW_POINTS} pontos (R$ {minWithdrawReal})
                 </p>
               </div>
 
