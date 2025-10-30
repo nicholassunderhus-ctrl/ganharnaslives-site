@@ -51,12 +51,21 @@ export const StreamCard = ({ stream, onWatch, isAdmin = false }: StreamCardProps
 
   return (
     <Card className="overflow-hidden group hover:shadow-[var(--shadow-card)] transition-all hover:-translate-y-1">
-      <div className="relative aspect-video overflow-hidden cursor-pointer" onClick={() => onWatch(stream)}>
+      <div className="relative aspect-video overflow-hidden cursor-pointer bg-gray-900" onClick={() => onWatch(stream)}>
         <img
           src={stream.thumbnailUrl}
           alt={stream.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        {/* Se a plataforma for Kick, exibe o nome do canal sobre a imagem */}
+        {stream.platform === 'kick' && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60 p-4">
+            <span className="text-white text-2xl font-bold text-center break-words drop-shadow-lg">
+              {/* Extrai o nome do canal da URL */}
+              {stream.streamUrl.split('/').pop()}
+            </span>
+          </div>
+        )}
         <div className="absolute top-2 left-2">
           <Badge variant="destructive" className="bg-red-600">
             <div className="w-2 h-2 rounded-full bg-white mr-1 animate-pulse" />
