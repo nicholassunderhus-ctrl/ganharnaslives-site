@@ -37,25 +37,23 @@ export const getEmbedUrl = (url: string, platform: Platform): string => {
  * @param streamUrl O link da live.
  * @returns A URL da imagem de thumbnail.
  */
-export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): string => {
+export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): string => {  
   try {
     const url = new URL(streamUrl);
 
     if (platform === Platform.YouTube) {
       // Ex: https://www.youtube.com/watch?v=VIDEO_ID
       const videoId = url.searchParams.get('v');
-      if (videoId) {
-        // mqdefault é uma boa qualidade para thumbnails
-        return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
-      }
+      // Retorna a thumbnail do YouTube se o videoId for encontrado
+      if (videoId) return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
     }
 
     if (platform === Platform.Kick) {
       // Ex: https://kick.com/CHANNEL
-      const pathParts = url.pathname.substring(1).split('/'); // Remove a barra inicial e divide o caminho
-      const channel = pathParts[0]; // O nome do canal é sempre a primeira parte
+      const pathParts = url.pathname.substring(1).split('/');
+      const channel = pathParts[0];
 
-      // Verifica se o caminho é simples (apenas o nome do canal) e não é um VOD
+      // A URL de um canal ao vivo geralmente não tem subdiretórios como /video
       if (channel && pathParts.length === 1 && channel !== 'video') {
         return `https://thumbnails.kick.com/stream/${channel.toLowerCase()}/thumbnail.jpeg`;
       }
@@ -65,6 +63,16 @@ export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): s
     console.error("URL de stream inválida para gerar thumbnail:", streamUrl, error);
   }
 
-  // Retorna uma imagem de fallback se não conseguir gerar a thumbnail
-  return "https://source.unsplash.com/random/800x450?gaming,live,stream";
+  // Fallback: Retorna a imagem de fundo da plataforma se a thumbnail dinâmica falhar.
+  // Os arquivos devem estar na pasta /public
+  switch (platform) {
+    case Platform.Kick:
+      return '/kick-bg.png';
+    case Platform.YouTube:
+      return '/youtube-bg.png';
+    case Platform.Twitch:
+      return '/twitch-bg.png';
+    default:
+      return '/youtube-bg.png'; // Fallback final
+  }
 };
