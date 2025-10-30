@@ -12,7 +12,7 @@ import { PlatformIcon } from "@/components/PlatformIcon";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { getPlatformThumbnail } from "@/lib/stream-utils";
+import { getDynamicThumbnailUrl } from "@/lib/stream-utils";
 
 const Watch = () => {
   const { userPoints } = useUserPoints();
@@ -65,7 +65,7 @@ const Watch = () => {
           viewers: stream.current_viewers, // Mantido por compatibilidade
           currentViewers: stream.current_viewers,
           maxViewers: stream.max_viewers,
-          thumbnailUrl: getPlatformThumbnail(stream.platform), // <-- CORREÇÃO AQUI
+          thumbnailUrl: getDynamicThumbnailUrl(stream.platform, stream.stream_url),
           streamUrl: stream.stream_url,
           pointsPerMinute: 1, // Placeholder, já que não estamos buscando esses dados
           durationMinutes: stream.duration_minutes,
