@@ -52,8 +52,12 @@ export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): s
 
     if (platform === Platform.Kick) {
       // Ex: https://kick.com/CHANNEL
-      const channel = url.pathname.substring(1).split('/')[0];
-      if (channel) {
+      const pathParts = url.pathname.substring(1).split('/');
+      // A URL de um canal ao vivo não tem subdiretórios como /video
+      const isLiveChannel = pathParts.length === 1 && pathParts[0] !== 'video';
+      const channel = pathParts[0];
+
+      if (channel && isLiveChannel) {
         return `https://thumbnails.kick.com/stream/${channel.toLowerCase()}/thumbnail.jpeg`;
       }
     }
