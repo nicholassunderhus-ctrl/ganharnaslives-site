@@ -55,7 +55,8 @@ export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): s
 
       // A URL de um canal ao vivo geralmente não tem subdiretórios como /video
       if (channel && pathParts.length === 1 && channel !== 'video') {
-        return `https://thumbnails.kick.com/stream/${channel.toLowerCase()}/thumbnail.jpeg`;
+        // Retorna a URL do avatar do canal em vez da thumbnail da stream
+        return `https://files.kick.com/images/user/${channel.toLowerCase()}/profile_image`;
       }
     }
 
