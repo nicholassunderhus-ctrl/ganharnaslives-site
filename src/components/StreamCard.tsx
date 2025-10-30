@@ -62,7 +62,7 @@ export const StreamCard = ({ stream, onWatch, isAdmin = false }: StreamCardProps
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 p-4">
             <span className="text-white text-2xl font-bold text-center break-words drop-shadow-lg">
               {/* Extrai o nome do canal da URL */}
-              {stream.streamUrl.split('/').pop()}
+              {stream.streamUrl.split('/').filter(Boolean).pop()}
             </span>
           </div>
         )}
