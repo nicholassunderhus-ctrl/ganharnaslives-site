@@ -1,3 +1,12 @@
+-- Function to update the updated_at timestamp on any table
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Create streams table to track active streams
 CREATE TABLE public.streams (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -9,7 +18,7 @@ CREATE TABLE public.streams (
   max_viewers INTEGER NOT NULL,
   viewers_per_minute INTEGER NOT NULL DEFAULT 1,
   points_per_viewer INTEGER NOT NULL DEFAULT 1,
-  status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'completed', 'cancelled')),
+  status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'live', 'finished', 'cancelled')),
   is_paid BOOLEAN NOT NULL DEFAULT false,
   payment_confirmed_at TIMESTAMP WITH TIME ZONE,
   started_at TIMESTAMP WITH TIME ZONE,
@@ -26,7 +35,7 @@ ALTER TABLE public.streams ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view active streams"
 ON public.streams
 FOR SELECT
-USING (status = 'active' AND is_paid = true);
+USING (status = 'live' AND is_paid = true);
 
 CREATE POLICY "Users can view their own streams"
 ON public.streams

@@ -1,15 +1,5 @@
 -- Migration to create the deposits table
 
--- Function to update updated_at timestamp.
--- This function will be re-used by other tables.
-CREATE OR REPLACE FUNCTION trigger_set_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE TABLE public.deposits (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES auth.users(id),
@@ -25,7 +15,7 @@ CREATE TABLE public.deposits (
 CREATE TRIGGER set_deposits_timestamp
 BEFORE UPDATE ON public.deposits
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_timestamp();
+EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Enable RLS for the table
 ALTER TABLE public.deposits ENABLE ROW LEVEL SECURITY;
@@ -42,3 +32,12 @@ ON public.deposits FOR INSERT
 WITH CHECK (auth.uid() = user_id);
 
 -- Note: Update and Delete policies are handled restrictively in a separate migration file.
+
+-- Restrict UPDATE and DELETE to service_role only by not creating permissive policies.
+-- This removes any old, potentially conflicting policies.
+DROP POLICY IF EXISTS "Allow update deposits" ON public.deposits;
+DROP POLICY IF EXISTS "Allow delete deposits" ON public.deposits;
+DROP POLICY IF EXISTS "public_deposits_update" ON public.deposits;
+DROP POLICY IF EXISTS "public_deposits_delete" ON public.deposits;
+DROP POLICY IF EXISTS "Admins or service role can update deposits" ON public.deposits;
+DROP POLICY IF EXISTS "Admins or service role can delete deposits" ON public.deposits;
