@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { MobileNav } from "@/components/MobileNav";
 import { MobileHeader } from "@/components/MobileHeader";
+import { StreamViewer } from "@/components/StreamViewer";
 import { StreamCard } from "@/components/StreamCard";
 import { Stream, Platform } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ const Watch = () => {
   const { isAdmin } = useAdmin();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
 
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,8 +120,11 @@ const Watch = () => {
   });
 
   const handleWatch = (stream: Stream) => {
-    // TODO: Implement watch functionality
-    window.open(stream.streamUrl, "_blank");
+    setSelectedStream(stream);
+  };
+
+  const handleCloseViewer = () => {
+    setSelectedStream(null);
   };
 
   return (
@@ -206,6 +211,10 @@ const Watch = () => {
           ) : null}
         </div>
       </main>
+
+      {selectedStream && (
+        <StreamViewer stream={selectedStream} onClose={handleCloseViewer} />
+      )}
     </div>
   );
 };
