@@ -40,9 +40,9 @@ const Watch = () => {
             current_viewers,
             viewers_per_minute,
             points_per_viewer,
-            duration_minutes
+            duration_minutes,
           `)
-          .eq('status', 'active')
+          .eq('status', 'live') -- CORREÇÃO: Buscar lives com status 'live'
           .eq('is_paid', true)
           .returns<{
             id: string;
@@ -56,7 +56,7 @@ const Watch = () => {
             viewers_per_minute: number;
             points_per_viewer: number;
             duration_minutes: number;
-          }[]>();
+          }[]>(); // Adicionado o ponto e vírgula que faltava aqui
 
         if (error) throw error;
 
