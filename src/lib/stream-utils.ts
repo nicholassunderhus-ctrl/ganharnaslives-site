@@ -52,12 +52,11 @@ export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): s
 
     if (platform === Platform.Kick) {
       // Ex: https://kick.com/CHANNEL
-      const pathParts = url.pathname.substring(1).split('/');
-      // A URL de um canal ao vivo não tem subdiretórios como /video
-      const isLiveChannel = pathParts.length === 1 && pathParts[0] !== 'video';
-      const channel = pathParts[0];
+      const pathParts = url.pathname.substring(1).split('/'); // Remove a barra inicial e divide o caminho
+      const channel = pathParts[0]; // O nome do canal é sempre a primeira parte
 
-      if (channel && isLiveChannel) {
+      // Verifica se o caminho é simples (apenas o nome do canal) e não é um VOD
+      if (channel && pathParts.length === 1 && channel !== 'video') {
         return `https://thumbnails.kick.com/stream/${channel.toLowerCase()}/thumbnail.jpeg`;
       }
     }
