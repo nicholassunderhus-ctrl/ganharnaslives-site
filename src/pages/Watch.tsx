@@ -42,7 +42,7 @@ const Watch = () => {
             points_per_viewer,
             duration_minutes,
           `)
-          .eq('status', 'live') -- CORREÇÃO: Buscar lives com status 'live'
+          .eq('status', 'live')
           .eq('is_paid', true)
           .returns<{
             id: string;

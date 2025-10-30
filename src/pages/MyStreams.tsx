@@ -102,21 +102,21 @@ const MyStreams = () => {
       return;
     }
 
-    const { error } = await supabase.from("streams").insert({
-      user_id: user.id,
-      platform: selectedPlatform,
-      stream_url: liveLink,
-      max_viewers: parseInt(maxQuantity, 10),
-      duration_minutes: selectedDuration,
-      status: 'live', // Define a stream como ativa para aparecer na página Assistir
-      is_paid: true, // Assumindo que o pagamento é com pontos
-      // TODO: Adicionar título e categoria se quiser coletar esses dados
+    // Chama a função RPC no Supabase para fazer a transação
+    const { data, error } = await supabase.rpc('create_stream_with_points', {
+      platform_text: selectedPlatform,
+      stream_url_text: liveLink,
+      max_viewers_int: parseInt(maxQuantity, 10),
+      duration_minutes_int: selectedDuration,
     });
 
     setIsLoading(false);
 
-    if (error) {
-      toast.error("Erro ao iniciar a stream.", { description: error.message });
+    if (error || !data.success) {
+      const errorMessage = error?.message || data?.message || "Ocorreu um erro desconhecido.";
+      toast.error("Erro ao iniciar a stream.", {
+        description: errorMessage,
+      });
     } else {
       toast.success("Sua stream foi iniciada e já está visível para outros usuários!");
       navigate("/dashboard/watch");
