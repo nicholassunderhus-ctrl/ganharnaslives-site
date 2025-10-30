@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
+import { POINTS_PER_REAL_DEPOSIT } from '../_shared/constants.ts';
 // Interface para os dados recebidos do frontend
 interface PayerData {
   monetaryAmount: number;
@@ -62,9 +63,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-    // Define a taxa de conversão (ex: 600 pontos por R$1)
-    const pointsPerReal = 600;
-    const pointsAwarded = Math.floor(monetaryAmount * pointsPerReal);
+    
+    const pointsAwarded = Math.floor(monetaryAmount * POINTS_PER_REAL_DEPOSIT);
     // 5. Insere o registro do depósito pendente na tabela 'deposits'
     const { data: depositData, error: depositError } = await supabaseAdmin
       .from('deposits')
