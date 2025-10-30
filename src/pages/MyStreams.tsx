@@ -108,7 +108,7 @@ const MyStreams = () => {
       stream_url: liveLink,
       max_viewers: parseInt(maxQuantity, 10),
       duration_minutes: selectedDuration,
-      status: 'active', // ou 'pending_payment' se precisar de confirmação
+      status: 'live', // Define a stream como ativa para aparecer na página Assistir
       is_paid: true, // Assumindo que o pagamento é com pontos
       // TODO: Adicionar título e categoria se quiser coletar esses dados
     });
