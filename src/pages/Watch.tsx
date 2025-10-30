@@ -104,13 +104,23 @@ const Watch = () => {
     };
   }, []);
 
-  const filteredStreams = streams.filter(stream => {
-    const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
-    const matchesSearch = stream.streamer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         stream.category.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesPlatform && matchesSearch;
-  });
+  const filteredStreams = streams
+    .filter(stream => {
+      const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
+      const matchesSearch = stream.streamer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           stream.category.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesPlatform && matchesSearch;
+    })
+    .sort((a, b) => {
+      // Se a live 'a' está lotada e a 'b' não, 'b' vem primeiro.
+      if (a.isFull && !b.isFull) return 1;
+      // Se a live 'b' está lotada e a 'a' não, 'a' vem primeiro.
+      if (!a.isFull && b.isFull) return -1;
+      // Se ambas estão no mesmo estado (lotadas ou não), ordena pela maior quantidade
+      // de espectadores (ordem decrescente).
+      return b.currentViewers - a.currentViewers;
+    });
 
   const handleWatch = (stream: Stream) => {
     setSelectedStream(stream);
