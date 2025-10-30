@@ -7,6 +7,7 @@ import { PlatformIcon } from "./PlatformIcon";
 import { Eye, Clock, Coins } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
+import { getEmbedUrl } from "@/lib/stream-utils";
 import { supabase } from "@/integrations/supabase/client";
 
 interface StreamViewerProps {
@@ -21,6 +22,9 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [lastEarnTime, setLastEarnTime] = useState<number>(0);
+
+  // Converte a URL da stream para a URL de incorporação correta
+  const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -83,7 +87,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
 
           <div className="aspect-video bg-black rounded-lg mb-4 flex items-center justify-center">
             <iframe
-              src={stream.streamUrl}
+              src={embedUrl}
               className="w-full h-full rounded-lg"
               allowFullScreen
             />
