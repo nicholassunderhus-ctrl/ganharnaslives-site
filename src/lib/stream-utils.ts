@@ -50,14 +50,15 @@ export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): s
 
     if (platform === Platform.Kick) {
       // Ex: https://kick.com/CHANNEL
-      // Limpa o caminho, removendo barras no início/fim e dividindo
       const pathParts = url.pathname.trim().replace(/^\/|\/$/g, '').split('/');
       const channel = pathParts[0];
 
-      // Garante que temos um nome de canal e que não é uma página de VOD
+      // Garante que temos um nome de canal válido e que não é uma página de VOD
       if (channel && pathParts.length === 1 && channel !== 'video') {
-        // Retorna a URL do avatar do canal em vez da thumbnail da stream
-        return `https://files.kick.com/images/user/${channel.toLowerCase()}/profile_image`;
+        // Tenta primeiro o avatar do canal. A API da Kick redireciona se não encontrar,
+        // mas vamos ter um fallback local para garantir.
+        // A URL do avatar é mais confiável que a da thumbnail da stream.
+        return `https://files.kick.com/images/user/${channel.toLowerCase()}/profile_image.png`;
       }
     }
 
