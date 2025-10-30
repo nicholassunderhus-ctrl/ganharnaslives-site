@@ -26,6 +26,31 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   // Converte a URL da stream para a URL de incorporação correta
   const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
 
+  // Efeito para registrar que o usuário está assistindo
+  useEffect(() => {
+    if (!user) return;
+
+    const joinStream = async () => {
+      await supabase
+        .from('stream_viewers')
+        .upsert({ stream_id: stream.id, user_id: user.id });
+    };
+
+    const leaveStream = async () => {
+      await supabase
+        .from('stream_viewers')
+        .delete()
+        .match({ stream_id: stream.id, user_id: user.id });
+    };
+
+    joinStream();
+
+    // Quando o componente for desmontado (usuário fechar), remove o registro
+    return () => {
+      leaveStream();
+    };
+  }, [stream.id, user]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
