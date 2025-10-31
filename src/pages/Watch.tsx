@@ -40,7 +40,8 @@ const Watch = () => {
             max_viewers,
             current_viewers,
             duration_minutes,
-            created_at
+            created_at,
+            points_per_minute
           `)
           .eq('status', 'live')
           .eq('is_paid', true)
@@ -53,6 +54,7 @@ const Watch = () => {
             current_viewers: number;
             duration_minutes: number;
             created_at: string;
+            points_per_minute: number;
           }[]>(); // Adicionado o ponto e vírgula que faltava aqui
 
         if (error) throw error;
@@ -69,7 +71,7 @@ const Watch = () => {
           maxViewers: stream.max_viewers,
           thumbnailUrl: getDynamicThumbnailUrl(stream.platform, stream.stream_url),
           streamUrl: stream.stream_url,
-          pointsPerMinute: 1, // Placeholder, já que não estamos buscando esses dados
+          pointsPerMinute: stream.points_per_minute,
           durationMinutes: stream.duration_minutes,
           isFull: stream.current_viewers >= stream.max_viewers,
           // Opcional: pode ser útil para mostrar o tempo restante no futuro

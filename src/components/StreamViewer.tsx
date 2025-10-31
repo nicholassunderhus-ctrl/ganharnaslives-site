@@ -63,7 +63,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
         // Earn points every minute (60 seconds)
         const now = Date.now();
         if (now - lastEarnTime >= 60000) { // 60 seconds
-          earnPoints(1).then(result => {
+          earnPoints(stream.pointsPerMinute).then(result => {
             if (result.success) {
               setEarnedPoints(prev => prev + result.pointsEarned!);
               setLastEarnTime(now);
@@ -80,7 +80,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isWatching, lastEarnTime, earnPoints]);
+  }, [isWatching, lastEarnTime, earnPoints, queryClient, user?.id, stream.pointsPerMinute]);
 
   const handleStartWatching = () => {
     setIsWatching(true);
