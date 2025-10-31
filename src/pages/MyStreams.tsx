@@ -102,20 +102,38 @@ const MyStreams = () => {
       return;
     }
 
-    // Chama a função RPC no Supabase para fazer a transação
-    const { data, error } = await supabase.rpc('create_stream_with_points', {
-      platform_text: selectedPlatform,
-      stream_url_text: liveLink,
-      max_viewers_int: parseInt(maxQuantity, 10),
-      duration_minutes_int: selectedDuration,
+    // 1. Debitar os pontos do usuário
+    const { error: pointsError } = await supabase.rpc('decrement_points', {
+      user_id_to_update: user.id,
+      points_to_subtract: cost,
+    });
+
+    if (pointsError) {
+      setIsLoading(false);
+      toast.error("Erro ao debitar pontos.", {
+        description: pointsError.message.includes("violates check constraint") 
+          ? "Você não tem pontos suficientes." 
+          : pointsError.message,
+      });
+      return;
+    }
+
+    // 2. Inserir a nova stream
+    const { error: streamError } = await supabase.from("streams").insert({
+      user_id: user.id,
+      platform: selectedPlatform,
+      stream_url: liveLink,
+      max_viewers: parseInt(maxQuantity, 10),
+      duration_minutes: selectedDuration,
+      status: 'live',
+      is_paid: true, // Garante que a stream apareça na página "Assistir"
     });
 
     setIsLoading(false);
 
-    if (error || !data.success) {
-      const errorMessage = error?.message || data?.message || "Ocorreu um erro desconhecido.";
+    if (streamError) {
       toast.error("Erro ao iniciar a stream.", {
-        description: errorMessage,
+        description: streamError.message,
       });
     } else {
       toast.success("Sua stream foi iniciada e já está visível para outros usuários!");
