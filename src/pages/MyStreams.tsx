@@ -127,6 +127,7 @@ const MyStreams = () => {
       duration_minutes: selectedDuration,
       status: 'live',
       is_paid: true, // Garante que a stream apareça na página "Assistir"
+      points_per_minute: 1, // Define 1 ponto por minuto como padrão
     });
 
     setIsLoading(false);
