@@ -36,6 +36,8 @@ const Watch = () => {
             id,
             user_id,
             platform,
+            title,
+            category,
             stream_url,
             max_viewers,
             current_viewers,
@@ -49,6 +51,8 @@ const Watch = () => {
             id: string;
             user_id: string;
             platform: Platform;
+            title: string | null;
+            category: string | null;
             stream_url: string;
             max_viewers: number;
             current_viewers: number;
@@ -63,9 +67,9 @@ const Watch = () => {
         const formattedStreams: Stream[] = data.map(stream => ({
           id: stream.id,
           platform: stream.platform as Platform,
-          streamer: `Streamer #${stream.user_id.substring(0, 8)}`, // Placeholder para o nome do streamer
-          title: `Live na plataforma ${stream.platform}`, // Placeholder para o título
-          category: "Ao Vivo", // Placeholder para a categoria
+          streamer: `Streamer #${stream.user_id.substring(0, 8)}`, // TODO: Buscar nome do usuário
+          title: stream.title || `Live em ${stream.platform}`, // Usa o título real ou um fallback
+          category: stream.category || "Ao Vivo", // Usa a categoria real ou um fallback
           viewers: stream.current_viewers, // Mantido por compatibilidade
           currentViewers: stream.current_viewers,
           maxViewers: stream.max_viewers,
