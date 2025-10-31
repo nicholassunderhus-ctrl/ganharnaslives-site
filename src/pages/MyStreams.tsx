@@ -104,8 +104,8 @@ const MyStreams = () => {
 
     // 1. Debitar os pontos do usuário
     const { error: pointsError } = await supabase.rpc('decrement_points', {
-      user_id_to_update: user.id,
       points_to_subtract: cost,
+      user_id_to_update: user.id,
     });
 
     if (pointsError) {
