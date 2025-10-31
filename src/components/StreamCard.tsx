@@ -17,10 +17,17 @@ interface StreamCardProps {
 
 export const StreamCard = ({ stream, onWatch, isAdmin = false }: StreamCardProps) => {
   const [viewersInput, setViewersInput] = useState(stream.currentViewers.toString());
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     setViewersInput(stream.currentViewers.toString());
   }, [stream.currentViewers]);
+
+  const handleTimerEnd = () => {
+    setIsVisible(false);
+  };
+
+  if (!isVisible) return null;
 
   const getPlatformColor = () => {
     switch (stream.platform) {
@@ -83,7 +90,7 @@ export const StreamCard = ({ stream, onWatch, isAdmin = false }: StreamCardProps
           <div className="bg-black/70 rounded px-2 py-1 text-xs font-medium whitespace-nowrap">
             <div className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              <StreamTimer createdAt={stream.createdAt} durationMinutes={stream.durationMinutes} />
+              <StreamTimer createdAt={stream.createdAt} durationMinutes={stream.durationMinutes} onTimerEnd={handleTimerEnd} />
             </div>
           </div>
         </div>
