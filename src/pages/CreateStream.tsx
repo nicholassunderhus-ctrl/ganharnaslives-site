@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"; 
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
 // Definição do tipo para os dados do formulário
 interface StreamFormData {
-  service: 'kick' | 'twitch' | 'youtube';
+  platform: 'kick' | 'twitch' | 'youtube';
   stream_url: string;
   max_viewers: number;
 }
@@ -29,7 +29,7 @@ export default function CreateStream() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !formData.service || !formData.stream_url || !formData.max_viewers) {
+    if (!user || !formData.platform || !formData.stream_url || !formData.max_viewers) {
       toast.error("Por favor, preencha todos os campos.");
       return;
     }
@@ -39,10 +39,11 @@ export default function CreateStream() {
 
     const { error } = await supabase.from("streams").insert({
       user_id: user.id,
-      service: formData.service,
+      platform: formData.platform,
       stream_url: formData.stream_url,
       max_viewers: formData.max_viewers,
       status: 'live', // Define a stream como ativa
+      is_paid: true, // Marca a stream como paga para aparecer no "Assistir"
     });
 
     setIsLoading(false);
@@ -75,7 +76,7 @@ export default function CreateStream() {
             <div className="space-y-2">
               <Label htmlFor="service">Plataforma</Label>
               <Select
-                onValueChange={(value: StreamFormData['service']) => handleInputChange({ service: value })}
+                onValueChange={(value: StreamFormData['platform']) => handleInputChange({ platform: value })}
                 required
               >
                 <SelectTrigger id="service">
