@@ -67,9 +67,9 @@ const Watch = () => {
         const formattedStreams: Stream[] = data.map(stream => ({
           id: stream.id,
           platform: stream.platform as Platform,
-          streamer: `Streamer #${stream.user_id.substring(0, 8)}`, // TODO: Buscar nome do usuário
-          title: stream.title || `Live em ${stream.platform}`, // Usa o título real ou um fallback
-          category: stream.category || "Ao Vivo", // Usa a categoria real ou um fallback
+          streamer: `Streamer #${stream.user_id.substring(0, 8)}`, // Placeholder
+          title: `Live em ${stream.platform}`, // Placeholder para o título
+          category: "Ao Vivo", // Placeholder para a categoria
           viewers: stream.current_viewers, // Mantido por compatibilidade
           currentViewers: stream.current_viewers,
           maxViewers: stream.max_viewers,
@@ -117,9 +117,9 @@ const Watch = () => {
   const filteredStreams = streams
     .filter(stream => {
       const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
-      const matchesSearch = stream.streamer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           stream.category.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = (stream.streamer?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+                           (stream.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+                           (stream.category?.toLowerCase() || '').includes(searchQuery.toLowerCase());
       return matchesPlatform && matchesSearch;
     })
     .sort((a, b) => {

@@ -20,9 +20,7 @@ const MyStreams = () => {
   const navigate = useNavigate();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
   const [liveLink, setLiveLink] = useState("");
-  const [maxQuantity, setMaxQuantity] = useState("");
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
+  const [maxQuantity, setMaxQuantity] = useState("");  
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -85,7 +83,7 @@ const MyStreams = () => {
   };
 
   const handleStartStream = async () => {
-    if (!user || !selectedPlatform || !liveLink || !maxQuantity || !selectedDuration || !title || !category) {
+    if (!user || !selectedPlatform || !liveLink || !maxQuantity || !selectedDuration) {
       toast.error("Por favor, preencha todos os campos antes de começar.");
       return;
     }
@@ -126,8 +124,6 @@ const MyStreams = () => {
       platform: selectedPlatform,
       stream_url: liveLink,
       max_viewers: parseInt(maxQuantity, 10),
-      title: title,
-      category: category,
       duration_minutes: selectedDuration,
       status: 'live',
       is_paid: true, // Garante que a stream apareça na página "Assistir"
@@ -215,31 +211,7 @@ const MyStreams = () => {
 
                       {/* Link e Quantidade dentro do card quando um serviço é selecionado */}
                       {selectedDuration && (
-                        <div className="space-y-4 pt-4 border-t">
-                          <div className="space-y-3">
-                            <Label htmlFor="title" className="text-sm font-medium">Título da Live:</Label>
-                            <Input
-                              id="title"
-                              type="text"
-                              placeholder="Ex: Jogando com inscritos!"
-                              value={title}
-                              onChange={(e) => setTitle(e.target.value)}
-                              className="w-full focus-visible:ring-primary"
-                            />
-                          </div>
-
-                          <div className="space-y-3">
-                            <Label htmlFor="category" className="text-sm font-medium">Categoria:</Label>
-                            <Input
-                              id="category"
-                              type="text"
-                              placeholder="Ex: Just Chatting, League of Legends"
-                              value={category}
-                              onChange={(e) => setCategory(e.target.value)}
-                              className="w-full focus-visible:ring-primary"
-                            />
-                          </div>
-
+                        <div className="space-y-4 pt-4 border-t">                          
                           <div className="space-y-3">
                             <div className="flex items-center gap-2">
                               <LinkIcon className="w-4 h-4 text-primary" />
