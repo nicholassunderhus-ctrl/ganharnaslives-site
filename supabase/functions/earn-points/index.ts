@@ -60,9 +60,9 @@ serve(async (req) => {
 
     const pointsToAdd = stream.points_per_minute;
 
-    // 5. Atualiza os pontos do usuário de forma segura usando a função RPC `increment_points`
-    const { error: rpcError } = await supabaseAdmin.rpc('increment_points', {
-      user_id_to_update: user.id,
+    // 5. Atualiza os pontos do usuário de forma segura usando a função RPC `add_points`
+    const { error: rpcError } = await supabaseAdmin.rpc('add_points', {
+      user_id_input: user.id,
       points_to_add: pointsToAdd,
     });
 
