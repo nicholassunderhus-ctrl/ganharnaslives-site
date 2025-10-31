@@ -1,0 +1,2 @@
+ALTER TABLE public.streams
+ADD COLUMN IF NOT EXISTS points_per_minute INTEGER NOT NULL DEFAULT 1;
