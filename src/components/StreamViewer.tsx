@@ -54,31 +54,34 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   }, [stream.id, user]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let timeInterval: NodeJS.Timeout | undefined;
+    let pointsInterval: NodeJS.Timeout | undefined;
 
     if (isWatching) {
-      interval = setInterval(() => {
+      // Intervalo para atualizar o tempo assistido na tela (a cada segundo)
+      timeInterval = setInterval(() => {
         setTimeWatched(prev => prev + 1);
-
-        // Earn points every minute (60 seconds)
-        const now = Date.now();
-        if (now - lastEarnTime >= 60000) { // 60 segundos
-          earnPoints(stream.id).then(result => {
-            if (result && result.success) {
-              setEarnedPoints(prev => prev + result.pointsEarned!);
-              setLastEarnTime(now);
-              // Invalida a query de pontos do usuário para forçar a atualização do saldo
-              queryClient.invalidateQueries({ queryKey: ['userPoints', user?.id] });
-            } else {
-              console.warn("Falha ao ganhar pontos:", result?.error);
-            }
-          });
-        }
       }, 1000);
+
+      // Intervalo para ganhar pontos (a cada minuto)
+      pointsInterval = setInterval(() => {
+        earnPoints(stream.id).then(result => {
+          if (result && result.success) {
+            setEarnedPoints(prev => prev + result.pointsEarned!);
+            // Invalida a query de pontos do usuário para forçar a atualização do saldo na UI
+            queryClient.invalidateQueries({ queryKey: ['userPoints', user?.id] });
+          } else {
+            console.warn("Falha ao ganhar pontos:", result?.error);
+          }
+        });
+      }, 60000); // 60000ms = 1 minuto
     }
 
-    return () => clearInterval(interval);
-  }, [isWatching, lastEarnTime, earnPoints, queryClient, user?.id, stream.id]);
+    return () => {
+      if (timeInterval) clearInterval(timeInterval);
+      if (pointsInterval) clearInterval(pointsInterval);
+    };
+  }, [isWatching, earnPoints, queryClient, user?.id, stream.id]);
 
   const handleStartWatching = () => {
     setIsWatching(true);
