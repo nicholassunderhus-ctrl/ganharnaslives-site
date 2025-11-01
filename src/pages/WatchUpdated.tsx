@@ -242,7 +242,6 @@ const Watch = () => {
       </main>
 
       {selectedStream && (
-        <StreamViewer stream={selectedStream} onStreamEnd={handleStreamEnd} onClose={() => setSelectedStream(null)} />
         <StreamViewer 
           key={selectedStream.id} // Força a recriação do componente quando a stream muda
           stream={selectedStream} 
