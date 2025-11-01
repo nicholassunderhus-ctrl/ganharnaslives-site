@@ -114,6 +114,32 @@ const Watch = () => {
     };
   }, []);
 
+  // Efeito para redirecionar ou fechar a live quando ela termina.
+  useEffect(() => {
+    // Só executa a lógica se houver uma live selecionada e a lista de lives não estiver carregando.
+    if (!selectedStream || loading) {
+      return;
+    }
+
+    // Verifica se a live que o usuário está assistindo ainda está na lista de lives ativas.
+    const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
+
+    if (!isStreamStillActive) {
+      // A live terminou. Procura a próxima live disponível na lista atualizada.
+      const nextStream = streams.find(stream => 
+        !stream.isFull && stream.id !== selectedStream.id
+      );
+
+      if (nextStream) {
+        // Encontrou uma próxima live, atualiza o estado para redirecionar.
+        setSelectedStream(nextStream);
+      } else {
+        // Não há mais lives disponíveis, fecha o pop-up.
+        setSelectedStream(null);
+      }
+    }
+  }, [streams, selectedStream, loading]); // Roda sempre que a lista de streams ou a stream selecionada mudar.
+
   const handleCloseViewer = () => {
     setSelectedStream(null);
   };
@@ -227,9 +253,12 @@ const Watch = () => {
 
       {selectedStream && (
         <StreamViewer 
+          key={selectedStream.id} // Força a recriação do componente ao redirecionar
           stream={selectedStream} 
-          onStreamEnd={handleCloseViewer} 
-          onClose={handleCloseViewer} 
+          // A lógica de redirecionamento agora está no useEffect acima.
+          // Ambas as ações agora simplesmente fecham o pop-up se o usuário interagir.
+          onStreamEnd={handleCloseViewer}
+          onClose={handleCloseViewer}
         />
       )}
     </div>

@@ -111,40 +111,31 @@ const Watch = () => {
     };
   }, []);
 
-  const handleStreamEnd = async () => {
-    // A live atual terminou. Busca a lista mais recente de lives ativas.
-    const { data: activeStreams, error } = await supabase
-      .from('streams')
-      .select('*') // Busca todos os dados para evitar uma segunda busca
-      .eq('status', 'live')
-      .eq('is_paid', true);
-
-    if (error || !activeStreams || activeStreams.length === 0) {
-      // Se houver erro ou nenhuma live, fecha o visualizador.
-      setSelectedStream(null);
+  // Efeito para redirecionar ou fechar a live quando ela termina.
+  useEffect(() => {
+    // Só executa a lógica se houver uma live selecionada e a lista de lives não estiver carregando.
+    if (!selectedStream || loading) {
       return;
     }
 
-    // Agora, com a lista atualizada, procura a próxima live disponível.
-    const nextStreamData = activeStreams.find(stream => 
-      (stream.current_viewers < stream.max_viewers) && stream.id !== selectedStream?.id
-    );
+    // Verifica se a live que o usuário está assistindo ainda está na lista de lives ativas.
+    const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
 
-    if (nextStreamData) {
-      // Encontramos uma próxima live. Formata os dados dela para o tipo `Stream`.
-      const nextStream: Stream = {
-        ...nextStreamData,
-        streamer: `Streamer #${nextStreamData.user_id.substring(0, 8)}`,
-        isFull: nextStreamData.current_viewers >= nextStreamData.max_viewers,
-        pointsPerMinute: nextStreamData.points_per_minute,
-        thumbnailUrl: getDynamicThumbnailUrl(nextStreamData.platform, nextStreamData.stream_url),
-      };
-      setSelectedStream(nextStream);
-    } else {
-      // Não há mais lives disponíveis, então fecha o visualizador.
-      setSelectedStream(null);
+    if (!isStreamStillActive) {
+      // A live terminou. Procura a próxima live disponível na lista atualizada.
+      const nextStream = streams.find(stream => 
+        !stream.isFull && stream.id !== selectedStream.id
+      );
+
+      if (nextStream) {
+        // Encontrou uma próxima live, atualiza o estado para redirecionar.
+        setSelectedStream(nextStream);
+      } else {
+        // Não há mais lives disponíveis, fecha o pop-up.
+        setSelectedStream(null);
+      }
     }
-  };
+  }, [streams, selectedStream, loading]); // Roda sempre que a lista de streams ou a stream selecionada mudar.
 
   const filteredStreams = streams.filter(stream => {
     const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
@@ -250,8 +241,8 @@ const Watch = () => {
       {selectedStream && (
         <StreamViewer 
           key={selectedStream.id} // Força a recriação do componente quando a stream muda
-          stream={selectedStream} 
-          onStreamEnd={handleStreamEnd} 
+          stream={selectedStream}
+          onStreamEnd={() => setSelectedStream(null)} // onStreamEnd agora apenas fecha se a lógica acima falhar
           onClose={() => setSelectedStream(null)} 
         />
       )}

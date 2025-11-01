@@ -83,29 +83,6 @@ export const StreamViewer = ({ stream, onStreamEnd, onClose }: StreamViewerProps
     };
   }, [isWatching, earnPoints, queryClient, user?.id, stream.id]);
 
-  // Efeito para verificar periodicamente se a stream ainda está ativa
-  useEffect(() => {
-    const checkStreamStatus = async () => {
-      const { data, error } = await supabase
-        .from('streams')
-        .select('status')
-        .eq('id', stream.id)
-        .single();
-
-      if (error || !data || data.status !== 'live') {
-        // Se a stream não for encontrada ou não estiver mais 'live', fecha o viewer.
-        onStreamEnd(); // Notifica o componente pai que a live terminou
-      }
-    };
-
-    // Verifica o status a cada 15 segundos
-    const statusInterval = setInterval(checkStreamStatus, 15000);
-
-    return () => {
-      clearInterval(statusInterval);
-    };
-  }, [stream.id, onStreamEnd]);
-
   const handleStartWatching = () => {
     setIsWatching(true);
   };
