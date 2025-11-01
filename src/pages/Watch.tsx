@@ -115,30 +115,45 @@ const Watch = () => {
   }, []);
 
   // Efeito para redirecionar ou fechar a live quando ela termina.
+  // Este efeito agora cria uma assinatura específica para a live selecionada.
   useEffect(() => {
-    // Se a lista de streams está sendo carregada, não faz nada para evitar decisões com dados desatualizados.
-    if (loading) {
+    if (!selectedStream) {
       return;
     }
 
-    // Se há uma live selecionada, verifica se ela ainda é válida.
-    if (selectedStream) {
-      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
+    // Cria um canal de assinatura para a stream específica que o usuário está assistindo.
+    const streamSubscription = supabase
+      .channel(`stream-${selectedStream.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'streams',
+          filter: `id=eq.${selectedStream.id}`, // Filtra eventos apenas para esta stream
+        },
+        (payload) => {
+          // Verifica se o status da stream mudou para algo diferente de 'live'.
+          if (payload.new.status !== 'live') {
+            // A live terminou. Procura a próxima live disponível que não esteja lotada.
+            // Usamos a lista 'streams' que já está no estado do componente.
+            const nextStream = streams.find(stream => !stream.isFull && stream.id !== selectedStream.id);
 
-      if (!isStreamStillActive) {
-        // A live terminou. Procura a próxima live disponível que não esteja lotada.
-        const nextStream = streams.find(stream => !stream.isFull);
-
-        if (nextStream) {
-          // Encontrou uma próxima live, atualiza o estado para redirecionar.
-          setSelectedStream(nextStream);
-        } else {
-          // Não há mais lives disponíveis, fecha o pop-up.
-          setSelectedStream(null);
+            if (nextStream) {
+              setSelectedStream(nextStream);
+            } else {
+              setSelectedStream(null); // Fecha o viewer se não houver outra live.
+            }
+          }
         }
-      }
-    }
-  }, [streams, loading, selectedStream]); // Roda sempre que a lista de streams, o loading ou a stream selecionada mudar.
+      )
+      .subscribe();
+
+    // Função de limpeza: remove a assinatura quando o usuário fecha a live ou é redirecionado.
+    return () => {
+      streamSubscription.unsubscribe();
+    };
+  }, [selectedStream, streams]); // Roda sempre que a stream selecionada ou a lista de streams mudar.
 
   const handleCloseViewer = () => {
     setSelectedStream(null);
