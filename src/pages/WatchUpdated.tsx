@@ -112,28 +112,34 @@ const Watch = () => {
   }, []);
 
   const handleStreamEnd = async () => {
-    // A live atual terminou. Primeiro, busca a lista mais recente de lives ativas.
-    const { data, error } = await supabase
+    // A live atual terminou. Busca a lista mais recente de lives ativas.
+    const { data: activeStreams, error } = await supabase
       .from('streams')
-      .select('id, current_viewers, max_viewers')
+      .select('*') // Busca todos os dados para evitar uma segunda busca
       .eq('status', 'live')
       .eq('is_paid', true);
 
-    if (error || !data) {
+    if (error || !activeStreams || activeStreams.length === 0) {
       // Se houver erro ou nenhuma live, fecha o visualizador.
       setSelectedStream(null);
       return;
     }
 
     // Agora, com a lista atualizada, procura a próxima live disponível.
-    const nextStream = data.find(stream => 
+    const nextStreamData = activeStreams.find(stream => 
       (stream.current_viewers < stream.max_viewers) && stream.id !== selectedStream?.id
     );
 
-    if (nextStream) {
-      // Encontramos uma próxima live, busca os dados completos dela para redirecionar.
-      const fullNextStream = streams.find(s => s.id === nextStream.id);
-      setSelectedStream(fullNextStream || null);
+    if (nextStreamData) {
+      // Encontramos uma próxima live. Formata os dados dela para o tipo `Stream`.
+      const nextStream: Stream = {
+        ...nextStreamData,
+        streamer: `Streamer #${nextStreamData.user_id.substring(0, 8)}`,
+        isFull: nextStreamData.current_viewers >= nextStreamData.max_viewers,
+        pointsPerMinute: nextStreamData.points_per_minute,
+        thumbnailUrl: getDynamicThumbnailUrl(nextStreamData.platform, nextStreamData.stream_url),
+      };
+      setSelectedStream(nextStream);
     } else {
       // Não há mais lives disponíveis, então fecha o visualizador.
       setSelectedStream(null);
