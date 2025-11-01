@@ -4,14 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Stream, Platform } from "@/types";
 import { PlatformIcon } from "./PlatformIcon";
-import { Eye, Clock, Coins, Loader2 } from "lucide-react";
+import { Eye, Clock, Coins, ExternalLink } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { getEmbedUrl } from "@/lib/stream-utils";
-import { Input } from "./ui/input";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 interface StreamViewerProps {
   stream: Stream;
@@ -25,20 +22,10 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const [timeWatched, setTimeWatched] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
-  const [kickUsername, setKickUsername] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
 
-  // Verifica se o usuário já conectou a conta Kick
-  const isKickConnected = useMemo(() => {
-    return !!user?.user_metadata?.kick_username;
-  }, [user]);
-
-  // Preenche o campo com o nome de usuário do Kick se já existir
-  useEffect(() => {
-    if (isKickConnected) {
-      setKickUsername(user.user_metadata.kick_username);
-    }
-  }, [isKickConnected, user]);
+  // Estado para controlar a verificação de login na Kick
+  const [kickLoginStep, setKickLoginStep] = useState<'initial' | 'verifying' | 'verified'>('initial');
+  const [verifyButtonEnabled, setVerifyButtonEnabled] = useState(false);
 
 
   // Converte a URL da stream para a URL de incorporação correta
@@ -48,24 +35,24 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   useEffect(() => {
     if (!user) return;
 
-    const joinStream = async () => {
-      await supabase
-        .from('stream_viewers')
-        .upsert({ stream_id: stream.id, user_id: user.id });
-    };
+    // const joinStream = async () => {
+    //   await supabase
+    //     .from('stream_viewers')
+    //     .upsert({ stream_id: stream.id, user_id: user.id });
+    // };
 
-    const leaveStream = async () => {
-      await supabase
-        .from('stream_viewers')
-        .delete()
-        .match({ stream_id: stream.id, user_id: user.id });
-    };
+    // const leaveStream = async () => {
+    //   await supabase
+    //     .from('stream_viewers')
+    //     .delete()
+    //     .match({ stream_id: stream.id, user_id: user.id });
+    // };
 
-    joinStream();
+    // joinStream();
 
     // Quando o componente for desmontado (usuário fechar), remove o registro
     return () => {
-      leaveStream();
+      // leaveStream();
     };
   }, [stream.id, user]);
 
@@ -107,27 +94,16 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     setIsWatching(false);
   };
 
-  const handleSaveKickUsername = async () => {
-    if (!kickUsername.trim()) {
-      toast.error("Por favor, insira seu nome de usuário do Kick.");
-      return;
-    }
-    setIsSaving(true);
-    try {
-      const { error } = await supabase.auth.updateUser({
-        data: { kick_username: kickUsername.trim() },
-      });
-      if (error) throw error;
-      toast.success("Nome de usuário do Kick salvo com sucesso!");
-      // A UI será atualizada automaticamente porque o hook `useAuth` detectará a mudança no `user`
-    } catch (error: any) {
-      toast.error("Erro ao salvar nome de usuário.", {
-        description: error.message,
-      });
-    } finally {
-      setIsSaving(false);
-    }
+  const handleOpenKickLogin = () => {
+    window.open('https://kick.com/login', '_blank');
+    setKickLoginStep('verifying');
+    // Habilita o botão de verificação após 5 segundos
+    setTimeout(() => {
+      setVerifyButtonEnabled(true);
+    }, 5000);
   };
+
+  const handleKickVerification = () => setKickLoginStep('verified');
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -182,18 +158,20 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
           </div>
 
           <div className="flex gap-2">
-            {stream.platform === Platform.Kick && !isKickConnected ? (
-              <div className="flex-1 flex w-full gap-2">
-                <Input
-                  placeholder="Seu usuário do Kick"
-                  value={kickUsername}
-                  onChange={(e) => setKickUsername(e.target.value)}
-                  disabled={isSaving}
-                  className="flex-1"
-                />
-                <Button onClick={handleSaveKickUsername} disabled={isSaving}>
-                  {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Salvar e Assistir"}
-                </Button>
+            {stream.platform === Platform.Kick && kickLoginStep !== 'verified' ? (
+              <div className="w-full text-center p-4 bg-muted/50 rounded-lg space-y-4">
+                <p className="text-sm font-medium">Para ganhar pontos, você precisa estar logado na Kick.</p>
+                {kickLoginStep === 'initial' && (
+                  <Button onClick={handleOpenKickLogin} className="w-full">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Fazer Login na Kick
+                  </Button>
+                )}
+                {kickLoginStep === 'verifying' && (
+                  <Button onClick={handleKickVerification} disabled={!verifyButtonEnabled} className="w-full">
+                    {verifyButtonEnabled ? "Já fiz o login, quero assistir!" : "Aguarde..."}
+                  </Button>
+                )}
               </div>
             ) : !isWatching ? (
               <Button onClick={handleStartWatching} className="flex-1">
