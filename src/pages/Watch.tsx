@@ -114,15 +114,29 @@ const Watch = () => {
     };
   }, []);
 
-  const handleStreamEnd = () => {
-    // A live atual terminou. Vamos procurar a próxima.
-    const nextStream = streams.find(stream => 
-      !stream.isFull && stream.id !== selectedStream?.id
+  const handleStreamEnd = async () => {
+    // A live atual terminou. Primeiro, busca a lista mais recente de lives ativas.
+    const { data, error } = await supabase
+      .from('streams')
+      .select('id, current_viewers, max_viewers')
+      .eq('status', 'live')
+      .eq('is_paid', true);
+
+    if (error || !data) {
+      // Se houver erro ou nenhuma live, fecha o visualizador.
+      setSelectedStream(null);
+      return;
+    }
+
+    // Agora, com a lista atualizada, procura a próxima live disponível.
+    const nextStream = data.find(stream => 
+      (stream.current_viewers < stream.max_viewers) && stream.id !== selectedStream?.id
     );
 
     if (nextStream) {
-      // Encontramos uma próxima live, redireciona o usuário para ela.
-      setSelectedStream(nextStream);
+      // Encontramos uma próxima live, busca os dados completos dela para redirecionar.
+      const fullNextStream = streams.find(s => s.id === nextStream.id);
+      setSelectedStream(fullNextStream || null);
     } else {
       // Não há mais lives disponíveis, então fecha o visualizador.
       setSelectedStream(null);
@@ -241,7 +255,11 @@ const Watch = () => {
       </main>
 
       {selectedStream && (
-        <StreamViewer stream={selectedStream} onStreamEnd={handleStreamEnd} />
+        <StreamViewer 
+          key={selectedStream.id} // Adicionado: Força a recriação do componente quando a stream muda
+          stream={selectedStream} 
+          onStreamEnd={handleStreamEnd} 
+          onClose={handleCloseViewer} />
       )}
     </div>
   );
