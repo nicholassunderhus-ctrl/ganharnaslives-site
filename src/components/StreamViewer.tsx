@@ -13,11 +13,10 @@ import { getEmbedUrl } from "@/lib/stream-utils";
 
 interface StreamViewerProps {
   stream: Stream;
-  onStreamEnd: () => void;
   onClose: () => void; // Chamado quando o usuário fecha manualmente
 }
 
-export const StreamViewer = ({ stream, onStreamEnd, onClose }: StreamViewerProps) => {
+export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { earnPoints, loading } = useEarnPoints(); // Agora usa a versão corrigida
@@ -82,29 +81,6 @@ export const StreamViewer = ({ stream, onStreamEnd, onClose }: StreamViewerProps
       if (pointsInterval) clearInterval(pointsInterval);
     };
   }, [isWatching, earnPoints, queryClient, user?.id, stream.id]);
-
-  // Efeito para verificar periodicamente se a stream ainda está ativa
-  useEffect(() => {
-    const checkStreamStatus = async () => {
-      const { data, error } = await supabase
-        .from('streams')
-        .select('status')
-        .eq('id', stream.id)
-        .single();
-
-      if (error || !data || data.status !== 'live') {
-        // Se a stream não for encontrada ou não estiver mais 'live', notifica o componente pai.
-        onStreamEnd();
-      }
-    };
-
-    // Verifica o status a cada 15 segundos
-    const statusInterval = setInterval(checkStreamStatus, 15000);
-
-    return () => {
-      clearInterval(statusInterval);
-    };
-  }, [stream.id, onStreamEnd]);
 
   const handleStartWatching = () => {
     setIsWatching(true);
