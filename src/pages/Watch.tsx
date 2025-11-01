@@ -126,11 +126,8 @@ const Watch = () => {
       const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
 
       if (!isStreamStillActive) {
-        // A live terminou. Procura a próxima live disponível que não esteja lotada
-        // e que seja DIFERENTE da que acabou de terminar.
-        const nextStream = streams.find(stream => 
-          !stream.isFull && stream.id !== selectedStream.id
-        );
+        // A live terminou. Procura a próxima live disponível que não esteja lotada.
+        const nextStream = streams.find(stream => !stream.isFull);
 
         if (nextStream) {
           // Encontrou uma próxima live, atualiza o estado para redirecionar.
@@ -141,27 +138,25 @@ const Watch = () => {
         }
       }
     }
-  }, [streams, loading, selectedStream]); // Roda sempre que a lista de streams ou a stream selecionada mudar.
+  }, [streams, loading, selectedStream]); // Roda sempre que a lista de streams, o loading ou a stream selecionada mudar.
 
   const handleCloseViewer = () => {
     setSelectedStream(null);
   };
 
-  const filteredStreams = streams
-    .filter(stream => {
+  const filteredStreams = streams.filter(stream => {
       const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
-      const matchesSearch = (stream.streamer?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-                           (stream.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-                           (stream.category?.toLowerCase() || '').includes(searchQuery.toLowerCase());
+      const matchesSearch = stream.streamer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         stream.category.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesPlatform && matchesSearch;
     })
-    .sort((a, b) => {
-      // Se a live 'a' está lotada e a 'b' não, 'b' vem primeiro.
-      if (a.isFull && !b.isFull) return 1;
-      // Se a live 'b' está lotada e a 'a' não, 'a' vem primeiro.
-      if (!a.isFull && b.isFull) return -1;
-      // Se ambas estão no mesmo estado (lotadas ou não), ordena pela maior quantidade
-      // de espectadores (ordem decrescente).
+    .sort((a, b) => { // Ordena as lives para melhor experiência do usuário
+      // Prioridade 1: Lives não lotadas vêm antes das lotadas.
+      if (a.isFull && !b.isFull) return 1; // 'a' (lotada) vai para o fim
+      if (!a.isFull && b.isFull) return -1; // 'a' (não lotada) vem para o início
+
+      // Prioridade 2: Entre lives com o mesmo status (lotada/não lotada), ordena por mais espectadores.
       return b.currentViewers - a.currentViewers;
     });
 
@@ -256,9 +251,8 @@ const Watch = () => {
 
       {selectedStream && (
         <StreamViewer 
-          key={selectedStream.id} // Força a recriação do componente ao redirecionar
+          key={selectedStream.id} // Força a recriação do componente quando a stream muda
           stream={selectedStream}
-          // A única ação que o StreamViewer pode tomar é fechar a si mesmo.
           onClose={handleCloseViewer}
         />
       )}
