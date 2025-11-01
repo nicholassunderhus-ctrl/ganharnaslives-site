@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Stream, Platform } from "@/types";
 import { PlatformIcon } from "./PlatformIcon";
-import { Eye, Clock, Coins, ExternalLink } from "lucide-react";
+import { Eye, Clock, Coins } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,21 +13,17 @@ import { getEmbedUrl } from "@/lib/stream-utils";
 
 interface StreamViewerProps {
   stream: Stream;
-  onStreamEnd: () => void; // Renomeado de onClose para onStreamEnd
+  onStreamEnd: () => void; // Chamado quando a live termina automaticamente
+  onClose: () => void; // Chamado quando o usuário fecha manualmente
 }
 
-export const StreamViewer = ({ stream, onStreamEnd }: StreamViewerProps) => {
+export const StreamViewer = ({ stream, onStreamEnd, onClose }: StreamViewerProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { earnPoints, loading } = useEarnPoints(); // Agora usa a versão corrigida
   const [timeWatched, setTimeWatched] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
-
-  // Estado para controlar a verificação de login na Kick
-  const [kickLoginStep, setKickLoginStep] = useState<'initial' | 'verifying' | 'verified'>('initial');
-  const [verifyButtonEnabled, setVerifyButtonEnabled] = useState(false);
-
 
   // Converte a URL da stream para a URL de incorporação correta
   const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
@@ -118,17 +114,6 @@ export const StreamViewer = ({ stream, onStreamEnd }: StreamViewerProps) => {
     setIsWatching(false);
   };
 
-  const handleOpenKickLogin = () => {
-    window.open('https://kick.com/login', '_blank');
-    setKickLoginStep('verifying');
-    // Habilita o botão de verificação após 5 segundos
-    setTimeout(() => {
-      setVerifyButtonEnabled(true);
-    }, 5000);
-  };
-
-  const handleKickVerification = () => setKickLoginStep('verified');
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -147,7 +132,7 @@ export const StreamViewer = ({ stream, onStreamEnd }: StreamViewerProps) => {
                 <p className="text-muted-foreground">{stream.streamer}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={onStreamEnd}>
+            <Button variant="outline" onClick={onClose}>
               Fechar
             </Button>
           </div>
@@ -182,22 +167,7 @@ export const StreamViewer = ({ stream, onStreamEnd }: StreamViewerProps) => {
           </div>
 
           <div className="flex gap-2">
-            {stream.platform === Platform.Kick && kickLoginStep !== 'verified' ? (
-              <div className="w-full text-center p-4 bg-muted/50 rounded-lg space-y-4">
-                <p className="text-sm font-medium">Para ganhar pontos, você precisa estar logado na Kick.</p>
-                {kickLoginStep === 'initial' && (
-                  <Button onClick={handleOpenKickLogin} className="w-full">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Fazer Login na Kick
-                  </Button>
-                )}
-                {kickLoginStep === 'verifying' && (
-                  <Button onClick={handleKickVerification} disabled={!verifyButtonEnabled} className="w-full">
-                    {verifyButtonEnabled ? "Já fiz o login, quero assistir!" : "Aguarde..."}
-                  </Button>
-                )}
-              </div>
-            ) : !isWatching ? (
+            {!isWatching ? (
               <Button onClick={handleStartWatching} className="flex-1">
                 Começar a Assistir e Ganhar Pontos
               </Button>

@@ -213,7 +213,7 @@ const Watch = () => {
       </main>
 
       {selectedStream && (
-        <StreamViewer stream={selectedStream} onClose={handleCloseViewer} />
+        <StreamViewer stream={selectedStream} onStreamEnd={handleStreamEnd} onClose={() => setSelectedStream(null)} />
       )}
     </div>
   );
