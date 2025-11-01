@@ -13,10 +13,10 @@ import { getEmbedUrl } from "@/lib/stream-utils";
 
 interface StreamViewerProps {
   stream: Stream;
-  onClose: () => void;
+  onStreamEnd: () => void; // Renomeado de onClose para onStreamEnd
 }
 
-export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
+export const StreamViewer = ({ stream, onStreamEnd }: StreamViewerProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { earnPoints, loading } = useEarnPoints(); // Agora usa a versão corrigida
@@ -98,7 +98,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
 
       if (error || !data || data.status !== 'live') {
         // Se a stream não for encontrada ou não estiver mais 'live', fecha o viewer.
-        onClose();
+        onStreamEnd(); // Notifica o componente pai que a live terminou
       }
     };
 
@@ -108,7 +108,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     return () => {
       clearInterval(statusInterval);
     };
-  }, [stream.id, onClose]);
+  }, [stream.id, onStreamEnd]);
 
   const handleStartWatching = () => {
     setIsWatching(true);
@@ -147,7 +147,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
                 <p className="text-muted-foreground">{stream.streamer}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onStreamEnd}>
               Fechar
             </Button>
           </div>

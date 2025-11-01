@@ -114,29 +114,24 @@ const Watch = () => {
     };
   }, []);
 
-  // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
-  // OU redirecionar para a próxima live disponível.
-  useEffect(() => {
-    // Se não há uma stream selecionada, não há nada a fazer.
-    if (!selectedStream) return;
+  const handleStreamEnd = () => {
+    // A live atual terminou. Vamos procurar a próxima.
+    const nextStream = streams.find(stream => 
+      !stream.isFull && stream.id !== selectedStream?.id
+    );
 
-    // Apenas executa a lógica de verificação se a lista de streams não estiver sendo carregada.
-    // Isso evita que a verificação aconteça com uma lista de streams vazia ou incompleta.
-    if (!loading) {
-      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
-      
-      if (!isStreamStillActive) {
-        // A live atual terminou. Vamos procurar a próxima.
-        const nextStream = streams.find(stream => !stream.isFull && stream.id !== selectedStream.id);
-
-        if (nextStream) {
-          setSelectedStream(nextStream);
-        } else {
-          setSelectedStream(null);
-        }
-      }
+    if (nextStream) {
+      // Encontramos uma próxima live, redireciona o usuário para ela.
+      setSelectedStream(nextStream);
+    } else {
+      // Não há mais lives disponíveis, então fecha o visualizador.
+      setSelectedStream(null);
     }
-  }, [streams, selectedStream, loading]); // Mantemos 'loading' para controlar o momento da execução
+  };
+
+  const handleCloseViewer = () => {
+    setSelectedStream(null);
+  };
 
   const filteredStreams = streams
     .filter(stream => {
@@ -158,10 +153,6 @@ const Watch = () => {
 
   const handleWatch = (stream: Stream) => {
     setSelectedStream(stream);
-  };
-
-  const handleCloseViewer = () => {
-    setSelectedStream(null);
   };
 
   return (
@@ -250,7 +241,7 @@ const Watch = () => {
       </main>
 
       {selectedStream && (
-        <StreamViewer stream={selectedStream} onClose={handleCloseViewer} />
+        <StreamViewer stream={selectedStream} onStreamEnd={handleStreamEnd} />
       )}
     </div>
   );
