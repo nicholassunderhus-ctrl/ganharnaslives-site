@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Stream } from "@/types";
@@ -7,8 +8,10 @@ import { PlatformIcon } from "./PlatformIcon";
 import { Eye, Clock, Coins } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
+import { Provider } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { getEmbedUrl } from "@/lib/stream-utils";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 interface StreamViewerProps {
@@ -24,6 +27,31 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [lastEarnTime, setLastEarnTime] = useState<number>(0);
+  const [kickUsername, setKickUsername] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Mapeia a plataforma da stream para o provedor OAuth do Supabase
+  const platformProvider = useMemo(() => {
+    if (stream.platform === Platform.YouTube) return 'google';
+    if (stream.platform === Platform.Twitch) return 'twitch';
+    // Kick não tem provedor OAuth nativo no Supabase, então não exigimos login.
+    return null;
+  }, [stream.platform]);
+
+  // Verifica se o usuário já conectou a conta da plataforma necessária
+  const isPlatformAuthenticated = useMemo(() => {
+    if (stream.platform === Platform.Kick) {
+      // Para Kick, verificamos se o nome de usuário está no metadata.
+      return !!user?.user_metadata?.kick_username;
+    }
+    if (!platformProvider) {
+      // Se não há provedor (ex: Kick), consideramos como autenticado para simplificar.
+      return true;
+    }
+    // Verifica se a identidade do provedor existe na conta do usuário
+    return user?.identities?.some(id => id.provider === platformProvider);
+  }, [user, platformProvider, stream.platform]);
+
 
   // Converte a URL da stream para a URL de incorporação correta
   const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
@@ -92,6 +120,44 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     setIsWatching(false);
   };
 
+  const handlePlatformLogin = async () => {
+    if (!platformProvider) return;
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: platformProvider as Provider,
+      options: {
+        redirectTo: window.location.href, // Redireciona de volta para a página atual após o login
+      },
+    });
+
+    if (error) {
+      console.error(`Erro ao fazer login com ${platformProvider}:`, error);
+    }
+  };
+
+  const handleSaveKickUsername = async () => {
+    if (!kickUsername.trim()) {
+      toast.error("Por favor, insira seu nome de usuário do Kick.");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { kick_username: kickUsername.trim() },
+      });
+      if (error) throw error;
+      toast.success("Nome de usuário do Kick salvo com sucesso!");
+      // O hook useAuth irá atualizar o objeto 'user' automaticamente,
+      // o que fará com que 'isPlatformAuthenticated' se torne true e a UI mude.
+    } catch (error: any) {
+      toast.error("Erro ao salvar nome de usuário.", {
+        description: error.message,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -145,12 +211,30 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
           </div>
 
           <div className="flex gap-2">
-            {!isWatching ? (
+            {!isPlatformAuthenticated && platformProvider ? (
+              <Button onClick={handlePlatformLogin} className="flex-1" variant="secondary">
+                <PlatformIcon platform={stream.platform} className="w-4 h-4 mr-2" />
+                Conectar com {stream.platform} para Assistir
+              </Button>
+            ) : !isPlatformAuthenticated && stream.platform === Platform.Kick ? (
+              <div className="flex-1 flex gap-2">
+                <Input
+                  placeholder="Seu usuário do Kick"
+                  value={kickUsername}
+                  onChange={(e) => setKickUsername(e.target.value)}
+                  disabled={isSaving}
+                />
+                <Button onClick={handleSaveKickUsername} disabled={isSaving}>
+                  {isSaving ? "Salvando..." : "Salvar e Assistir"}
+                </Button>
+              </div>
+              </Button>
+            ) : !isWatching ? (
               <Button onClick={handleStartWatching} className="flex-1">
                 Começar a Assistir e Ganhar Pontos
               </Button>
             ) : (
-              <Button onClick={handleStopWatching} variant="outline" className="flex-1">
+              <Button onClick={handleStopWatching} variant="destructive" className="flex-1">
                 Parar de Assistir
               </Button>
             )}
