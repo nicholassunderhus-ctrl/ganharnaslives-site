@@ -19,7 +19,7 @@ interface StreamViewerProps {
 export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { earnPoints, loading } = useEarnPoints();
+  const { earnPoints, loading } = useEarnPoints(); // Agora usa a versão corrigida
   const [timeWatched, setTimeWatched] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
@@ -62,25 +62,23 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
 
         // Earn points every minute (60 seconds)
         const now = Date.now();
-        if (now - lastEarnTime >= 60000) { // 60 seconds
-          earnPoints(stream.pointsPerMinute).then(result => {
-            if (result.success) {
+        if (now - lastEarnTime >= 60000) { // 60 segundos
+          earnPoints(stream.id).then(result => {
+            if (result && result.success) {
               setEarnedPoints(prev => prev + result.pointsEarned!);
               setLastEarnTime(now);
               // Invalida a query de pontos do usuário para forçar a atualização do saldo
               queryClient.invalidateQueries({ queryKey: ['userPoints', user?.id] });
             } else {
-              console.warn("Failed to earn points:", result.error);
+              console.warn("Falha ao ganhar pontos:", result?.error);
             }
           });
         }
       }, 1000);
     }
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isWatching, lastEarnTime, earnPoints, queryClient, user?.id, stream.pointsPerMinute]);
+    return () => clearInterval(interval);
+  }, [isWatching, lastEarnTime, earnPoints, queryClient, user?.id, stream.id]);
 
   const handleStartWatching = () => {
     setIsWatching(true);
