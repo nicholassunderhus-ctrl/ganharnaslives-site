@@ -217,12 +217,13 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
                 Conectar com {stream.platform} para Assistir
               </Button>
             ) : !isPlatformAuthenticated && stream.platform === Platform.Kick ? (
-              <div className="flex-1 flex gap-2">
+              <div className="flex-1 flex w-full gap-2">
                 <Input
                   placeholder="Seu usuário do Kick"
                   value={kickUsername}
                   onChange={(e) => setKickUsername(e.target.value)}
                   disabled={isSaving}
+                  className="flex-1"
                 />
                 <Button onClick={handleSaveKickUsername} disabled={isSaving}>
                   {isSaving ? "Salvando..." : "Salvar e Assistir"}
