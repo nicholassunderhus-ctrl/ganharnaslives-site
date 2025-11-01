@@ -8,6 +8,7 @@ import { Eye, Clock, Coins, ExternalLink } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { getEmbedUrl } from "@/lib/stream-utils";
 
 interface StreamViewerProps {
@@ -85,6 +86,29 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
       if (pointsInterval) clearInterval(pointsInterval);
     };
   }, [isWatching, earnPoints, queryClient, user?.id, stream.id]);
+
+  // Efeito para verificar periodicamente se a stream ainda está ativa
+  useEffect(() => {
+    const checkStreamStatus = async () => {
+      const { data, error } = await supabase
+        .from('streams')
+        .select('status')
+        .eq('id', stream.id)
+        .single();
+
+      if (error || !data || data.status !== 'live') {
+        // Se a stream não for encontrada ou não estiver mais 'live', fecha o viewer.
+        onClose();
+      }
+    };
+
+    // Verifica o status a cada 15 segundos
+    const statusInterval = setInterval(checkStreamStatus, 15000);
+
+    return () => {
+      clearInterval(statusInterval);
+    };
+  }, [stream.id, onClose]);
 
   const handleStartWatching = () => {
     setIsWatching(true);

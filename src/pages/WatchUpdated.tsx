@@ -44,7 +44,7 @@ const Watch = () => {
             points_per_viewer,
             duration_minutes
           `)
-          .eq('status', 'active')
+          .eq('status', 'live')
           .eq('is_paid', true)
           .returns<{
             id: string;
