@@ -14,6 +14,10 @@ serve(async (req) => {
   }
 
   try {
+    // Adicionado: Captura o IP do usuário a partir dos headers da requisição
+    // O Deno Deploy (onde as Edge Functions rodam) fornece o IP no header 'x-forwarded-for'
+    const userIpAddress = req.headers.get('x-forwarded-for');
+
     // 1. Valida se a requisição veio de um usuário autenticado
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -40,6 +44,38 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // Adicionado: Verificação de abuso de IP
+    if (userIpAddress) {
+      const ACCOUNT_LIMIT_PER_IP = 5; // Máximo de 5 contas diferentes por IP em 24 horas
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+
+      // Busca todos os user_id distintos que usaram este IP nas últimas 24h
+      const { data: recentUsers, error: ipCheckError } = await supabaseAdmin
+        .from('ip_activity')
+        .select('user_id')
+        .eq('ip_address', userIpAddress)
+        .gt('created_at', twentyFourHoursAgo);
+
+      if (ipCheckError) {
+        console.error('Erro ao verificar IP:', ipCheckError.message);
+        // Em caso de erro na verificação, optamos por prosseguir para não penalizar usuários legítimos.
+      }
+
+      if (recentUsers) {
+        const distinctUserIds = new Set(recentUsers.map(u => u.user_id));
+
+        // Se o limite foi atingido E o usuário atual não está na lista, bloqueia.
+        if (distinctUserIds.size >= ACCOUNT_LIMIT_PER_IP && !distinctUserIds.has(user.id)) {
+          throw new Error('Limite de contas por rede atingido. Por favor, use outra rede ou aguarde.');
+        }
+      }
+
+      // Registra a atividade do IP atual
+      await supabaseAdmin
+        .from('ip_activity')
+        .insert({ ip_address: userIpAddress, user_id: user.id });
+    }
 
     // 4. Busca os dados da stream para obter o `points_per_minute` e o status
     const { data: stream, error: streamError } = await supabaseAdmin

@@ -114,6 +114,19 @@ const Watch = () => {
     };
   }, []);
 
+  // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
+  useEffect(() => {
+    if (selectedStream && !loading) {
+      // Verifica se a stream selecionada ainda existe na lista de streams ativas
+      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
+      
+      if (!isStreamStillActive) {
+        // Se a stream não está mais ativa, fecha o visualizador
+        setSelectedStream(null);
+      }
+    }
+  }, [streams, selectedStream, loading]);
+
   const filteredStreams = streams
     .filter(stream => {
       const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
