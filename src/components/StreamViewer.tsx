@@ -228,7 +228,6 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
                   {isSaving ? "Salvando..." : "Salvar e Assistir"}
                 </Button>
               </div>
-              </Button>
             ) : !isWatching ? (
               <Button onClick={handleStartWatching} className="flex-1">
                 Começar a Assistir e Ganhar Pontos
