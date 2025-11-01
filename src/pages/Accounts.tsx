@@ -87,8 +87,8 @@ const Accounts = () => {
                 <div className="flex items-center gap-4">
                   <PlatformIcon platform={Platform.YouTube} className="w-10 h-10" />
                   <div>
-                    <CardTitle>YouTube</CardTitle>
-                    <CardDescription>Conecte sua conta do Google.</CardDescription>
+                    <CardTitle>Fazer login com YouTube</CardTitle>
+                    <CardDescription>Conecte sua conta do Google para validar.</CardDescription>
                   </div>
                 </div>
                 {isGoogleConnected ? (
@@ -112,8 +112,8 @@ const Accounts = () => {
                   <div className="flex items-center gap-4">
                     <PlatformIcon platform={Platform.Kick} className="w-10 h-10" />
                     <div>
-                      <CardTitle>Kick</CardTitle>
-                      <CardDescription>Informe seu nome de usuário.</CardDescription>
+                      <CardTitle>Fazer login com Kick</CardTitle>
+                      <CardDescription>Informe seu nome de usuário para validar.</CardDescription>
                     </div>
                   </div>
                   {isKickConnected && (
