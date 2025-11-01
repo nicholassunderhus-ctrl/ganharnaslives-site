@@ -126,18 +126,18 @@ const Watch = () => {
       const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
 
       if (!isStreamStillActive) {
-        // A live terminou. Primeiro, fecha o visualizador atual.
-        setSelectedStream(null);
-
-        // Procura a próxima live disponível na lista atualizada.
-        const nextStream = streams.find(stream => !stream.isFull);
+        // A live terminou. Procura a próxima live disponível que não esteja lotada
+        // e que seja DIFERENTE da que acabou de terminar.
+        const nextStream = streams.find(stream => 
+          !stream.isFull && stream.id !== selectedStream.id
+        );
 
         if (nextStream) {
-          // Usa um pequeno timeout para garantir que o componente antigo foi desmontado
-          // antes de montar o novo, evitando o loop.
-          setTimeout(() => {
-            setSelectedStream(nextStream);
-          }, 100); // 100ms é suficiente para o React processar a mudança.
+          // Encontrou uma próxima live, atualiza o estado para redirecionar.
+          setSelectedStream(nextStream);
+        } else {
+          // Não há mais lives disponíveis, fecha o pop-up.
+          setSelectedStream(null);
         }
       }
     }
