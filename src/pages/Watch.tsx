@@ -133,16 +133,22 @@ const Watch = () => {
           filter: `id=eq.${selectedStream.id}`, // Filtra eventos apenas para esta stream
         },
         (payload) => {
-          // Verifica se o status da stream mudou para algo diferente de 'live'.
-          if (payload.new.status !== 'live') {
-            // A live terminou. Procura a próxima live disponível que não esteja lotada.
-            // Usamos a lista 'streams' que já está no estado do componente.
-            const nextStream = streams.find(stream => !stream.isFull && stream.id !== selectedStream.id);
-
-            if (nextStream) {
-              setSelectedStream(nextStream);
+          // Verifica se o status da stream mudou para algo diferente de 'live' (ex: 'finished').
+          // O payload.new contém os novos dados da linha que foi atualizada.
+          const updatedStream = payload.new as { id: string; status: string };
+          if (updatedStream.status !== 'live') {
+            toast.info("A live que você estava assistindo terminou.", {
+              description: "Procurando a próxima live disponível...",
+            });
+            
+            // A live terminou. Procura a próxima live disponível na lista de streams do estado.
+            // A lista 'streams' é atualizada pelo outro listener de realtime.
+            const nextAvailableStream = streams.find(s => s.id !== selectedStream.id && !s.isFull);
+            
+            if (nextAvailableStream) {
+              setSelectedStream(nextAvailableStream);
             } else {
-              setSelectedStream(null); // Fecha o viewer se não houver outra live.
+              setSelectedStream(null); // Fecha o viewer se não houver outra live disponível.
             }
           }
         }
