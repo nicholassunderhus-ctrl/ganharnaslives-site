@@ -13,11 +13,10 @@ import { getEmbedUrl } from "@/lib/stream-utils";
 
 interface StreamViewerProps {
   stream: Stream;
-  onStreamEnd: () => void; // Chamado quando a live termina automaticamente
   onClose: () => void; // Chamado quando o usuário fecha manualmente
 }
 
-export const StreamViewer = ({ stream, onStreamEnd, onClose }: StreamViewerProps) => {
+export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { earnPoints, loading } = useEarnPoints(); // Agora usa a versão corrigida
