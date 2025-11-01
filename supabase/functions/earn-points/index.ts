@@ -47,27 +47,6 @@ serve(async (req) => {
       .eq('id', streamId)
       .single();
 
-    // Adicionado: Busca o último timestamp em que o usuário ganhou pontos
-    const { data: userPoints, error: userPointsError } = await supabaseAdmin
-      .from('user_points')
-      .select('last_earn_timestamp')
-      .eq('user_id', user.id)
-      .single();
-
-    if (userPointsError && userPointsError.code !== 'PGRST116') { // Ignora erro "not found"
-      throw new Error('Erro ao buscar dados de pontos do usuário.');
-    }
-
-    // Adicionado: Verifica se já passou um minuto desde o último ganho
-    const now = new Date();
-    const lastEarn = userPoints?.last_earn_timestamp ? new Date(userPoints.last_earn_timestamp) : null;
-
-    if (lastEarn && (now.getTime() - lastEarn.getTime()) < 59000) { // 59 segundos para ter uma margem
-      return new Response(JSON.stringify({ success: false, pointsEarned: 0, error: 'Aguarde um minuto para ganhar pontos novamente.' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
     if (streamError || !stream) {
       throw new Error('Stream não encontrada ou erro ao buscar dados.');
     }
@@ -81,15 +60,19 @@ serve(async (req) => {
 
     const pointsToAdd = stream.points_per_minute;
 
-    // 5. Atualiza os pontos e o timestamp do usuário de forma segura usando a função RPC `add_points`
-    const { error: rpcError } = await supabaseAdmin.rpc('add_points', {
+    // 5. Tenta adicionar os pontos usando a nova função RPC `try_add_points`
+    const { data: wasSuccessful, error: rpcError } = await supabaseAdmin.rpc('try_add_points', {
       user_id_input: user.id,
       points_to_add: pointsToAdd,
-      // A função `add_points` já deve atualizar o `last_earn_timestamp`
     });
 
     if (rpcError) {
       throw new Error(`Erro ao creditar pontos: ${rpcError.message}`);
+    }
+
+    // Se a função retornou 'false', significa que o tempo de espera não foi atingido.
+    if (!wasSuccessful) {
+      throw new Error('Aguarde um minuto para ganhar pontos novamente.');
     }
 
     // 6. Retorna uma resposta de sucesso para o frontend
