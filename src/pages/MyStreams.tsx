@@ -32,7 +32,7 @@ const MyStreams = () => {
 
   const calculateReais = () => {
     const totalPoints = calculateCost();
-    return (totalPoints / 600).toFixed(2);
+    return (totalPoints / 1200).toFixed(2);
   };
 
   const platforms = [
@@ -250,7 +250,7 @@ const MyStreams = () => {
                                     </div>
                                     <div className="pt-2 border-t text-xs text-muted-foreground">
                                       <p>Cálculo: {maxQuantity} usuários × {selectedDuration} minutos = {calculateCost()} pontos</p>
-                                      <p className="mt-1">Taxa de conversão: 600 pontos = R$ 1,00</p>
+                                      <p className="mt-1">Taxa de conversão (depósito): 1200 pontos = R$ 1,00</p>
                                     </div>
                                   </div>
                                 </CardContent>

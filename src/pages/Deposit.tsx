@@ -29,7 +29,7 @@ const Deposit = () => {
   const [error, setError] = useState<string | null>(null);
   const [pixData, setPixData] = useState<PixData | null>(null);
 
-  const pointsPerReal = 600; // 600 pontos por R$1
+  const pointsPerReal = 1200; // 1200 pontos por R$1
 
   useEffect(() => {
     if (!authLoading && !user) {

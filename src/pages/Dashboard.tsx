@@ -31,7 +31,7 @@ const Dashboard = () => {
     return null;
   }
 
-  const pointsToReal = (points: number) => (points / 700).toFixed(2); // 700 pontos = R$ 1,00
+  const pointsToReal = (points: number) => (points / 1400).toFixed(2); // 1400 pontos = R$ 1,00
 
   const stats = {
     points: userPoints?.points ?? 0,

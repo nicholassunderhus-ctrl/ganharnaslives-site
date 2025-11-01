@@ -197,7 +197,7 @@ const Withdraw = () => {
               <div className="bg-muted/50 rounded-lg p-4">
                 <h3 className="font-semibold mb-2">Taxa de Conversão</h3>
                 <p className="text-sm text-muted-foreground">
-                  700 pontos = R$ 1,00
+                  1400 pontos = R$ 1,00
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Saque mínimo: {MIN_WITHDRAW_POINTS} pontos (R$ {minWithdrawReal})
