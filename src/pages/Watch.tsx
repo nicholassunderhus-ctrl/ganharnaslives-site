@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
+import { toast } from "sonner";
 import { MobileNav } from "@/components/MobileNav";
 import { MobileHeader } from "@/components/MobileHeader";
 import { StreamViewer } from "@/components/StreamViewer";
@@ -115,40 +116,42 @@ const Watch = () => {
   }, []);
 
   // Efeito para redirecionar ou fechar a live quando ela termina.
-  // Este efeito agora cria uma assinatura específica para a live selecionada.
   useEffect(() => {
     if (!selectedStream) {
       return;
     }
 
-    // Cria um canal de assinatura para a stream específica que o usuário está assistindo.
+    // Cria um canal de assinatura dedicado para a stream que o usuário está assistindo.
     const streamSubscription = supabase
       .channel(`stream-${selectedStream.id}`)
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: 'UPDATE', // Escuta apenas por atualizações
           schema: 'public',
           table: 'streams',
-          filter: `id=eq.${selectedStream.id}`, // Filtra eventos apenas para esta stream
+          filter: `id=eq.${selectedStream.id}`, // Filtro para receber eventos SOMENTE desta stream
         },
         (payload) => {
-          // Verifica se o status da stream mudou para algo diferente de 'live' (ex: 'finished').
-          // O payload.new contém os novos dados da linha que foi atualizada.
+          // O payload.new contém os dados da stream após a atualização.
           const updatedStream = payload.new as { id: string; status: string };
+
+          // Se o status não for mais 'live', a stream terminou.
           if (updatedStream.status !== 'live') {
             toast.info("A live que você estava assistindo terminou.", {
               description: "Procurando a próxima live disponível...",
             });
             
-            // A live terminou. Procura a próxima live disponível na lista de streams do estado.
-            // A lista 'streams' é atualizada pelo outro listener de realtime.
+            // Procura a próxima live disponível na lista que já temos no estado.
+            // A lista 'streams' é mantida atualizada pela outra subscription.
             const nextAvailableStream = streams.find(s => s.id !== selectedStream.id && !s.isFull);
             
             if (nextAvailableStream) {
+              // Se encontrou, muda para a próxima live.
               setSelectedStream(nextAvailableStream);
             } else {
-              setSelectedStream(null); // Fecha o viewer se não houver outra live disponível.
+              // Se não encontrou, fecha o viewer.
+              setSelectedStream(null);
             }
           }
         }
@@ -156,10 +159,11 @@ const Watch = () => {
       .subscribe();
 
     // Função de limpeza: remove a assinatura quando o usuário fecha a live ou é redirecionado.
+    // Isso evita múltiplas assinaturas e vazamentos de memória.
     return () => {
-      streamSubscription.unsubscribe();
+      supabase.removeChannel(streamSubscription);
     };
-  }, [selectedStream, streams]); // Roda sempre que a stream selecionada ou a lista de streams mudar.
+  }, [selectedStream, streams]); // Roda sempre que a stream selecionada ou a lista geral de streams mudar.
 
   const handleCloseViewer = () => {
     setSelectedStream(null);
