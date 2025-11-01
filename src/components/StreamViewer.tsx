@@ -1,12 +1,16 @@
 import { useState, useEffect, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Stream } from "@/types";
+import { Stream, Platform } from "@/types";
 import { PlatformIcon } from "./PlatformIcon";
-import { Eye, Clock, Coins, MessageSquare, X } from "lucide-react";
+import { Eye, Clock, Coins } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { getEmbedUrl } from "@/lib/stream-utils";
+import { getEmbedUrl } from "@/lib/stream-utils"; // getEmbedUrl não é mais usado aqui, mas pode ser mantido se usado em outro lugar
 import { StreamChat } from "./StreamChat";
 import ReactPlayer from "react-player";
 
@@ -19,37 +23,76 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { earnPoints, loading } = useEarnPoints(); // Agora usa a versão corrigida
-  const [timeWatched, setTimeWatched] = useState(0); // Começa em 0
-  const [isChatVisible, setIsChatVisible] = useState(true);
+  const [timeWatched, setTimeWatched] = useState(0);
+  const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
+
+  // Converte a URL da stream para a URL de incorporação correta
+  const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
+  // const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform); // Movido para dentro do ReactPlayer
+
+  // Efeito para registrar que o usuário está assistindo
+  useEffect(() => {
+    if (!user) return;
+
+    // const joinStream = async () => {
+    //   await supabase
+    //     .from('stream_viewers')
+    //     .upsert({ stream_id: stream.id, user_id: user.id });
+    // };
+
+    // const leaveStream = async () => {
+    //   await supabase
+    //     .from('stream_viewers')
+    //     .delete()
+    //     .match({ stream_id: stream.id, user_id: user.id });
+    // };
+
+    // joinStream();
+
+    // Quando o componente for desmontado (usuário fechar), remove o registro
+    return () => {
+      // leaveStream();
+    };
+  }, [stream.id, user]);
 
   useEffect(() => {
     let timeInterval: NodeJS.Timeout | undefined;
     let pointsInterval: NodeJS.Timeout | undefined;
 
-    // Intervalo para atualizar o tempo assistido na tela (a cada segundo)
-    timeInterval = setInterval(() => {
-      setTimeWatched(prev => prev + 1);
-    }, 1000);
+    if (isWatching) {
+      // Intervalo para atualizar o tempo assistido na tela (a cada segundo)
+      timeInterval = setInterval(() => {
+        setTimeWatched(prev => prev + 1);
+      }, 1000);
 
-    // Intervalo para ganhar pontos (a cada minuto)
-    pointsInterval = setInterval(() => {
-      earnPoints(stream.id).then(result => {
-        if (result && result.success) {
-          setEarnedPoints(prev => prev + result.pointsEarned!);
-          // Invalida a query de pontos do usuário para forçar a atualização do saldo na UI
-          queryClient.invalidateQueries({ queryKey: ['userPoints', user?.id] });
-        } else {
-          console.warn("Falha ao ganhar pontos:", result?.error);
-        }
-      });
-    }, 60000); // 60000ms = 1 minuto
+      // Intervalo para ganhar pontos (a cada minuto)
+      pointsInterval = setInterval(() => {
+        earnPoints(stream.id).then(result => {
+          if (result && result.success) {
+            setEarnedPoints(prev => prev + result.pointsEarned!);
+            // Invalida a query de pontos do usuário para forçar a atualização do saldo na UI
+            queryClient.invalidateQueries({ queryKey: ['userPoints', user?.id] });
+          } else {
+            console.warn("Falha ao ganhar pontos:", result?.error);
+          }
+        });
+      }, 60000); // 60000ms = 1 minuto
+    }
 
     return () => {
       if (timeInterval) clearInterval(timeInterval);
       if (pointsInterval) clearInterval(pointsInterval);
-    }; // A dependência vazia [] faz com que o efeito rode apenas uma vez na montagem
-  }, [earnPoints, queryClient, user?.id, stream.id]);
+    };
+  }, [isWatching, earnPoints, queryClient, user?.id, stream.id]);
+
+  const handleStartWatching = () => {
+    setIsWatching(true);
+  };
+
+  const handleStopWatching = () => {
+    setIsWatching(false);
+  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -58,76 +101,63 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="relative w-full h-full max-w-6xl max-h-[90vh] bg-background shadow-2xl rounded-lg overflow-hidden">
-        <div className="flex w-full h-full">
-          <div className="flex-1 h-full bg-black">
-            <ReactPlayer
-              url={stream.streamUrl}
-              playing={true}
-              width="100%"
-              height="100%"
-              controls={true} // Habilitar controles nativos para melhor UX
-              config={{
-                youtube: { playerVars: { autoplay: 1 } },
-                twitch: { options: { parent: [window.location.hostname] } },
-              }}
+    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-4xl bg-background">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <PlatformIcon platform={stream.platform} className="w-6 h-6" />
+              <div>
+                <h2 className="text-xl font-bold">{stream.title}</h2>
+                <p className="text-muted-foreground">{stream.streamer}</p>
+              </div>
+            </div>
+            <Button variant="outline" onClick={onClose}>
+              Fechar
+            </Button>
+          </div>
+
+          <div className="aspect-video bg-black rounded-lg mb-4 flex items-center justify-center">
+            <iframe
+              src={embedUrl}
+              className="w-full h-full rounded-lg"
+              allowFullScreen
             />
           </div>
 
-          {isChatVisible && (
-            <div className="w-[340px] h-full hidden lg:block">
-              <StreamChat platform={stream.platform} streamUrl={stream.streamUrl} />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Eye className="w-3 h-3" />
+                {stream.currentViewers}/{stream.maxViewers}
+              </Badge>
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {formatTime(timeWatched)}
+              </Badge>
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Coins className="w-3 h-3" />
+                +{earnedPoints} pontos ganhos
+              </Badge>
             </div>
-          )}
-        </div>
-        {/* Controles sobrepostos */}
-        <div className="absolute top-0 left-0 right-0 p-2 flex justify-between items-start bg-gradient-to-b from-black/50 to-transparent">
-          <div className="flex items-center gap-2">
-            <button onClick={onClose} className="text-white hover:bg-white/20 p-2 rounded-full transition-colors">
-              <X className="w-6 h-6" />
-            </button>
-            <button
-              onClick={() => setIsChatVisible(!isChatVisible)}
-              className="text-white hover:bg-white/20 p-2 rounded-full transition-colors hidden lg:inline-flex"
-            >
-              <MessageSquare className="w-5 h-5" />
-            </button>
-          </div>
-          <Badge variant="destructive" className="bg-red-600/90">
-            <div className="w-2 h-2 rounded-full bg-white mr-1.5 animate-pulse" />
-            AO VIVO
-          </Badge>
-        </div>
-
-        <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-4">
-          <div className="flex items-center justify-between text-white drop-shadow-md">
-             <div className="flex items-center gap-4">
-               <Badge variant="secondary" className="flex items-center gap-1.5 bg-black/60 border-none text-white">
-                 <Eye className="w-4 h-4" />
-                 {stream.currentViewers}/{stream.maxViewers}
-               </Badge>
-               <Badge variant="secondary" className="flex items-center gap-1.5 bg-black/60 border-none text-white">
-                 <Clock className="w-4 h-4" />
-                 {formatTime(timeWatched)}
-               </Badge>
-               <Badge variant="secondary" className="flex items-center gap-1.5 bg-black/60 border-none text-white">
-                 <Coins className="w-4 h-4 text-primary" />
-                 +{earnedPoints}
-               </Badge>
-             </div>
-             <div className="text-sm font-semibold text-primary drop-shadow-lg">
-               +{stream.pointsPerMinute} pts/min
-             </div>
+            <div className="text-sm text-muted-foreground">
+              +{stream.pointsPerMinute} pts/min
+            </div>
           </div>
 
-          {loading && (
-            <p className="text-center text-sm text-muted-foreground mt-2">
-              Processando pontos...
-            </p>
-          )}
+          <div className="flex gap-2">
+            {!isWatching ? (
+              <Button onClick={handleStartWatching} className="flex-1">
+                Começar a Assistir e Ganhar Pontos
+              </Button>
+            ) : (
+              <Button onClick={handleStopWatching} variant="destructive" className="flex-1">
+                Parar de Assistir
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
