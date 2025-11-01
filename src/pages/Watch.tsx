@@ -116,16 +116,18 @@ const Watch = () => {
 
   // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
   useEffect(() => {
-    if (selectedStream && !loading) {
-      // Verifica se a stream selecionada ainda existe na lista de streams ativas
-      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
-      
-      if (!isStreamStillActive) {
-        // Se a stream não está mais ativa, fecha o visualizador
-        setSelectedStream(null);
-      }
+    // Se não há stream selecionada, não faz nada.
+    if (!selectedStream) return;
+
+    // Verifica se a stream selecionada ainda existe na lista de streams ativas.
+    // Esta verificação acontece toda vez que a lista 'streams' é atualizada.
+    const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
+    
+    if (!isStreamStillActive) {
+      // Se a stream não está mais na lista de ativas, fecha o visualizador.
+      setSelectedStream(null);
     }
-  }, [streams, selectedStream, loading]);
+  }, [streams, selectedStream]);
 
   const filteredStreams = streams
     .filter(stream => {
