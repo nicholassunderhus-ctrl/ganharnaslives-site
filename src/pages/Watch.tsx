@@ -43,7 +43,7 @@ const Watch = () => {
             max_viewers,
             current_viewers,
             duration_minutes,
-            created_at,
+            created_at, // Mantido para referência
             points_per_minute
           `)
           .eq('status', 'live')
@@ -59,7 +59,7 @@ const Watch = () => {
             current_viewers: number;
             duration_minutes: number;
             created_at: string;
-            points_per_minute: number;
+            points_per_minute: number; // Adicionado
           }[]>(); // Adicionado o ponto e vírgula que faltava aqui
 
         if (error) throw error;
@@ -69,8 +69,8 @@ const Watch = () => {
           id: stream.id,
           platform: stream.platform as Platform,
           streamer: `Streamer #${stream.user_id.substring(0, 8)}`, // Placeholder
-          title: `Live em ${stream.platform}`, // Placeholder para o título
-          category: "Ao Vivo", // Placeholder para a categoria
+          title: stream.title || `Live em ${stream.platform}`,
+          category: stream.category || "Ao Vivo",
           viewers: stream.current_viewers, // Mantido por compatibilidade
           currentViewers: stream.current_viewers,
           maxViewers: stream.max_viewers,
@@ -79,8 +79,7 @@ const Watch = () => {
           pointsPerMinute: stream.points_per_minute,
           durationMinutes: stream.duration_minutes,
           isFull: stream.current_viewers >= stream.max_viewers,
-          // Opcional: pode ser útil para mostrar o tempo restante no futuro
-          createdAt: stream.created_at 
+          createdAt: stream.created_at,
         }));
 
         setStreams(formattedStreams);
@@ -93,67 +92,70 @@ const Watch = () => {
 
     fetchStreams();
 
-    // Subscrever para atualizações em tempo real da tabela streams
-    const subscription = supabase
-      .channel('streams_changes')
+    const streamsChannel = supabase
+      .channel('public:streams')
       .on(
         'postgres_changes',
-        {
-          event: '*', // Escutar todos os eventos (INSERT, UPDATE, DELETE)
-          schema: 'public',
-          table: 'streams'
-        },
-        async () => {
-          // Quando houver qualquer mudança, atualizar a lista
-          await fetchStreams();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  // Efeito para redirecionar ou fechar a live quando ela termina.
-  // Este efeito agora cria uma assinatura específica para a live selecionada.
-  useEffect(() => {    
-    if (!selectedStream) {
-      return;
-    }
-
-    // Cria um canal de assinatura para a stream específica que o usuário está assistindo.
-    const streamSubscription = supabase
-      .channel(`stream-${selectedStream.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE', // Escuta apenas por atualizações
-          schema: 'public',
-          table: 'streams',
-          filter: `id=eq.${selectedStream.id}`, // Filtra eventos apenas para esta stream
-        },
+        { event: '*', schema: 'public', table: 'streams' },
         (payload) => {
-          // O payload.new contém os dados da stream após a atualização.
-          const updatedStream = payload.new as { id: string; status: string };
+          const { eventType, new: newRecord, old: oldRecord } = payload;
 
-          // Se o status não for mais 'live', a stream terminou.
-          if (updatedStream.status !== 'live') {
-            toast.info("A live que você estava assistindo terminou.");
+          setStreams((currentStreams) => {
+            // Se a live que está sendo assistida for finalizada, fecha o viewer.
+            if (
+              eventType === 'UPDATE' &&
+              selectedStream &&
+              newRecord.id === selectedStream.id &&
+              newRecord.status !== 'live'
+            ) {
+              toast.info("A live que você estava assistindo terminou.");
+              setSelectedStream(null);
+            }
 
-            // A live terminou, então simplesmente fechamos o viewer.
-            // O usuário pode então escolher outra live da lista atualizada.
-            setSelectedStream(null);
-          }
+            // Lógica para atualizar a lista de streams na tela principal
+            if (eventType === 'INSERT') {
+              const newStream: Stream = {
+                id: newRecord.id,
+                platform: newRecord.platform as Platform,
+                streamer: `Streamer #${newRecord.user_id.substring(0, 8)}`,
+                title: newRecord.title || `Live em ${newRecord.platform}`,
+                category: newRecord.category || "Ao Vivo",
+                currentViewers: newRecord.current_viewers,
+                maxViewers: newRecord.max_viewers,
+                thumbnailUrl: getDynamicThumbnailUrl(newRecord.platform, newRecord.stream_url),
+                streamUrl: newRecord.stream_url,
+                pointsPerMinute: newRecord.points_per_minute,
+                durationMinutes: newRecord.duration_minutes,
+                isFull: newRecord.current_viewers >= newRecord.max_viewers,
+                createdAt: newRecord.created_at,
+                viewers: newRecord.current_viewers,
+              };
+              // Adiciona apenas se não existir para evitar duplicatas
+              if (!currentStreams.some(s => s.id === newStream.id)) {
+                return [...currentStreams, newStream];
+              }
+            } else if (eventType === 'UPDATE') {
+              return currentStreams.map(stream => {
+                if (stream.id === newRecord.id) {
+                  // Se o status não for mais 'live', remove da lista. Senão, atualiza.
+                  return newRecord.status === 'live' ? { ...stream, currentViewers: newRecord.current_viewers, isFull: newRecord.current_viewers >= newRecord.max_viewers } : null;
+                }
+                return stream;
+              }).filter(Boolean) as Stream[]; // filter(Boolean) remove os nulos
+            } else if (eventType === 'DELETE') {
+              return currentStreams.filter(stream => stream.id !== oldRecord.id);
+            }
+
+            return currentStreams;
+          });
         }
       )
       .subscribe();
 
-    // Função de limpeza: remove a assinatura quando o usuário fecha a live ou é redirecionado.
     return () => {
-      streamSubscription.unsubscribe();
+      supabase.removeChannel(streamsChannel);
     };
-  }, [selectedStream]); // A dependência de 'streams' não é mais necessária aqui.
+  }, [selectedStream]); // Adiciona selectedStream para que a lógica de fechamento tenha a referência correta.
 
   const handleCloseViewer = () => {
     setSelectedStream(null);
