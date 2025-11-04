@@ -72,7 +72,7 @@ const Watch = () => {
           viewers: stream.current_viewers, // Mantido por compatibilidade
           currentViewers: stream.current_viewers,
           maxViewers: stream.max_viewers,
-          thumbnailUrl: `https://source.unsplash.com/random/800x450?${stream.category.toLowerCase().replace(/\s+/g, '-')}`, // Placeholder
+          thumbnailUrl: `https://source.unsplash.com/random/800x450?${(stream.category ?? 'live').toLowerCase().replace(/\s+/g, '-')}`, // Placeholder seguro
           streamUrl: stream.stream_url,
           pointsPerMinute: stream.points_per_viewer * stream.viewers_per_minute,
           durationMinutes: stream.duration_minutes,
