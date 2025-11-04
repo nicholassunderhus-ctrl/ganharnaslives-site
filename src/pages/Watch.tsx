@@ -95,7 +95,7 @@ const Watch = () => {
 
     // Subscrever para atualizações em tempo real da tabela streams
     const subscription = supabase
-      .channel('public:streams') // Usar nome de canal consistente com Admin.tsx
+      .channel('public:streams')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'streams' }, 
         () => fetchStreams() // Refetch a lista de lives em qualquer mudança
       )
