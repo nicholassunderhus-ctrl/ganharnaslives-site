@@ -32,6 +32,15 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   // Converte a URL da stream para a URL de incorporação correta
   const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
 
+  // Efeito para iniciar o ganho de pontos automaticamente.
+  useEffect(() => {
+    // Se a plataforma não for Kick, ou se a verificação da Kick já passou,
+    // inicia o ganho de pontos.
+    if (stream.platform !== Platform.Kick || kickLoginStep === 'verified') {
+      setIsWatching(true);
+    }
+  }, [stream.platform, kickLoginStep]);
+
 
   useEffect(() => {
     let timeInterval: NodeJS.Timeout | undefined;
@@ -88,14 +97,6 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
       clearInterval(statusInterval);
     };
   }, [stream.id, onClose]);
-
-  const handleStartWatching = () => {
-    setIsWatching(true);
-  };
-
-  const handleStopWatching = () => {
-    setIsWatching(false);
-  };
 
   const handleOpenKickLogin = () => {
     window.open('https://kick.com/login', '_blank');
@@ -162,32 +163,23 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
             </div>
           </div>
 
-          <div className="flex gap-2">
-            {stream.platform === Platform.Kick && kickLoginStep !== 'verified' ? (
-              <div className="w-full text-center p-4 bg-muted/50 rounded-lg space-y-4">
-                <p className="text-sm font-medium">Para ganhar pontos, você precisa estar logado na Kick.</p>
-                {kickLoginStep === 'initial' && (
-                  <Button onClick={handleOpenKickLogin} className="w-full">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Fazer Login na Kick
-                  </Button>
-                )}
-                {kickLoginStep === 'verifying' && (
-                  <Button onClick={handleKickVerification} disabled={!verifyButtonEnabled} className="w-full">
-                    {verifyButtonEnabled ? "Já fiz o login, quero assistir!" : "Aguarde..."}
-                  </Button>
-                )}
-              </div>
-            ) : !isWatching ? (
-              <Button onClick={handleStartWatching} className="flex-1">
-                Começar a Assistir e Ganhar Pontos
-              </Button>
-            ) : (
-              <Button onClick={handleStopWatching} variant="destructive" className="flex-1">
-                Parar de Assistir
-              </Button>
-            )}
-          </div>
+          {/* Lógica de verificação da Kick, sem os botões de iniciar/parar */}
+          {stream.platform === Platform.Kick && kickLoginStep !== 'verified' && (
+            <div className="w-full text-center p-4 bg-muted/50 rounded-lg space-y-4">
+              <p className="text-sm font-medium">Para ganhar pontos, você precisa estar logado na Kick.</p>
+              {kickLoginStep === 'initial' && (
+                <Button onClick={handleOpenKickLogin} className="w-full">
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Fazer Login na Kick
+                </Button>
+              )}
+              {kickLoginStep === 'verifying' && (
+                <Button onClick={handleKickVerification} disabled={!verifyButtonEnabled} className="w-full">
+                  {verifyButtonEnabled ? "Já fiz o login, pode começar!" : "Aguarde..."}
+                </Button>
+              )}
+            </div>
+          )}
 
           {loading && (
             <p className="text-center text-sm text-muted-foreground mt-2">
