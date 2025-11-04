@@ -98,7 +98,7 @@ const Watch = () => {
     // A abordagem mais simples e robusta é re-buscar todas as lives ativas
     // sempre que houver uma mudança, garantindo que a lista esteja sempre em sincronia.
     const streamsChannel = supabase
-      .channel('public:streams')
+      .channel('streams_changes')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'streams' },
