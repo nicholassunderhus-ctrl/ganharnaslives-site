@@ -111,6 +111,25 @@ const Watch = () => {
     };
   }, []);
 
+  // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa.
+  useEffect(() => {
+    // Se não há uma stream selecionada, não há nada a fazer.
+    if (!selectedStream) return;
+
+    // Apenas executa a lógica de verificação se a lista de streams não estiver sendo carregada.
+    if (!loading) {
+      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
+      
+      if (!isStreamStillActive) {
+        // A live atual terminou ou não está mais na lista de lives ativas.
+        // Fecha o visualizador da stream.
+        setSelectedStream(null);
+        // Opcional: Adicionar um toast para notificar o usuário.
+        // toast.info("A live que você estava assistindo terminou.");
+      }
+    }
+  }, [streams, selectedStream, loading]); // Depende das streams, da stream selecionada e do estado de loading
+
   const filteredStreams = streams.filter(stream => {
     const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
     const matchesSearch = stream.streamer.toLowerCase().includes(searchQuery.toLowerCase()) ||
