@@ -132,9 +132,9 @@ const Watch = () => {
 
   const filteredStreams = streams.filter(stream => {
     const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
-    const matchesSearch = stream.streamer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         stream.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (stream.streamer?.toLowerCase() ?? '').includes(searchQuery.toLowerCase()) ||
+                         (stream.title?.toLowerCase() ?? '').includes(searchQuery.toLowerCase()) ||
+                         (stream.category?.toLowerCase() ?? '').includes(searchQuery.toLowerCase());
     return matchesPlatform && matchesSearch;
   });
 
