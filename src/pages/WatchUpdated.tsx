@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { MobileNav } from "@/components/MobileNav";
 import { MobileHeader } from "@/components/MobileHeader";
-import { StreamViewer } from "@/components/StreamViewer";
 import { StreamCard } from "@/components/StreamCard";
+import { StreamViewer } from "@/components/StreamViewer";
 import { Stream, Platform } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,6 @@ import { PlatformIcon } from "@/components/PlatformIcon";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { getDynamicThumbnailUrl } from "@/lib/stream-utils";
 
 const Watch = () => {
   const { userPoints } = useUserPoints();
@@ -25,7 +23,6 @@ const Watch = () => {
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Função para buscar as streams ativas
   // Inscrever-se nas atualizações em tempo real
   useEffect(() => {
     // Primeiro, buscar todas as streams ativas
@@ -43,54 +40,49 @@ const Watch = () => {
             stream_url,
             max_viewers,
             current_viewers,
-            duration_minutes,
-            created_at,
-            points_per_minute
-          `) // A busca já estava correta, mas para garantir, confirmo o status 'live'
+            viewers_per_minute,
+            points_per_viewer,
+            duration_minutes
+          `)
           .eq('status', 'live')
           .eq('is_paid', true)
           .returns<{
             id: string;
             user_id: string;
             platform: Platform;
-            title: string | null;
-            category: string | null;
+            title: string;
+            category: string;
             stream_url: string;
             max_viewers: number;
             current_viewers: number;
+            viewers_per_minute: number;
+            points_per_viewer: number;
             duration_minutes: number;
-            created_at: string;
-            points_per_minute: number;
-          }[]>(); // Adicionado o ponto e vírgula que faltava aqui
+          }[]>();
 
-        console.log("fetchStreams: Dados recebidos do Supabase:", data);
         if (error) throw error;
 
         // Transformar os dados do Supabase para o formato Stream
         const formattedStreams: Stream[] = data.map(stream => ({
           id: stream.id,
           platform: stream.platform as Platform,
-          streamer: `Streamer #${stream.user_id.substring(0, 8)}`, // Placeholder
-          title: `Live em ${stream.platform}`, // Placeholder para o título
-          category: "Ao Vivo", // Placeholder para a categoria
+          streamer: stream.user_id, // TODO: Buscar nome do usuário
+          title: stream.title,
+          category: stream.category,
           viewers: stream.current_viewers, // Mantido por compatibilidade
           currentViewers: stream.current_viewers,
           maxViewers: stream.max_viewers,
-          thumbnailUrl: getDynamicThumbnailUrl(stream.platform, stream.stream_url),
+          thumbnailUrl: `https://source.unsplash.com/random/800x450?${stream.category.toLowerCase().replace(/\s+/g, '-')}`, // Placeholder
           streamUrl: stream.stream_url,
-          pointsPerMinute: stream.points_per_minute,
+          pointsPerMinute: stream.points_per_viewer * stream.viewers_per_minute,
           durationMinutes: stream.duration_minutes,
-          isFull: stream.current_viewers >= stream.max_viewers,
-          // Opcional: pode ser útil para mostrar o tempo restante no futuro
-          createdAt: stream.created_at 
+          isFull: stream.current_viewers >= stream.max_viewers
         }));
 
-        console.log("fetchStreams: Streams formatadas:", formattedStreams);
         setStreams(formattedStreams);
       } catch (error) {
         console.error('Erro ao buscar lives:', error);
       } finally {
-        console.log("fetchStreams: Loading set to false.");
         setLoading(false);
       }
     };
@@ -99,51 +91,52 @@ const Watch = () => {
 
     // Subscrever para atualizações em tempo real da tabela streams
     const subscription = supabase
-      .channel('public:streams') // Nome de canal unificado
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'streams' }, 
-        (payload) => {
-          console.log("Realtime: Mudança detectada na tabela streams!", payload);
-          fetchStreams(); // Refetch a lista de lives em qualquer mudança
+      .channel('public:streams') // NOME UNIFICADO para evitar conflitos
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Escutar todos os eventos (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'streams'
+        },
+        async () => {
+          // Quando houver qualquer mudança, atualizar a lista
+          await fetchStreams();
         }
       )
       .subscribe();
 
     return () => {
-      console.log("Realtime: Desinscrevendo do canal 'public:streams'.");
       supabase.removeChannel(subscription);
     };
   }, []);
 
-  // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
+  // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa.
   useEffect(() => {
     // Se não há uma stream selecionada, não há nada a fazer.
-    if (!selectedStream || loading) return;
+    if (!selectedStream) return;
 
-    const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
-    if (!isStreamStillActive) {
-      toast.info("A live que você estava assistindo terminou.");
-      setSelectedStream(null);
-      console.log("useEffect (close player): Live não está mais ativa. Fechando player.");
+    // Apenas executa a lógica de verificação se a lista de streams não estiver sendo carregada.
+    if (!loading) {
+      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
+      
+      if (!isStreamStillActive) {
+        // A live atual terminou ou não está mais na lista de lives ativas.
+        // Fecha o visualizador da stream.
+        setSelectedStream(null);
+        // Opcional: Adicionar um toast para notificar o usuário.
+        // toast.info("A live que você estava assistindo terminou.");
+      }
     }
-  }, [streams, selectedStream, loading]);
+  }, [streams, selectedStream, loading]); // Depende das streams, da stream selecionada e do estado de loading
 
-  const filteredStreams = streams
-    .filter(stream => {
-      const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
-      const matchesSearch = (stream.streamer?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-                           (stream.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-                           (stream.category?.toLowerCase() || '').includes(searchQuery.toLowerCase());
-      return matchesPlatform && matchesSearch;
-    })
-    .sort((a, b) => {
-      // Se a live 'a' está lotada e a 'b' não, 'b' vem primeiro.
-      if (a.isFull && !b.isFull) return 1;
-      // Se a live 'b' está lotada e a 'a' não, 'a' vem primeiro.
-      if (!a.isFull && b.isFull) return -1;
-      // Se ambas estão no mesmo estado (lotadas ou não), ordena pela maior quantidade
-      // de espectadores (ordem decrescente).
-      return b.currentViewers - a.currentViewers;
-    });
+  const filteredStreams = streams.filter(stream => {
+    const matchesPlatform = selectedPlatform === "all" || stream.platform === selectedPlatform;
+    const matchesSearch = stream.streamer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         stream.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesPlatform && matchesSearch;
+  });
 
   const handleWatch = (stream: Stream) => {
     setSelectedStream(stream);
@@ -158,7 +151,7 @@ const Watch = () => {
       <Sidebar points={userPoints?.points ?? 0} />
       <MobileHeader />
       <MobileNav />
-      
+
       <main className="md:ml-64 ml-0 pt-20 pb-24 md:pb-8 p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div>
@@ -177,7 +170,7 @@ const Watch = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:pb-0">
               <Button
                 variant={selectedPlatform === "all" ? "default" : "outline"}
