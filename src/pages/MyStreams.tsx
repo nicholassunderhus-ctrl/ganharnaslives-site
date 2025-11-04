@@ -171,7 +171,7 @@ const MyStreams = () => {
                       <Label htmlFor="duration" className="flex items-center gap-2">
                         <Clock className="w-4 h-4" /> Duração da Live
                       </Label>
-                       <Select onValueChange={(value) => setSelectedDuration(Number(value))} value={selectedDuration?.toString()}>
+                       <Select onValueChange={(value) => setSelectedDuration(Number(value))} value={selectedDuration ? selectedDuration.toString() : ""}>
                         <SelectTrigger id="duration">
                           <SelectValue placeholder="Selecione a duração" />
                         </SelectTrigger>
