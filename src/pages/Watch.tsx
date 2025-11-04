@@ -139,19 +139,11 @@ const Watch = () => {
 
           // Se o status não for mais 'live', a stream terminou.
           if (updatedStream.status !== 'live') {
-            toast.info("A live que você estava assistindo terminou.", {
-              description: "Procurando a próxima live disponível...",
-            });
-            
-            // A live terminou. Procura a próxima live disponível na lista de streams do estado.
-            // A lista 'streams' é atualizada pelo outro listener de realtime.
-            const nextAvailableStream = streams.find(s => s.id !== selectedStream.id && !s.isFull);
-            
-            if (nextAvailableStream) {
-              setSelectedStream(nextAvailableStream);
-            } else {
-              setSelectedStream(null); // Fecha o viewer se não houver outra live disponível.
-            }
+            toast.info("A live que você estava assistindo terminou.");
+
+            // A live terminou, então simplesmente fechamos o viewer.
+            // O usuário pode então escolher outra live da lista atualizada.
+            setSelectedStream(null);
           }
         }
       )
@@ -161,7 +153,7 @@ const Watch = () => {
     return () => {
       streamSubscription.unsubscribe();
     };
-  }, [selectedStream, streams]); // Roda sempre que a stream selecionada ou a lista de streams mudar.
+  }, [selectedStream]); // A dependência de 'streams' não é mais necessária aqui.
 
   const handleCloseViewer = () => {
     setSelectedStream(null);
