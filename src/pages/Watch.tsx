@@ -157,6 +157,16 @@ const Watch = () => {
     });
 
   const handleWatch = (stream: Stream) => {
+    setSelectedStream(stream);
+  };
+
+  const handleCloseViewer = () => {
+    setSelectedStream(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Sidebar points={userPoints?.points ?? 0} />
       <MobileHeader />
       <MobileNav />
       

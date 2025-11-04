@@ -89,7 +89,7 @@ serve(async (req) => {
     }
     // Garante que o usuário não ganhe pontos por uma live que já acabou
     if (stream.status !== 'live') {
-      return new Response(JSON.stringify({ error: 'Esta live foi encerrada e não está mais creditando pontos. Por favor, atualize a página para ver outras lives disponíveis.' }), {
+      return new Response(JSON.stringify({ error: 'Esta live não está mais ativa.' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
