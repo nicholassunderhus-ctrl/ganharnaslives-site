@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
-import Watch from "./pages/WatchUpdated";
+import Watch from "./pages/Watch";
 import MyStreams from "./pages/MyStreams";
 import Withdraw from "./pages/Withdraw";
 import Deposit from "./pages/Deposit";

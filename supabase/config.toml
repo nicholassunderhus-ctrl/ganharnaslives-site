@@ -27,3 +27,8 @@ enabled = true
 verify_jwt = true # Apenas admins logados podem chamar
 import_map = "./functions/handle-withdrawal/deno.json"
 entrypoint = "./functions/handle-withdrawal/index.ts"
+
+[functions.update-expired-streams]
+auth_token_env_var = "SUPABASE_SERVICE_ROLE_KEY"
+verify_jwt = false
+schedule = "*/1 * * * *"
