@@ -13,7 +13,9 @@ export const getEmbedUrl = (url: string, platform: Platform): string => {
     if (platform === Platform.YouTube) {
       // Ex: https://www.youtube.com/watch?v=VIDEO_ID -> https://www.youtube.com/embed/VIDEO_ID
       const videoId = urlObj.searchParams.get("v");
-      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
+      // Adicionado `mute=1` para contornar as políticas de autoplay de navegadores como o Opera GX.
+      // A maioria dos navegadores modernos só permite autoplay se o vídeo estiver sem som.
+      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1` : url;
     }
 
     if (platform === Platform.Kick) {
