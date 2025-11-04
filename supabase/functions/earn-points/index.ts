@@ -95,9 +95,7 @@ serve(async (req) => {
       });
     }
 
-const pointsToAdd = stream.points_per_minute;
-    // CORREÇÃO: Define um valor fixo de 1 ponto por minuto,
-    // conforme a regra de negócio principal do site.
+    // CORREÇÃO: Define a quantidade de pontos a serem adicionados.
     const pointsToAdd = 1;
 
     // 5. Tenta adicionar os pontos usando a nova função RPC `try_add_points`
@@ -112,7 +110,13 @@ const pointsToAdd = stream.points_per_minute;
 
     // Se a função retornou 'false', significa que o tempo de espera não foi atingido.
     if (!wasSuccessful) {
-      throw new Error('Aguarde um minuto para ganhar pontos novamente.');
+      // MUDANÇA: Em vez de lançar um erro, retornamos uma resposta de sucesso
+      // indicando que a chamada foi bem-sucedida, mas 0 pontos foram ganhos devido ao cooldown.
+      return new Response(JSON.stringify({
+        success: true,
+        pointsEarned: 0,
+        message: 'Cooldown ativo. Tente novamente em breve.',
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
     }
 
     // 6. Retorna uma resposta de sucesso para o frontend
