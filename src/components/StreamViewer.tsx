@@ -137,9 +137,12 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
           <div className="relative aspect-video bg-black rounded-lg mb-4 flex items-center justify-center">
             <iframe
               src={embedUrl}
-              className="w-full h-full rounded-lg"
+              // A propriedade abaixo faz com que o iframe ignore cliques
+              className="w-full h-full rounded-lg pointer-events-none"
               allowFullScreen
             />
+            {/* Esta camada transparente fica sobre o vídeo e bloqueia qualquer interação com o player */}
+            <div className="absolute inset-0 w-full h-full" />
           </div>
 
           <div className="flex items-center justify-between mb-4">
