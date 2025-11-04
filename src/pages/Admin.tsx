@@ -167,7 +167,7 @@ const Admin = () => {
 
     // Subscrever para atualizações em tempo real
     const subscription = supabase
-      .channel('admin_streams_changes')
+      .channel('public:streams') // NOME UNIFICADO para evitar conflitos
       .on(
         'postgres_changes',
         {
@@ -182,7 +182,7 @@ const Admin = () => {
       .subscribe();
     
     const withdrawalsSubscription = supabase
-      .channel('admin_withdrawals_changes')
+      .channel('public:withdrawals') // NOME UNIFICADO para consistência
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'withdrawals' },
@@ -195,7 +195,6 @@ const Admin = () => {
     return () => {
       supabase.removeChannel(subscription);
       supabase.removeChannel(withdrawalsSubscription);
-      subscription.unsubscribe();
     };
   }, []);
 
