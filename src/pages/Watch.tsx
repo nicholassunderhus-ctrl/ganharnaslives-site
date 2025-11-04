@@ -95,27 +95,17 @@ const Watch = () => {
     // Subscrever para atualizações em tempo real da tabela streams
     const subscription = supabase
       .channel('streams_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Escutar todos os eventos (INSERT, UPDATE, DELETE)
-          schema: 'public',
-          table: 'streams'
-        },
-        async () => {
-          // Quando houver qualquer mudança, atualizar a lista
-          await fetchStreams();
-        }
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'streams' }, 
+        () => fetchStreams() // Refetch a lista de lives em qualquer mudança
       )
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      supabase.removeChannel(subscription);
     };
   }, []);
 
   // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
-  // OU redirecionar para a próxima live disponível.
   useEffect(() => {
     // Se não há uma stream selecionada, não há nada a fazer.
     if (!selectedStream) return;
@@ -126,14 +116,10 @@ const Watch = () => {
       const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
       
       if (!isStreamStillActive) {
-        // A live atual terminou. Vamos procurar a próxima.
-        const nextStream = streams.find(stream => !stream.isFull && stream.id !== selectedStream.id);
-
-        if (nextStream) {
-          setSelectedStream(nextStream);
-        } else {
-          setSelectedStream(null);
-        }
+        // A live atual terminou ou não está mais na lista de lives ativas.
+        // Fecha o visualizador da stream.
+        toast.info("A live que você estava assistindo terminou.");
+        setSelectedStream(null);
       }
     }
   }, [streams, selectedStream, loading]); // Mantemos 'loading' para controlar o momento da execução
