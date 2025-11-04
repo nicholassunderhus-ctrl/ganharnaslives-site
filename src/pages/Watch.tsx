@@ -12,6 +12,7 @@ import { PlatformIcon } from "@/components/PlatformIcon";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { getDynamicThumbnailUrl } from "@/lib/stream-utils";
 
 const Watch = () => {
@@ -108,21 +109,14 @@ const Watch = () => {
   // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
   useEffect(() => {
     // Se não há uma stream selecionada, não há nada a fazer.
-    if (!selectedStream) return;
+    if (!selectedStream || loading) return;
 
-    // Apenas executa a lógica de verificação se a lista de streams não estiver sendo carregada.
-    // Isso evita que a verificação aconteça com uma lista de streams vazia ou incompleta.
-    if (!loading) {
-      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
-      
-      if (!isStreamStillActive) {
-        // A live atual terminou ou não está mais na lista de lives ativas.
-        // Fecha o visualizador da stream.
-        toast.info("A live que você estava assistindo terminou.");
-        setSelectedStream(null);
-      }
+    const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
+    if (!isStreamStillActive) {
+      toast.info("A live que você estava assistindo terminou.");
+      setSelectedStream(null);
     }
-  }, [streams, selectedStream, loading]); // Mantemos 'loading' para controlar o momento da execução
+  }, [streams, selectedStream, loading]);
 
   const filteredStreams = streams
     .filter(stream => {
