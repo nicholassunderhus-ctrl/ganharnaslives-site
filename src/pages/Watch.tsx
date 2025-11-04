@@ -101,7 +101,7 @@ const Watch = () => {
     return () => {
       supabase.removeChannel(streamsChannel);
     };
-  }, [loading]); // Adicionado 'loading' para garantir que o setLoading(false) seja chamado.
+  }, []); // Roda apenas uma vez na montagem, que é o comportamento correto.
 
   // Efeito para redirecionar ou fechar a live quando ela termina.
   useEffect(() => {
@@ -114,10 +114,18 @@ const Watch = () => {
     const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
 
     if (!isStreamStillActive) {
-      // A live terminou ou foi removida.
-      toast.info("A live que você estava assistindo terminou.");
-      // Simplesmente fecha o viewer, retornando o usuário para a tela de "Assistir".
-      setSelectedStream(null);
+      toast.info("A live que você estava assistindo terminou. Procurando a próxima...");
+
+      // Procura a próxima live disponível que não esteja lotada.
+      const nextStream = streams.find(stream => !stream.isFull);
+
+      if (nextStream) {
+        toast.success("Redirecionando para a próxima live disponível!");
+        setSelectedStream(nextStream);
+      } else {
+        toast.warning("Não há outras lives disponíveis no momento.");
+        setSelectedStream(null);
+      }
     }
   }, [streams, selectedStream, loading]); // Roda sempre que a lista de streams ou a stream selecionada mudar.
 
