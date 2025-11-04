@@ -44,8 +44,8 @@ const Watch = () => {
             duration_minutes,
             created_at,
             points_per_minute
-          `)
-          .eq('status', 'live')
+          `) // A busca já estava correta, mas para garantir, confirmo o status 'live'
+          .eq('status', 'live') 
           .eq('is_paid', true)
           .returns<{
             id: string;
