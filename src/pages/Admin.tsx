@@ -60,7 +60,6 @@ const Admin = () => {
           stream_url
         `)
         .eq('status', 'live')
-        .eq('is_paid', true)
         .returns<{
           id: string;
           platform: string;
