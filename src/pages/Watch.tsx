@@ -25,6 +25,7 @@ const Watch = () => {
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Função para buscar as streams ativas
   // Inscrever-se nas atualizações em tempo real
   useEffect(() => {
     // Primeiro, buscar todas as streams ativas
@@ -62,6 +63,7 @@ const Watch = () => {
             points_per_minute: number;
           }[]>(); // Adicionado o ponto e vírgula que faltava aqui
 
+        console.log("fetchStreams: Dados recebidos do Supabase:", data);
         if (error) throw error;
 
         // Transformar os dados do Supabase para o formato Stream
@@ -83,10 +85,12 @@ const Watch = () => {
           createdAt: stream.created_at 
         }));
 
+        console.log("fetchStreams: Streams formatadas:", formattedStreams);
         setStreams(formattedStreams);
       } catch (error) {
         console.error('Erro ao buscar lives:', error);
       } finally {
+        console.log("fetchStreams: Loading set to false.");
         setLoading(false);
       }
     };
@@ -95,19 +99,22 @@ const Watch = () => {
 
     // Subscrever para atualizações em tempo real da tabela streams
     const subscription = supabase
-      .channel('public:streams')
+      .channel('public:streams') // Nome de canal unificado
       .on('postgres_changes', { event: '*', schema: 'public', table: 'streams' }, 
-        () => fetchStreams() // Refetch a lista de lives em qualquer mudança
+        (payload) => {
+          console.log("Realtime: Mudança detectada na tabela streams!", payload);
+          fetchStreams(); // Refetch a lista de lives em qualquer mudança
+        }
       )
       .subscribe();
 
     return () => {
+      console.log("Realtime: Desinscrevendo do canal 'public:streams'.");
       supabase.removeChannel(subscription);
     };
   }, []);
 
   // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
-  useEffect(() => {
     // Se não há uma stream selecionada, não há nada a fazer.
     if (!selectedStream || loading) return;
 
@@ -115,6 +122,7 @@ const Watch = () => {
     if (!isStreamStillActive) {
       toast.info("A live que você estava assistindo terminou.");
       setSelectedStream(null);
+      console.log("useEffect (close player): Live não está mais ativa. Fechando player.");
     }
   }, [streams, selectedStream, loading]);
 
