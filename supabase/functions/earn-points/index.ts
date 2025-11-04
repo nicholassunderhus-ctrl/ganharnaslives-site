@@ -95,23 +95,18 @@ serve(async (req) => {
       });
     }
 
-    // CORREÇÃO: Define a quantidade de pontos a serem adicionados.
-    const pointsToAdd = 1;
-
     // 5. Tenta adicionar os pontos usando a nova função RPC `try_add_points`
-    const { data: wasSuccessful, error: rpcError } = await supabaseAdmin.rpc('try_add_points', {
+    // A função agora não precisa de 'points_to_add' e retorna o número de pontos ganhos.
+    const { data: pointsEarned, error: rpcError } = await supabaseAdmin.rpc('try_add_points', {
       user_id_input: user.id,
-      points_to_add: pointsToAdd,
     });
 
     if (rpcError) {
       throw new Error(`Erro ao creditar pontos: ${rpcError.message}`);
     }
 
-    // Se a função retornou 'false', significa que o tempo de espera não foi atingido.
-    if (!wasSuccessful) {
-      // MUDANÇA: Em vez de lançar um erro, retornamos uma resposta de sucesso
-      // indicando que a chamada foi bem-sucedida, mas 0 pontos foram ganhos devido ao cooldown.
+    // Se a função retornou 0, significa que o tempo de espera não foi atingido.
+    if (pointsEarned === 0) {
       return new Response(JSON.stringify({
         success: true,
         pointsEarned: 0,
@@ -122,8 +117,8 @@ serve(async (req) => {
     // 6. Retorna uma resposta de sucesso para o frontend
     return new Response(JSON.stringify({
       success: true,
-      pointsEarned: pointsToAdd,
-      message: `${pointsToAdd} pontos ganhos com sucesso!`,
+      pointsEarned: pointsEarned,
+      message: `${pointsEarned} pontos ganhos com sucesso!`,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,

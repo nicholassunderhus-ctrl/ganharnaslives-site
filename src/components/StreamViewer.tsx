@@ -61,24 +61,27 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     let timeInterval: NodeJS.Timeout | undefined;
     let pointsInterval: NodeJS.Timeout | undefined;
 
+    const attemptToEarnPoints = () => {
+      earnPoints(stream.id).then(result => {
+        if (result && result.success && result.pointsEarned > 0) {
+          setEarnedPoints(prev => prev + result.pointsEarned!);
+          // Invalida a query de pontos do usuário para forçar a atualização do saldo na UI
+          queryClient.invalidateQueries({ queryKey: ['userPoints', user?.id] });
+        } else if (result && !result.success) {
+          console.warn("Falha ao ganhar pontos:", result?.error);
+        }
+      });
+    };
+
     if (isWatching) {
       // Intervalo para atualizar o tempo assistido na tela (a cada segundo)
       timeInterval = setInterval(() => {
         setTimeWatched(prev => prev + 1);
       }, 1000);
 
-      // Intervalo para ganhar pontos (a cada minuto)
-      pointsInterval = setInterval(() => {
-        earnPoints(stream.id).then(result => {
-          if (result && result.success) {
-            setEarnedPoints(prev => prev + result.pointsEarned!);
-            // Invalida a query de pontos do usuário para forçar a atualização do saldo na UI
-            queryClient.invalidateQueries({ queryKey: ['userPoints', user?.id] });
-          } else {
-            console.warn("Falha ao ganhar pontos:", result?.error);
-          }
-        });
-      }, 60000); // 60000ms = 1 minuto
+      // Chama a função para ganhar pontos imediatamente e depois a cada minuto.
+      attemptToEarnPoints();
+      pointsInterval = setInterval(attemptToEarnPoints, 60000); // 60000ms = 1 minuto
     }
 
     return () => {
