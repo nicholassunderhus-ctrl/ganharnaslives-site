@@ -19,11 +19,11 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Busca todas as streams que ainda estão com status 'live'.
+    // Busca todas as streams que ainda estão com status 'live' ou 'pending'.
     const { data: liveStreams, error: fetchError } = await supabaseAdmin
       .from("streams")
       .select("id, created_at, duration_minutes")
-      .eq("status", "live");
+      .in("status", ["live", "pending"]); // Modificado para incluir 'pending'
 
     if (fetchError) throw fetchError;
 

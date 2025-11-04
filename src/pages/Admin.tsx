@@ -206,7 +206,10 @@ const Admin = () => {
     try {
       const { error } = await (supabase as any)
         .from('streams')
-        .update({ current_viewers: newValue })
+        .update({ 
+          current_viewers: newValue,
+          status: 'live' // Garante que o status não seja alterado para 'pending' pela RLS
+        })
         .eq('id', streamId);
 
       if (error) throw error;
