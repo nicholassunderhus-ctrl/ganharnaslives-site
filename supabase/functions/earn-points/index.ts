@@ -95,7 +95,10 @@ serve(async (req) => {
       });
     }
 
-    const pointsToAdd = stream.points_per_minute;
+const pointsToAdd = stream.points_per_minute;
+    // CORREÇÃO: Define um valor fixo de 1 ponto por minuto,
+    // conforme a regra de negócio principal do site.
+    const pointsToAdd = 1;
 
     // 5. Tenta adicionar os pontos usando a nova função RPC `try_add_points`
     const { data: wasSuccessful, error: rpcError } = await supabaseAdmin.rpc('try_add_points', {
