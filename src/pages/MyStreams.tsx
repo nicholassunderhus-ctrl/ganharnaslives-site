@@ -71,16 +71,6 @@ const MyStreams = () => {
     setIsLoading(true);
     toast.info("Iniciando sua stream...");
 
-    const currentUserPoints = userPoints?.points ?? 0;
-
-    if (currentUserPoints < cost) {
-      toast.error("Você não tem pontos suficientes para iniciar esta stream.", {
-        description: `Custo: ${cost} pontos. Você tem: ${currentUserPoints} pontos.`,
-      });
-      setIsLoading(false);
-      return;
-    }
-
     // Chama a função RPC que debita os pontos e cria a stream de forma atômica
     const { data, error } = await supabase.rpc('create_stream_with_points', {
       platform_text: selectedPlatform,
