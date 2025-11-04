@@ -4,155 +4,98 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Stream } from "@/types";
 import { PlatformIcon } from "./PlatformIcon";
-import { Eye, Clock, Users } from "lucide-react";
-import { Input } from "./ui/input";
-import { StreamTimer } from "./StreamTimer";
+import { Eye, Clock, Coins, XCircle } from "lucide-react";
+import { formatDuration } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface StreamCardProps {
   stream: Stream;
   onWatch: (stream: Stream) => void;
-  isAdmin?: boolean;
+  isAdmin: boolean;
 }
 
-export const StreamCard = ({ stream, onWatch, isAdmin = false }: StreamCardProps) => {
-  const [viewersInput, setViewersInput] = useState(stream.currentViewers.toString());
-  const [isVisible, setIsVisible] = useState(true);
+export const StreamCard = ({ stream, onWatch, isAdmin }: StreamCardProps) => {
+  const [remainingMinutes, setRemainingMinutes] = useState(0);
 
   useEffect(() => {
-    setViewersInput(stream.currentViewers.toString());
-  }, [stream.currentViewers]);
+    const calculateRemainingTime = () => {
+      const endTime = new Date(stream.createdAt).getTime() + stream.durationMinutes * 60000;
+      const now = Date.now();
+      const remainingMs = Math.max(0, endTime - now);
+      setRemainingMinutes(Math.floor(remainingMs / 60000));
+    };
 
-  const handleTimerEnd = () => {
-    setIsVisible(false);
-  };
+    calculateRemainingTime();
+    const interval = setInterval(calculateRemainingTime, 60000); // Atualiza a cada minuto
 
-  if (!isVisible) return null;
+    return () => clearInterval(interval);
+  }, [stream.createdAt, stream.durationMinutes]);
 
-  const getPlatformColor = () => {
-    switch (stream.platform) {
-      case "Kick":
-        return "text-[hsl(var(--kick-green))]";
-      case "Twitch":
-        return "text-[hsl(var(--twitch-purple))]";
-      case "YouTube":
-        return "text-[hsl(var(--youtube-red))]";
-    }
-  };
+  const handleEndStream = async () => {
+    if (!isAdmin) return;
 
-  const updateViewers = async (streamId: string) => {
-    const newValue = parseInt(viewersInput);
-    if (isNaN(newValue) || newValue < 0) return;
+    const { error } = await supabase
+      .from('streams')
+      .update({ status: 'ended' })
+      .eq('id', stream.id);
 
-    try {
-      const { error } = await supabase
-        .from('streams')
-        .update({ current_viewers: newValue })
-        .eq('id', streamId);
-
-      if (error) throw error;
-
-    } catch (error) {
-      console.error('Erro ao atualizar viewers:', error);
+    if (error) {
+      toast.error("Erro ao encerrar a live.", { description: error.message });
+    } else {
+      toast.success("Live encerrada com sucesso.");
     }
   };
 
   return (
-    <Card className="overflow-hidden group hover:shadow-[var(--shadow-card)] transition-all hover:-translate-y-1">
-      <div className="relative aspect-video overflow-hidden cursor-pointer bg-gray-900" onClick={() => onWatch(stream)}>
+    <Card className="overflow-hidden group flex flex-col">
+      <div className="relative">
         <img
           src={stream.thumbnailUrl}
-          alt={stream.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          alt={stream.title || "Live thumbnail"}
+          className="aspect-video object-cover w-full"
         />
-        {/* Se a plataforma for Kick, exibe o nome do canal sobre a imagem */}
-        {stream.platform === 'kick' && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/60 p-4">
-            <span className="text-white text-2xl font-bold text-center break-words drop-shadow-lg">
-              {/* Extrai o nome do canal da URL */}
-              {stream.streamUrl.split('/').filter(Boolean).pop()}
-            </span>
-          </div>
-        )}
         <div className="absolute top-2 left-2">
-          <Badge variant="destructive" className="bg-red-600">
-            <div className="w-2 h-2 rounded-full bg-white mr-1 animate-pulse" />
+          <Badge variant="destructive" className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
             AO VIVO
           </Badge>
         </div>
-        <div className="absolute top-2 right-2 flex flex-col gap-1">
-          <div className="bg-black/70 rounded px-2 py-1 flex items-center gap-1">
-            <Eye className="w-3 h-3" />
-            <span className="text-xs font-semibold">
-              {stream.currentViewers}/{stream.maxViewers}
-            </span>
-          </div>
-          <div className="bg-black/70 rounded px-2 py-1 text-xs font-medium whitespace-nowrap">
-            <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              <StreamTimer createdAt={stream.createdAt} durationMinutes={stream.durationMinutes} onTimerEnd={handleTimerEnd} />
-            </div>
-          </div>
+        <div className="absolute top-2 right-2">
+          <PlatformIcon platform={stream.platform} className="w-6 h-6" />
         </div>
       </div>
 
-      <div className="p-4 space-y-3">
-        <div className="flex items-start gap-3">
-          <div className={cn("mt-1", getPlatformColor())}>
-            <PlatformIcon platform={stream.platform} className="w-6 h-6" />
+      <div className="p-4 flex-grow flex flex-col">
+        <h3 className="font-bold truncate" title={stream.title || "Live"}>{stream.title || "Live"}</h3>
+        <p className="text-sm text-muted-foreground truncate">{stream.streamer}</p>
+
+        <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
+          <div className="flex items-center gap-1" title="Espectadores">
+            <Eye className="w-4 h-4" />
+            <span>{stream.currentViewers}/{stream.maxViewers}</span>
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm line-clamp-2 mb-1">{stream.title}</h3>
-            <p className="text-muted-foreground text-sm">{stream.streamer}</p>
-            <p className="text-muted-foreground text-xs mt-1">{stream.category}</p>
+          <div className="flex items-center gap-1" title="Tempo restante">
+            <Clock className="w-4 h-4" />
+            <span>{formatDuration(remainingMinutes)}</span>
+          </div>
+          <div className="flex items-center gap-1" title="Pontos por minuto">
+            <Coins className="w-4 h-4" />
+            <span>+{stream.pointsPerMinute}</span>
           </div>
         </div>
 
-        {isAdmin && (
-          <div className="space-y-2 pt-2 border-t border-dashed">
-            <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Controle de Viewers (Admin)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                min="0"
-                max={stream.maxViewers}
-                value={viewersInput}
-                onChange={(e) => setViewersInput(e.target.value)}
-                className="max-w-[120px] h-8"
-              />
-              <Button 
-                variant="secondary"
-                size="sm"
-                onClick={() => updateViewers(stream.id)}
-                disabled={viewersInput === stream.currentViewers.toString()}
-                className="h-8"
-              >
-                Atualizar
-              </Button>
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between pt-2 border-t border-border">
-          <div className="flex items-center gap-1 text-primary">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm font-semibold">+{stream.pointsPerMinute} pts/min</span>
-          </div>
-          <Button 
-            size="sm" 
-            variant={stream.isFull ? "outline" : "gradient"} 
-            onClick={() => !stream.isFull && onWatch(stream)}
-            disabled={stream.isFull}
-          >
-            {stream.isFull ? "Lotado" : "Assistir"}
+        <div className="mt-4 pt-4 border-t flex-grow flex items-end">
+          <Button onClick={() => onWatch(stream)} className="w-full" disabled={stream.isFull}>
+            {stream.isFull ? "Live Cheia" : "Assistir e Ganhar"}
           </Button>
+          {isAdmin && (
+            <Button onClick={handleEndStream} variant="ghost" size="icon" className="ml-2 text-muted-foreground hover:text-destructive">
+              <XCircle className="w-5 h-5" />
+            </Button>
+          )}
         </div>
       </div>
     </Card>
   );
 };
-
-const cn = (...classes: string[]) => classes.filter(Boolean).join(" ");
