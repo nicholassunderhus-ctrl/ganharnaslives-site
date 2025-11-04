@@ -25,11 +25,10 @@ const Watch = () => {
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Inscrever-se nas atualizações em tempo real
+  // Efeito para buscar as lives iniciais e se inscrever nas atualizações em tempo real.
   useEffect(() => {
-    // Primeiro, buscar todas as streams ativas
     const fetchStreams = async () => {
-      setLoading(true);
+      if (!loading) setLoading(true);
       try {
         const { data, error } = await supabase
           .from('streams')
@@ -92,6 +91,7 @@ const Watch = () => {
 
     fetchStreams();
 
+    // Subscreve para atualizações em tempo real da tabela streams
     const streamsChannel = supabase
       .channel('public:streams')
       .on(
