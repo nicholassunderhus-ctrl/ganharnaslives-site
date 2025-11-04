@@ -21,9 +21,7 @@ export const getEmbedUrl = (url: string, platform: Platform): string => {
     if (platform === Platform.Kick) {
       // Ex: https://kick.com/CHANNEL -> https://player.kick.com/CHANNEL
       const channel = urlObj.pathname.substring(1);
-      // Adicionado `muted=true` para garantir o autoplay em todos os navegadores,
-      // que bloqueiam autoplay com som por padrão.
-      return channel ? `https://player.kick.com/${channel}?autoplay=true&muted=true` : url;
+      return channel ? `https://player.kick.com/${channel}?autoplay=true` : url;
     }
 
     // Para Twitch e outros, a URL de embed é diferente e pode precisar de mais lógica.
