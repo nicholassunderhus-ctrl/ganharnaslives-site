@@ -101,7 +101,7 @@ const Watch = () => {
     return () => {
       supabase.removeChannel(streamsChannel);
     };
-  }, [loading]); // Adicionado 'loading' para garantir que o setLoading(false) seja chamado.
+  }, []); // Roda apenas uma vez na montagem, que é o comportamento correto.
 
   // Efeito para redirecionar ou fechar a live quando ela termina.
   useEffect(() => {
