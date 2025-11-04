@@ -4,19 +4,15 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Stream, Platform } from "@/types";
 import { PlatformIcon } from "./PlatformIcon";
-import { Eye, Clock, Coins } from "lucide-react";
+import { Eye, Clock, Coins, ExternalLink } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { getEmbedUrl } from "@/lib/stream-utils";
-import { getEmbedUrl } from "@/lib/stream-utils"; // getEmbedUrl não é mais usado aqui, mas pode ser mantido se usado em outro lugar
-import { StreamChat } from "./StreamChat";
-import ReactPlayer from "react-player";
 
 interface StreamViewerProps {
   stream: Stream;
-  onClose: () => void; // Chamado quando o usuário fecha manualmente
+  onClose: () => void;
 }
 
 export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
@@ -27,9 +23,13 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
 
+  // Estado para controlar a verificação de login na Kick
+  const [kickLoginStep, setKickLoginStep] = useState<'initial' | 'verifying' | 'verified'>('initial');
+  const [verifyButtonEnabled, setVerifyButtonEnabled] = useState(false);
+
+
   // Converte a URL da stream para a URL de incorporação correta
   const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
-  // const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform); // Movido para dentro do ReactPlayer
 
   // Efeito para registrar que o usuário está assistindo
   useEffect(() => {
@@ -94,6 +94,17 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     setIsWatching(false);
   };
 
+  const handleOpenKickLogin = () => {
+    window.open('https://kick.com/login', '_blank');
+    setKickLoginStep('verifying');
+    // Habilita o botão de verificação após 5 segundos
+    setTimeout(() => {
+      setVerifyButtonEnabled(true);
+    }, 5000);
+  };
+
+  const handleKickVerification = () => setKickLoginStep('verified');
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -140,13 +151,29 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
                 +{earnedPoints} pontos ganhos
               </Badge>
             </div>
+
             <div className="text-sm text-muted-foreground">
               +{stream.pointsPerMinute} pts/min
             </div>
           </div>
 
           <div className="flex gap-2">
-            {!isWatching ? (
+            {stream.platform === Platform.Kick && kickLoginStep !== 'verified' ? (
+              <div className="w-full text-center p-4 bg-muted/50 rounded-lg space-y-4">
+                <p className="text-sm font-medium">Para ganhar pontos, você precisa estar logado na Kick.</p>
+                {kickLoginStep === 'initial' && (
+                  <Button onClick={handleOpenKickLogin} className="w-full">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Fazer Login na Kick
+                  </Button>
+                )}
+                {kickLoginStep === 'verifying' && (
+                  <Button onClick={handleKickVerification} disabled={!verifyButtonEnabled} className="w-full">
+                    {verifyButtonEnabled ? "Já fiz o login, quero assistir!" : "Aguarde..."}
+                  </Button>
+                )}
+              </div>
+            ) : !isWatching ? (
               <Button onClick={handleStartWatching} className="flex-1">
                 Começar a Assistir e Ganhar Pontos
               </Button>
@@ -156,6 +183,12 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
               </Button>
             )}
           </div>
+
+          {loading && (
+            <p className="text-center text-sm text-muted-foreground mt-2">
+              Processando pontos...
+            </p>
+          )}
         </div>
       </Card>
     </div>

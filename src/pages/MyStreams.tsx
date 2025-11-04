@@ -1,23 +1,22 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlatformIcon } from "@/components/PlatformIcon";
 import { Platform } from "@/types";
 import { useUserPoints } from "@/hooks/useUserPoints";
+import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
-import { Link as LinkIcon, Users, Loader2, Clock, DollarSign } from "lucide-react";
+import { Eye, Link as LinkIcon, Users, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const POINTS_PER_MINUTE_PER_VIEWER = 1;
 
 const MyStreams = () => {
   const { userPoints } = useUserPoints();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
   const [liveLink, setLiveLink] = useState("");
@@ -25,11 +24,16 @@ const MyStreams = () => {
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const cost = useMemo(() => {
+  const calculateCost = () => {
     const quantity = parseInt(maxQuantity) || 0;
     const duration = selectedDuration || 0;
-    return quantity * duration * POINTS_PER_MINUTE_PER_VIEWER;
-  }, [maxQuantity, selectedDuration]);
+    return quantity * duration;
+  };
+
+  const calculateReais = () => {
+    const totalPoints = calculateCost();
+    return (totalPoints / 1200).toFixed(2);
+  };
 
   const platforms = [
     {
@@ -55,15 +59,31 @@ const MyStreams = () => {
     },
   ];
 
-  const durationOptions = [60, 120, 180];
+  const services = {
+    [Platform.YouTube]: [
+      { duration: 60, label: "Live YouTube - ⏱️ 60 Min", service: "Views ao Vivo" },
+      { duration: 120, label: "Live YouTube - ⏱️ 120 Min", service: "Views ao Vivo" },
+      { duration: 180, label: "Live YouTube - ⏱️ 180 Min", service: "Views ao Vivo" },
+    ],
+    [Platform.Kick]: [
+      { duration: 60, label: "Live Kick - ⏱️ 60 Min", service: "Views ao Vivo" },
+      { duration: 120, label: "Live Kick - ⏱️ 120 Min", service: "Views ao Vivo" },
+      { duration: 180, label: "Live Kick - ⏱️ 180 Min", service: "Views ao Vivo" },
+    ],
+    [Platform.Twitch]: [],
+  };
 
   const handleSelectPlatform = (platform: Platform) => {
     setSelectedPlatform(platform);
-    setSelectedDuration(null); // Reseta a duração ao trocar de plataforma
+  };
+
+  const handleSelectService = (duration: number) => {
+    setSelectedDuration(duration);
+    console.log("Selected service:", duration, "minutes for", selectedPlatform);
   };
 
   const handleStartStream = async () => {
-    if (!selectedPlatform || !liveLink || !maxQuantity || !selectedDuration) {
+    if (!user || !selectedPlatform || !liveLink || !maxQuantity || !selectedDuration) {
       toast.error("Por favor, preencha todos os campos antes de começar.");
       return;
     }
@@ -71,7 +91,18 @@ const MyStreams = () => {
     setIsLoading(true);
     toast.info("Iniciando sua stream...");
 
-    // Chama a função RPC que debita os pontos e cria a stream de forma atômica
+    const cost = calculateCost();
+    const currentUserPoints = userPoints?.points ?? 0;
+
+    if (currentUserPoints < cost) {
+      toast.error("Você não tem pontos suficientes para iniciar esta stream.", {
+        description: `Custo: ${cost} pontos. Você tem: ${currentUserPoints} pontos.`,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Chama a função RPC que debita os pontos e cria a stream atomicamente
     const { data, error } = await supabase.rpc('create_stream_with_points', {
       platform_text: selectedPlatform,
       stream_url_text: liveLink,
@@ -99,130 +130,199 @@ const MyStreams = () => {
       <main className="md:ml-64 ml-0 pt-20 pb-24 md:pb-8 p-4 md:p-8">
         <div className="max-w-5xl mx-auto space-y-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">Criar Live</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Streamer</h1>
             <p className="text-muted-foreground">
-              Configure e inicie sua transmissão para que outros usuários possam assistir.
+              Escolha a plataforma onde você quer transmitir
             </p>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {platforms.map((platform) => (
+              <Card 
+                key={platform.id} 
+                className={`relative ${!platform.available ? 'opacity-60' : selectedPlatform === platform.id ? 'ring-2 ring-primary' : 'hover:shadow-lg'} transition-all`}
+              >
+                <CardHeader>
+                  <div className="flex flex-col items-start sm:flex-row sm:items-center justify-between mb-2 gap-3">
+                    <div className="flex items-center gap-3">
+                      <PlatformIcon platform={platform.id} className="w-10 h-10" />
+                      <div>
+                        <CardTitle className="text-lg md:text-2xl">{platform.name}</CardTitle>
+                        <CardDescription className="text-sm">{platform.description}</CardDescription>
+                      </div>
+                    </div>
+                    <div className="ml-auto flex items-center gap-2">
+                      {!platform.available && (
+                        <Badge variant="secondary">Em breve</Badge>
+                      )}
+                      {selectedPlatform === platform.id && (
+                        <Badge>Selecionado</Badge>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button
+                    variant={selectedPlatform === platform.id ? platform.color as any : platform.available ? "outline" : "outline"}
+                    className="w-full"
+                    disabled={!platform.available}
+                    onClick={() => handleSelectPlatform(platform.id)}
+                  >
+                    {platform.available ? "Selecionar" : "Indisponível"}
+                  </Button>
+                  
+                  {/* Serviços específicos da plataforma */}
+                  {selectedPlatform === platform.id && platform.available && (
+                    <div className="space-y-4 pt-4 border-t">
+                      <p className="text-sm font-medium">Serviços disponíveis:</p>
+                      <div className="grid grid-cols-1 gap-2">
+                        {services[platform.id].map((service) => (
+                          <Button
+                            key={`${service.service}-${service.duration}`}
+                            variant={selectedDuration === service.duration ? "default" : "outline"}
+                            size="sm"
+                            className={`w-full justify-start items-center gap-2 ${
+                              selectedDuration === service.duration ? 'bg-primary/10' : ''
+                            }`}
+                            onClick={() => handleSelectService(service.duration)}
+                          >
+                            <Eye className={`w-4 h-4 mr-2 ${selectedDuration === service.duration ? 'text-primary' : 'text-muted-foreground'}`} />
+                            <span className="text-sm font-medium">{service.service} — {service.duration} min</span>
+                          </Button>
+                        ))}
+                      </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuração da Live</CardTitle>
-              <CardDescription>
-                Selecione a plataforma e preencha os detalhes da sua transmissão.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Seleção de Plataforma */}
-              <div className="space-y-2">
-                <Label>Plataforma</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {platforms.map((platform) => (
-                    <Button
-                      key={platform.id}
-                      variant={selectedPlatform === platform.id ? platform.color as any : "outline"}
-                      className="flex flex-col h-24 gap-2"
-                      disabled={!platform.available}
-                      onClick={() => handleSelectPlatform(platform.id)}
-                    >
-                      <PlatformIcon platform={platform.id} className="w-8 h-8" />
-                      <span className="font-semibold">{platform.name}</span>
-                      {!platform.available && <Badge variant="secondary" className="absolute top-2 right-2">Em breve</Badge>}
-                    </Button>
-                  ))}
+                      {/* Link e Quantidade dentro do card quando um serviço é selecionado */}
+                      {selectedDuration && (
+                        <div className="space-y-4 pt-4 border-t">                          
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <LinkIcon className="w-4 h-4 text-primary" />
+                              <Label htmlFor="live-link" className="text-sm font-medium">Link da Live:</Label>
+                            </div>
+                            <Input
+                              id="live-link"
+                              type="url"
+                              placeholder="https://..."
+                              value={liveLink}
+                              onChange={(e) => setLiveLink(e.target.value)}
+                              className="w-full focus-visible:ring-primary"
+                            />
+                          </div>
+
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4 text-primary" />
+                              <Label htmlFor="max-quantity" className="text-sm font-medium">Quantidade Máxima:</Label>
+                            </div>
+                            <div className="space-y-2">
+                              <Input
+                                id="max-quantity"
+                                type="number"
+                                placeholder="Digite a quantidade"
+                                value={maxQuantity}
+                                onChange={(e) => setMaxQuantity(e.target.value)}
+                                min="10"
+                                max="1000"
+                                className="w-full focus-visible:ring-primary"
+                              />
+                              <p className="text-xs text-muted-foreground">
+                                Min: 10 - Máx: 1000
+                              </p>
+                            </div>
+                          </div>
+                          {/* Valor - mostrado logo abaixo da Quantidade quando link e quantidade preenchidos */}
+                          {liveLink.trim() !== "" && maxQuantity && selectedDuration && (
+                            <div className="pt-4">
+                              <Card className="bg-primary/5">
+                                <CardContent className="pt-4">
+                                  <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium">Custo total:</span>
+                                      <span className="text-lg font-bold text-primary">
+                                        {calculateCost().toLocaleString('pt-BR')} pontos
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-muted-foreground">
+                                      <span className="text-xs">Equivalente a:</span>
+                                      <span className="text-sm font-semibold">
+                                        R$ {calculateReais()}
+                                      </span>
+                                    </div>
+                                    <div className="pt-2 border-t text-xs text-muted-foreground">
+                                      <p>Cálculo: {maxQuantity} usuários × {selectedDuration} minutos = {calculateCost()} pontos</p>
+                                      <p className="mt-1">Taxa de conversão (depósito): 1200 pontos = R$ 1,00</p>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            </div>
+                          )}
+
+                          {/* Botão de Começar Live */}
+                          {liveLink.trim() !== "" && maxQuantity && selectedDuration && (
+                            <div className="pt-4">
+                              <Button
+                                variant="gradient"
+                                size="lg"
+                                className="w-full"
+                                onClick={handleStartStream}
+                                disabled={isLoading}
+                              >
+                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                Começar Live
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {selectedPlatform && services[selectedPlatform].length > 0 && (
+            <>
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">Descrição:</h2>
                 </div>
+                <Card className="bg-muted/50">
+                  <CardContent className="pt-6 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl">⌛</span>
+                      <p className="text-foreground">
+                        <span className="font-semibold">Tempo de Início:</span> 5-10 minutos
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl">⭐</span>
+                      <p className="text-foreground font-semibold">
+                        100% de Visualizações Estáveis
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl">⭐</span>
+                      <p className="text-foreground font-semibold">
+                        Melhor Serviço do Mercado
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl">⭐</span>
+                      <p className="text-foreground font-semibold">
+                        Eles não interagem no chat durante as transmissões.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
-              {/* Detalhes da Live (só aparece após selecionar plataforma) */}
-              {selectedPlatform && (
-                <div className="space-y-6 animate-in fade-in-50">
-                  <div className="space-y-2">
-                    <Label htmlFor="live-link" className="flex items-center gap-2">
-                      <LinkIcon className="w-4 h-4" /> Link da Live
-                    </Label>
-                    <Input
-                      id="live-link"
-                      type="url"
-                      placeholder="https://www.youtube.com/watch?v=..."
-                      value={liveLink}
-                      onChange={(e) => setLiveLink(e.target.value)}
-                      className="focus-visible:ring-primary"
-                    />
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="max-quantity" className="flex items-center gap-2">
-                        <Users className="w-4 h-4" /> Máximo de Espectadores
-                      </Label>
-                      <Input
-                        id="max-quantity"
-                        type="number"
-                        placeholder="Ex: 50"
-                        value={maxQuantity}
-                        onChange={(e) => setMaxQuantity(e.target.value)}
-                        min="10"
-                        max="1000"
-                        className="focus-visible:ring-primary"
-                      />
-                       <p className="text-xs text-muted-foreground">Mínimo: 10, Máximo: 1000</p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="duration" className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" /> Duração da Live
-                      </Label>
-                       <Select onValueChange={(value) => setSelectedDuration(Number(value))} value={selectedDuration ? selectedDuration.toString() : ""}>
-                        <SelectTrigger id="duration">
-                          <SelectValue placeholder="Selecione a duração" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {durationOptions.map(duration => (
-                            <SelectItem key={duration} value={duration.toString()}>
-                              {duration} minutos
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
 
-                  {/* Resumo do Custo e Botão de Ação */}
-                  {cost > 0 && (
-                     <div className="space-y-4 pt-6 border-t">
-                       <Card className="bg-muted/30">
-                         <CardHeader>
-                           <CardTitle className="text-lg">Resumo do Custo</CardTitle>
-                         </CardHeader>
-                         <CardContent className="space-y-2">
-                           <div className="flex items-center justify-between">
-                             <span className="text-muted-foreground">Custo total:</span>
-                             <span className="text-lg font-bold text-primary">
-                               {cost.toLocaleString('pt-BR')} pontos
-                             </span>
-                           </div>
-                           <p className="text-xs text-muted-foreground pt-2 border-t">
-                             Cálculo: {parseInt(maxQuantity) || 0} espectadores × {selectedDuration || 0} min = {cost} pontos.
-                           </p>
-                         </CardContent>
-                       </Card>
-
-                       <Button
-                         variant="gradient"
-                         size="lg"
-                         className="w-full"
-                         onClick={handleStartStream}
-                         disabled={isLoading || !liveLink || cost <= 0}
-                       >
-                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <DollarSign className="mr-2 h-4 w-4" />}
-                         Pagar {cost.toLocaleString('pt-BR')} pontos e Iniciar Live
-                       </Button>
-                     </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
+              
+            </>
+          )}
         </div>
       </main>
     </div>
