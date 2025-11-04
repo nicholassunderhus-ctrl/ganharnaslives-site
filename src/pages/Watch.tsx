@@ -115,6 +115,7 @@ const Watch = () => {
   }, []);
 
   // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
+  useEffect(() => {
     // Se não há uma stream selecionada, não há nada a fazer.
     if (!selectedStream || loading) return;
 
