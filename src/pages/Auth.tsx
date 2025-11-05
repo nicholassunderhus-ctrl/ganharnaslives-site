@@ -30,7 +30,7 @@ const Auth = () => {
     const password = formData.get("password") as string;
     const username = formData.get("username") as string;
 
-    const { error } = await signUp(email, password, username);
+    const { error } = await signUp(email, password, { username });
     
     if (error) {
       if (error.message.includes("already registered")) {
