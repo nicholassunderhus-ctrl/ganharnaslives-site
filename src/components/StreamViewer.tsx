@@ -8,7 +8,7 @@ import { Eye, Clock, Coins, ExternalLink } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client"; 
 import { getEmbedUrl } from "@/lib/stream-utils";
 
 interface StreamViewerProps {
@@ -31,6 +31,32 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
 
   // Converte a URL da stream para a URL de incorporação correta
   const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
+
+  // Efeito para gerenciar a contagem de espectadores
+  useEffect(() => {
+    const updateViewerCount = async (action: 'join' | 'leave') => {
+      try {
+        await supabase.functions.invoke('update-viewer-count', {
+          body: { streamId: stream.id, action },
+        });
+      } catch (error) {
+        console.error(`Erro ao atualizar contagem de viewers (${action}):`, error);
+      }
+    };
+
+    // Informa que o usuário ENTROU na live
+    updateViewerCount('join');
+
+    // Função de limpeza: informa que o usuário SAIU da live quando o componente é desmontado
+    return () => {
+      updateViewerCount('leave');
+    };
+    // A dependência vazia [] garante que 'join' rode na montagem e 'leave' na desmontagem.
+    // Adicionar stream.id garante que se o stream mudar, a contagem seja ajustada corretamente.
+  }, [stream.id]);
+
+
+
 
   // Efeito para iniciar o ganho de pontos automaticamente.
   useEffect(() => {
