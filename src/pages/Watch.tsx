@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { PlatformIcon } from "@/components/PlatformIcon";
-import { useUserPoints } from "@/hooks/useUserPoints"; 
+import { useUserPoints } from "@/hooks/useUserPoints";
+import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { getDynamicThumbnailUrl } from "@/lib/stream-utils";
 
 const Watch = () => {
-  const { userPoints } = useUserPoints(); 
+  const { userPoints } = useUserPoints();
+  const { isAdmin } = useAdmin();
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStream, setSelectedStream] = useState<Stream | null>(null);
@@ -225,7 +227,7 @@ const Watch = () => {
           {/* Streams Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {filteredStreams.map(stream => (
-              <StreamCard key={stream.id} stream={stream} onWatch={handleWatch} />
+              <StreamCard key={stream.id} stream={stream} onWatch={handleWatch} isAdmin={isAdmin} />
             ))}
           </div>
 
