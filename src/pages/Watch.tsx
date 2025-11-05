@@ -103,8 +103,37 @@ const Watch = () => {
           table: 'streams'
         },
         async () => {
-          // Quando houver qualquer mudança, atualizar a lista
-          await fetchStreams();
+          // Otimização: Em vez de buscar tudo de novo, atualizamos o estado local.
+          const updatedStream = payload.new as any;
+
+          setStreams(currentStreams => {
+            const streamExists = currentStreams.some(s => s.id === updatedStream.id);
+
+            if (payload.eventType === 'UPDATE' && streamExists) {
+              // Se for uma atualização, encontramos a stream e atualizamos seus dados.
+              return currentStreams.map(s => 
+                s.id === updatedStream.id 
+                  ? { ...s, 
+                      currentViewers: updatedStream.current_viewers, 
+                      isFull: updatedStream.current_viewers >= updatedStream.max_viewers 
+                    } 
+                  : s
+              );
+            }
+            
+            // Para INSERT ou DELETE, ou se a stream não existir, uma busca completa ainda é a abordagem mais segura
+            // para garantir consistência total.
+            // Isso cobre casos onde uma nova live começa ou uma live é removida.
+            fetchStreams();
+            return currentStreams; // Retorna o estado atual enquanto a busca acontece em segundo plano.
+          });
+
+          // Se a stream aberta for a que foi atualizada, atualizamos o estado dela também.
+          setSelectedStream(currentSelected => 
+            currentSelected && currentSelected.id === updatedStream.id 
+              ? { ...currentSelected, currentViewers: updatedStream.current_viewers, isFull: updatedStream.current_viewers >= updatedStream.max_viewers }
+              : currentSelected
+          );
         }
       )
       .subscribe();

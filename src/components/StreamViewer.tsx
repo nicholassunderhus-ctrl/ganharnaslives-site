@@ -175,7 +175,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
             <div className="flex items-center gap-4">
               <Badge variant="secondary" className="flex items-center gap-1">
                 <Eye className="w-3 h-3" />
-                {stream.currentViewers}/{stream.maxViewers}
+                {stream.currentViewers.toLocaleString()}/{stream.maxViewers.toLocaleString()}
               </Badge>
               <Badge variant="secondary" className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
