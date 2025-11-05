@@ -67,11 +67,11 @@ serve(async (req) => {
       });
     }
 
-    // Usa a função `increment` do Supabase para uma atualização atômica e segura
-    const { error: updateError } = await supabaseAdmin
-      .from('streams')
-      .increment('current_viewers', incrementValue)
-      .eq('id', streamId);
+    // CORREÇÃO: Usa a função RPC 'update_stream_viewers' para uma atualização atômica e segura
+    const { error: updateError } = await supabaseAdmin.rpc('update_stream_viewers', {
+      stream_id_input: streamId,
+      increment_value: incrementValue
+    });
 
     if (updateError) {
       throw new Error(`Erro ao atualizar a contagem de espectadores: ${updateError.message}`);
