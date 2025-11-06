@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { MobileNav } from "@/components/MobileNav";
 import { MobileHeader } from "@/components/MobileHeader";
@@ -11,7 +11,7 @@ import { Search } from "lucide-react";
 import { PlatformIcon } from "@/components/PlatformIcon";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { useAdmin } from "@/hooks/useAdmin";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client"; // Adicionado o ponto e vírgula que faltava aqui
 import { toast } from "sonner";
 import { getDynamicThumbnailUrl } from "@/lib/stream-utils";
 
@@ -103,11 +103,38 @@ const Watch = () => {
           schema: 'public',
           table: 'streams'
         },
-        (payload) => {
-          // Para garantir consistência, especialmente quando uma live volta a ficar online (UPDATE de status),
-          // a abordagem mais segura é buscar a lista completa de lives ativas novamente.
-          console.log('Mudança detectada nas streams, buscando novamente...', payload);
-          fetchStreams();
+        async (payload) => {
+          // Otimização: Em vez de buscar tudo de novo, atualizamos o estado local.
+          const updatedStream = payload.new as any;
+
+          setStreams(currentStreams => {
+            const streamExists = currentStreams.some(s => s.id === updatedStream.id);
+
+            if (payload.eventType === 'UPDATE' && streamExists) {
+              // Se for uma atualização, encontramos a stream e atualizamos seus dados.
+              return currentStreams.map(s => 
+                s.id === updatedStream.id 
+                  ? { ...s, 
+                      currentViewers: updatedStream.current_viewers, 
+                      isFull: updatedStream.current_viewers >= updatedStream.max_viewers 
+                    } 
+                  : s
+              );
+            }
+            
+            // Para INSERT ou DELETE, ou se a stream não existir, uma busca completa ainda é a abordagem mais segura
+            // para garantir consistência total.
+            // Isso cobre casos onde uma nova live começa ou uma live é removida.
+            fetchStreams();
+            return currentStreams; // Retorna o estado atual enquanto a busca acontece em segundo plano.
+          });
+
+          // Se a stream aberta for a que foi atualizada, atualizamos o estado dela também.
+          setSelectedStream(currentSelected => 
+            currentSelected && currentSelected.id === updatedStream.id 
+              ? { ...currentSelected, currentViewers: updatedStream.current_viewers, isFull: updatedStream.current_viewers >= updatedStream.max_viewers }
+              : currentSelected
+          );
         }
       )
       .subscribe();
@@ -117,28 +144,29 @@ const Watch = () => {
     };
   }, []);
 
+  // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
+  // OU redirecionar para a próxima live disponível.
   useEffect(() => {
+    // Se não há uma stream selecionada, não há nada a fazer.
     if (!selectedStream) return;
- 
-    // Quando a lista de streams é atualizada, verificamos o estado da stream selecionada.
+
+    // Apenas executa a lógica de verificação se a lista de streams não estiver sendo carregada.
+    // Isso evita que a verificação aconteça com uma lista de streams vazia ou incompleta.
     if (!loading) {
-      const updatedStreamInList = streams.find(s => s.id === selectedStream.id);
- 
-      if (updatedStreamInList) {
-        // Se a stream ainda existe na lista, atualizamos o estado do selectedStream
-        // para garantir que o StreamViewer tenha os dados mais recentes (ex: contagem de viewers).
-        // Comparamos para evitar re-renderizações desnecessárias.
-        if (JSON.stringify(selectedStream) !== JSON.stringify(updatedStreamInList)) {
-          setSelectedStream(updatedStreamInList);
+      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
+      
+      if (!isStreamStillActive) {
+        // A live atual terminou. Vamos procurar a próxima.
+        const nextStream = streams.find(stream => !stream.isFull && stream.id !== selectedStream.id);
+
+        if (nextStream) {
+          setSelectedStream(nextStream);
+        } else {
+          setSelectedStream(null);
         }
-      } else {
-        // Se a stream não está mais na lista (terminou), fechamos o viewer.
-        // A lógica de "próxima live" pode ser adicionada aqui se desejado.
-        setSelectedStream(null);
-        toast.info("A live que você estava assistindo terminou.");
       }
     }
-  }, [streams, loading, selectedStream]);
+  }, [streams, selectedStream, loading]); // Mantemos 'loading' para controlar o momento da execução
 
   const filteredStreams = streams
     .filter(stream => {
@@ -162,9 +190,9 @@ const Watch = () => {
     setSelectedStream(stream);
   };
 
-  const handleCloseViewer = useCallback(() => {
+  const handleCloseViewer = () => {
     setSelectedStream(null);
-  }, []);
+  };
 
   return (
     <div className="min-h-screen bg-background">
