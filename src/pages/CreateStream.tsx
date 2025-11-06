@@ -12,7 +12,7 @@ import { Loader2 } from "lucide-react";
 
 // Definição do tipo para os dados do formulário
 interface StreamFormData {
-  platform: 'kick' | 'twitch' | 'youtube';
+  platform: 'kick' | 'tiktok' | 'youtube';
   stream_url: string;
   max_viewers: number;
 }
@@ -84,7 +84,7 @@ export default function CreateStream() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="kick">Kick</SelectItem>
-                  <SelectItem value="twitch">Twitch</SelectItem>
+                  <SelectItem value="tiktok">TikTok</SelectItem>
                   <SelectItem value="youtube">YouTube</SelectItem>
                 </SelectContent>
               </Select>

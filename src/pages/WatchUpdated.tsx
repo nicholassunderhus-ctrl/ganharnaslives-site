@@ -177,12 +177,12 @@ const Watch = () => {
                 YouTube
               </Button>
               <Button
-                variant={selectedPlatform === Platform.Twitch ? "twitch" : "outline"}
-                onClick={() => setSelectedPlatform(Platform.Twitch)}
+                variant={selectedPlatform === Platform.TikTok ? "tiktok" : "outline"}
+                onClick={() => setSelectedPlatform(Platform.TikTok)}
                 className="gap-2 shrink-0"
               >
-                <PlatformIcon platform={Platform.Twitch} className="w-4 h-4" />
-                Twitch
+                <PlatformIcon platform={Platform.TikTok} className="w-4 h-4" />
+                TikTok
               </Button>
             </div>
           </div>

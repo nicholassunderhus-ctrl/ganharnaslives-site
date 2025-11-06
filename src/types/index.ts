@@ -1,7 +1,7 @@
 export enum Platform {
   Kick = 'Kick',
   YouTube = 'YouTube',
-  Twitch = 'Twitch',
+  TikTok = 'TikTok',
 }
 
 export interface Stream {

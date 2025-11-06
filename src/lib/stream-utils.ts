@@ -24,7 +24,7 @@ export const getEmbedUrl = (url: string, platform: Platform): string => {
       return channel ? `https://player.kick.com/${channel}?autoplay=true` : url;
     }
 
-    // Para Twitch e outros, a URL de embed é diferente e pode precisar de mais lógica.
+    // Para TikTok e outros, a URL de embed é diferente e pode precisar de mais lógica.
     // Por enquanto, retornamos a URL original se não for YouTube ou Kick.
     return url;
   } catch (error) {
@@ -66,8 +66,8 @@ export const getDynamicThumbnailUrl = (platform: Platform, streamUrl: string): s
       return '/kick-bg.png';
     case Platform.YouTube:
       return '/youtube-bg.png';
-    case Platform.Twitch:
-      return '/twitch-bg.png';
+    case Platform.TikTok:
+      return '/tiktok-bg.png'; // Assumindo que você terá um tiktok-bg.png
     default:
       return '/youtube-bg.png'; // Fallback final
   }
