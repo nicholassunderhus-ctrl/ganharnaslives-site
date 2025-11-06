@@ -51,11 +51,11 @@ const MyStreams = () => {
       color: "youtube",
     },
     {
-      id: Platform.Twitch,
-      name: "Twitch",
-      description: "Em breve você poderá transmitir no Twitch",
-      available: false,
-      color: "twitch",
+      id: Platform.TikTok,
+      name: "TikTok",
+      description: "Impulsione sua live no TikTok",
+      available: true,
+      color: "tiktok",
     },
   ];
 
@@ -70,7 +70,11 @@ const MyStreams = () => {
       { duration: 120, label: "Live Kick - ⏱️ 120 Min", service: "Views ao Vivo" },
       { duration: 180, label: "Live Kick - ⏱️ 180 Min", service: "Views ao Vivo" },
     ],
-    [Platform.Twitch]: [],
+    [Platform.TikTok]: [
+      { duration: 60, label: "Live TikTok - ⏱️ 60 Min", service: "Views ao Vivo" },
+      { duration: 120, label: "Live TikTok - ⏱️ 120 Min", service: "Views ao Vivo" },
+      { duration: 180, label: "Live TikTok - ⏱️ 180 Min", service: "Views ao Vivo" },
+    ],
   };
 
   const handleSelectPlatform = (platform: Platform) => {
