@@ -30,7 +30,10 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
 
 
   // Converte a URL da stream para a URL de incorporação correta
-  const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
+  // Adicionamos um parâmetro `v=${stream.id}` para forçar o recarregamento do iframe
+  // quando uma stream é reiniciada. O navegador não recarrega o iframe se a URL for idêntica.
+  const rawEmbedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
+  const embedUrl = `${rawEmbedUrl}${rawEmbedUrl.includes('?') ? '&' : '?'}v=${stream.id}`;
 
   // Efeito para gerenciar a contagem de espectadores
   useEffect(() => {
