@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { MobileNav } from "@/components/MobileNav";
 import { MobileHeader } from "@/components/MobileHeader";
@@ -12,6 +12,7 @@ import { PlatformIcon } from "@/components/PlatformIcon";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { getDynamicThumbnailUrl } from "@/lib/stream-utils";
 
 const Watch = () => {
@@ -161,9 +162,9 @@ const Watch = () => {
     setSelectedStream(stream);
   };
 
-  const handleCloseViewer = () => {
+  const handleCloseViewer = useCallback(() => {
     setSelectedStream(null);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">

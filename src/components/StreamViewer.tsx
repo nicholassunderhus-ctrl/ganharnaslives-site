@@ -125,7 +125,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     return () => {
       clearInterval(statusInterval);
     };
-  }, [stream.id, onClose]);
+  }, [stream.id, onClose]); // Agora com onClose estabilizado, esta dependência é segura.
 
   const handleOpenKickLogin = () => {
     window.open('https://kick.com/login', '_blank');
