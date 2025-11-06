@@ -116,29 +116,28 @@ const Watch = () => {
     };
   }, []);
 
-  // Efeito para fechar o StreamViewer se a live selecionada não estiver mais ativa
-  // OU redirecionar para a próxima live disponível.
   useEffect(() => {
-    // Se não há uma stream selecionada, não há nada a fazer.
     if (!selectedStream) return;
-
-    // Apenas executa a lógica de verificação se a lista de streams não estiver sendo carregada.
-    // Isso evita que a verificação aconteça com uma lista de streams vazia ou incompleta.
+ 
+    // Quando a lista de streams é atualizada, verificamos o estado da stream selecionada.
     if (!loading) {
-      const isStreamStillActive = streams.some(stream => stream.id === selectedStream.id);
-      
-      if (!isStreamStillActive) {
-        // A live atual terminou. Vamos procurar a próxima.
-        const nextStream = streams.find(stream => !stream.isFull && stream.id !== selectedStream.id);
-
-        if (nextStream) {
-          setSelectedStream(nextStream);
-        } else {
-          setSelectedStream(null);
+      const updatedStreamInList = streams.find(s => s.id === selectedStream.id);
+ 
+      if (updatedStreamInList) {
+        // Se a stream ainda existe na lista, atualizamos o estado do selectedStream
+        // para garantir que o StreamViewer tenha os dados mais recentes (ex: contagem de viewers).
+        // Comparamos para evitar re-renderizações desnecessárias.
+        if (JSON.stringify(selectedStream) !== JSON.stringify(updatedStreamInList)) {
+          setSelectedStream(updatedStreamInList);
         }
+      } else {
+        // Se a stream não está mais na lista (terminou), fechamos o viewer.
+        // A lógica de "próxima live" pode ser adicionada aqui se desejado.
+        setSelectedStream(null);
+        toast.info("A live que você estava assistindo terminou.");
       }
     }
-  }, [streams, selectedStream, loading]); // Mantemos 'loading' para controlar o momento da execução
+  }, [streams, loading, selectedStream]);
 
   const filteredStreams = streams
     .filter(stream => {
