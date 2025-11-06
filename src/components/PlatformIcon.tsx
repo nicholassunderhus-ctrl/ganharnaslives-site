@@ -1,7 +1,8 @@
 import { Platform } from "@/types";
 import kickLogo from "@/assets/kick-logo.png";
 import youtubeLogo from "@/assets/youtube-logo.png";
-
+import tiktokLogo from "@/assets/tiktok-logo.png"; // Importe o logo do TikTok
+ 
 interface PlatformIconProps {
   platform: Platform;
   className?: string;
@@ -14,11 +15,9 @@ export const PlatformIcon = ({ platform, className = "w-6 h-6" }: PlatformIconPr
     );
   }
   
-  if (platform === Platform.Twitch) {
+  if (platform === Platform.TikTok) {
     return (
-      <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" fill="currentColor"/>
-      </svg>
+      <img src={tiktokLogo} alt="TikTok" className={className} />
     );
   }
   
