@@ -116,8 +116,8 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
       }
     };
 
-    // Verifica o status a cada 15 segundos
-    const statusInterval = setInterval(checkStreamStatus, 15000);
+    // Verifica o status a cada 30 segundos para reduzir requisições
+    const statusInterval = setInterval(checkStreamStatus, 30000);
 
     return () => {
       clearInterval(statusInterval);
