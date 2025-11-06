@@ -27,7 +27,7 @@ const Index = () => {
           <div className="max-w-4xl mx-auto space-y-8">
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight">
               Ganhe Dinheiro
-              <span className="block bg-gradient-to-r from-primary via-[hsl(var(--tiktok-blue))] to-[hsl(var(--kick-green))] bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-primary via-[hsl(var(--twitch-purple))] to-[hsl(var(--kick-green))] bg-clip-text text-transparent">
                 Assistindo Lives
               </span>
             </h1>
@@ -88,11 +88,11 @@ const Index = () => {
             </Card>
             
             <Card className="p-8 text-center hover:shadow-[var(--shadow-card)] transition-all hover:-translate-y-1">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--tiktok-blue))]/10 mb-4">
-                <PlatformIcon platform={Platform.TikTok} className="w-10 h-10 text-[hsl(var(--tiktok-blue))]" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--twitch-purple))]/10 mb-4">
+                <PlatformIcon platform={Platform.Twitch} className="w-10 h-10 text-[hsl(var(--twitch-purple))]" />
               </div>
-              <h3 className="text-xl font-bold mb-2">TikTok</h3>
-              <p className="text-muted-foreground">Assista lives no TikTok e ganhe pontos</p>
+              <h3 className="text-xl font-bold mb-2">Twitch</h3>
+              <p className="text-muted-foreground">Assista lives na Twitch e ganhe pontos</p>
             </Card>
             
             <Card className="p-8 text-center hover:shadow-[var(--shadow-card)] transition-all hover:-translate-y-1">

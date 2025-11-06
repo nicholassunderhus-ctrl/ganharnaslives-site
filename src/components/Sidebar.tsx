@@ -35,7 +35,7 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
       <div className="p-6">
         <Link to="/dashboard" className="flex items-center gap-3">
           <img src={logo} alt="Logo" className="h-10 w-10" />
-          <span className="font-bold text-lg bg-gradient-to-r from-primary to-[hsl(var(--tiktok-blue))] bg-clip-text text-transparent">
+          <span className="font-bold text-lg bg-gradient-to-r from-primary to-[hsl(var(--twitch-purple))] bg-clip-text text-transparent">
             Ganhar Nas Lives
           </span>
         </Link>

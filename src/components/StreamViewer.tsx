@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Stream, Platform } from "@/types";
-import { PlatformIcon } from "./PlatformIcon";
+import { PlatformIcon } from "./PlatformIcon";;
 import { Eye, Clock, Coins, ExternalLink } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
