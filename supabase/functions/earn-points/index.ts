@@ -47,7 +47,7 @@ serve(async (req) => {
 
     // Adicionado: Verificação de abuso de IP
     if (userIpAddress) {
-      const ACCOUNT_LIMIT_PER_IP = 4; // Máximo de 4 contas diferentes por IP em 24 horas
+      const ACCOUNT_LIMIT_PER_IP = 1; // Máximo de 1 conta por IP em 24 horas
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
 
       // Busca todos os user_id distintos que usaram este IP nas últimas 24h
