@@ -229,11 +229,10 @@ const Admin = () => {
           </div>
 
           <Tabs defaultValue="streams" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="streams">Lives</TabsTrigger>
               <TabsTrigger value="users">Usuários</TabsTrigger>
               <TabsTrigger value="withdrawals">Saques</TabsTrigger>
-              <TabsTrigger value="vpn">VPN</TabsTrigger>
             </TabsList>
 
             <TabsContent value="streams">
@@ -439,20 +438,6 @@ const Admin = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="vpn">
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Gerenciamento de VPN</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-20">
-                    <p className="text-muted-foreground">
-                      Funcionalidade de gerenciamento de VPN a ser implementada.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
         </div>
       </main>
