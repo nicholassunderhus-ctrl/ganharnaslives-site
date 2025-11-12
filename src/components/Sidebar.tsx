@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Eye, Upload, Wallet, LogOut, Coins, PiggyBank } from "lucide-react";
+import { Home, Eye, Upload, Wallet, LogOut, Coins, PiggyBank, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
     { to: "/dashboard/my-streams", icon: Upload, label: "Streamer" },
     { to: "/dashboard/deposit", icon: PiggyBank, label: "Depositar" },
     { to: "/dashboard/withdraw", icon: Wallet, label: "Sacar" },
+    { to: "/dashboard/vpn", icon: Shield, label: "VPN" },
   ];
 
   return (
