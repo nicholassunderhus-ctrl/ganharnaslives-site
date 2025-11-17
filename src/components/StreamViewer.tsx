@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Stream, Platform } from "@/types";
-import { PlatformIcon } from "./PlatformIcon";;
+import { PlatformIcon } from "./PlatformIcon";
 import { Eye, Clock, Coins, ExternalLink } from "lucide-react";
 import { useEarnPoints } from "@/hooks/useEarnPoints";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client"; 
 import { getEmbedUrl } from "@/lib/stream-utils";
+import LiveStreamPlayer from "./LiveStreamPlayer"; // Importa o novo player
 
 interface StreamViewerProps {
   stream: Stream;
@@ -24,10 +25,14 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const [timeWatched, setTimeWatched] = useState(0);
   const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
-  // Estado para controlar a verificação de login na Kick
   const [kickLoginStep, setKickLoginStep] = useState<'initial' | 'verifying' | 'verified'>('initial');
   const [verifyButtonEnabled, setVerifyButtonEnabled] = useState(false);
 
+  // Verifica se a URL da stream da Kick é uma URL de streaming válida (.m3u8)
+  const isKickStreamValid = stream.platform === Platform.Kick && stream.streamUrl.includes('.m3u8');
+
+  // Para plataformas que não são a Kick, ou se a URL da Kick for inválida, usa o iframe.
+  const useIframe = stream.platform !== Platform.Kick || !isKickStreamValid;
 
   // Converte a URL da stream para a URL de incorporação correta
   const embedUrl = getEmbedUrl(stream.streamUrl, stream.platform);
