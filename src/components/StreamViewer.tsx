@@ -129,16 +129,6 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   }, [stream.id, onClose]);
 
   const handleStartEarning = () => {
-    // Cria um link invisível, clica nele para acionar o pop-under e o remove.
-    // Esta é uma técnica mais confiável para acionar scripts de anúncio.
-    const adTriggerLink = document.createElement('a');
-    adTriggerLink.href = window.location.href; // Usa a URL atual como destino.
-    adTriggerLink.target = '_blank';
-    adTriggerLink.style.display = 'none';
-    document.body.appendChild(adTriggerLink);
-    adTriggerLink.click();
-    document.body.removeChild(adTriggerLink);
-
     // Ao clicar, o usuário confirma que está logado e o ganho de pontos começa.
     setKickLoginStep('verified');
     setIsWatching(true);
@@ -202,6 +192,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
           {/* Lógica de verificação da Kick, sem os botões de iniciar/parar */}
           {stream.platform === Platform.Kick && kickLoginStep !== 'verified' && (
             <div className="w-full text-center p-4 bg-muted/50 rounded-lg space-y-4">
+              <p className="text-sm font-medium">Para ganhar pontos, você precisa estar logado na Kick.</p>
               {kickLoginStep === 'initial' && (
                 <Button onClick={handleStartEarning} className="w-full">
                   Começar a Ganhar Pontos
