@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Eye, Wallet, PiggyBank, Target } from "lucide-react";
+import { Home, Eye, Wallet, PiggyBank, CircleDollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const MobileNav = () => {
@@ -18,7 +18,7 @@ export const MobileNav = () => {
     },
     {
       label: "Missões",
-      icon: Target,
+      icon: CircleDollarSign,
       href: "/dashboard/missions",
     },
     {
