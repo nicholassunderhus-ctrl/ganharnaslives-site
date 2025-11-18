@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { toast } from "sonner";
 
 interface SidebarProps { points?: number; }
@@ -11,6 +12,7 @@ interface SidebarProps { points?: number; }
 export const Sidebar = ({ points = 0 }: SidebarProps) => {
   const location = useLocation();
   const { signOut } = useAuth();
+  const { isAdmin } = useAdmin();
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -21,15 +23,17 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
     }
   };
   
-  const navItems = [
+  const allNavItems = [
     { to: "/dashboard", icon: Home, label: "Início" },
     { to: "/dashboard/watch", icon: Eye, label: "Assistir" },
     { to: "/dashboard/missions", icon: CircleDollarSign, label: "Missões Diárias" },
-    { to: "/dashboard/my-streams", icon: Upload, label: "Streamer" },
-    { to: "/dashboard/deposit", icon: PiggyBank, label: "Depositar" },
+    { to: "/dashboard/my-streams", icon: Upload, label: "Streamer", adminOnly: true },
+    { to: "/dashboard/deposit", icon: PiggyBank, label: "Depositar", adminOnly: true },
     { to: "/dashboard/withdraw", icon: Wallet, label: "Sacar" },
     { to: "/dashboard/vpn", icon: Shield, label: "VPN" },
   ];
+
+  const navItems = allNavItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     // Hidden on small screens. On md+ it becomes a fixed sidebar.

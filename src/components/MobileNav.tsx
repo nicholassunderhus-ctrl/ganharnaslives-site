@@ -1,11 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Eye, Wallet, PiggyBank, Upload, CircleDollarSign } from "lucide-react";
+import { Home, Eye, Wallet, PiggyBank, Upload, CircleDollarSign, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAdmin } from "@/hooks/useAdmin";
 
 export const MobileNav = () => {
   const location = useLocation();
+  const { isAdmin } = useAdmin();
 
-  const items = [
+  // Define todos os itens possíveis
+  const allItems = [
     {
       label: "Início",
       icon: Home,
@@ -17,21 +20,30 @@ export const MobileNav = () => {
       href: "/dashboard/watch",
     },
     {
-      label: "Missões",
+      label: "Streamer",
+      icon: Upload,
+      href: "/dashboard/my-streams",
+      adminOnly: true,
+    },
+    {
+      label: "Missões", // Mantido para todos os usuários
       icon: CircleDollarSign,
       href: "/dashboard/missions",
     },
     {
       label: "Sacar",
       icon: Wallet,
-      href: "/dashboard/withdraw",
+      href: "/dashboard/withdraw", // Adicionado de volta para usuários comuns
     },
     {
       label: "Depositar",
       icon: PiggyBank,
       href: "/dashboard/deposit",
+      adminOnly: true,
     },
   ];
+
+  const items = allItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
