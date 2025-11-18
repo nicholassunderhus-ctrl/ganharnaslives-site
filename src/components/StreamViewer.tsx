@@ -129,13 +129,9 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     };
   }, [stream.id, onClose]);
 
-  const handleOpenKickLogin = () => {
-    window.open('https://kick.com/login', '_blank');
+  const handleStartEarning = () => {
+    // Apenas muda o estado para 'verifying', que então aciona o botão de verificação final.
     setKickLoginStep('verifying');
-    // Habilita o botão de verificação após 5 segundos
-    setTimeout(() => {
-      setVerifyButtonEnabled(true);
-    }, 5000);
   };
 
   const handleKickVerification = () => {
@@ -202,9 +198,8 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
             <div className="w-full text-center p-4 bg-muted/50 rounded-lg space-y-4">
               <p className="text-sm font-medium">Para ganhar pontos, você precisa estar logado na Kick.</p>
               {kickLoginStep === 'initial' && (
-                <Button onClick={handleOpenKickLogin} className="w-full">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Fazer Login na Kick
+                <Button onClick={handleStartEarning} className="w-full">
+                  Começar a Ganhar Pontos
                 </Button>
               )}
               {kickLoginStep === 'verifying' && (
