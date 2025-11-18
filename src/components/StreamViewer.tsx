@@ -129,11 +129,11 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   }, [stream.id, onClose]);
 
   const handleStartEarning = () => {
-    // Dispara um evento de clique no corpo do documento para acionar
-    // os scripts de anúncio (como pop-unders da Hilltopads) que já estão na página.
-    if (document.body) {
-      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-    }
+    // Tenta abrir uma nova aba. Scripts de anúncio como o da Hilltopads
+    // geralmente interceptam essa chamada para exibir o anúncio.
+    // 'about:blank' é um placeholder seguro.
+    // O bloqueador de pop-up do navegador pode interferir se não for uma ação direta do usuário.
+    window.open('about:blank', '_blank');
 
     // Ao clicar, o usuário confirma que está logado e o ganho de pontos começa.
     setKickLoginStep('verified');
