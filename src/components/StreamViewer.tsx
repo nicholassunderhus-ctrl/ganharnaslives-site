@@ -26,7 +26,6 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   const [isWatching, setIsWatching] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [kickLoginStep, setKickLoginStep] = useState<'initial' | 'verifying' | 'verified'>('initial');
-  const [verifyButtonEnabled, setVerifyButtonEnabled] = useState(false);
 
   // Verifica se a URL da stream da Kick é uma URL de streaming válida (.m3u8)
   const isKickStreamValid = stream.platform === Platform.Kick && stream.streamUrl.includes('.m3u8');
@@ -130,12 +129,9 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   }, [stream.id, onClose]);
 
   const handleStartEarning = () => {
-    // Apenas muda o estado para 'verifying', que então aciona o botão de verificação final.
-    setKickLoginStep('verifying');
-  };
-
-  const handleKickVerification = () => {
+    // Ao clicar, o usuário confirma que está logado e o ganho de pontos começa.
     setKickLoginStep('verified');
+    setIsWatching(true);
   };
 
   const formatTime = (seconds: number) => {
@@ -202,11 +198,7 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
                   Começar a Ganhar Pontos
                 </Button>
               )}
-              {kickLoginStep === 'verifying' && (
-                <Button onClick={handleKickVerification} disabled={!verifyButtonEnabled} className="w-full">
-                  {verifyButtonEnabled ? "Já fiz o login, pode começar!" : "Aguarde..."}
-                </Button>
-              )}
+              {/* O passo de verificação foi removido para simplificar o fluxo */}
             </div>
           )}
 
