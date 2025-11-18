@@ -33,15 +33,13 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />}>
-            <Route index element={<></>} /> {/* Rota para /dashboard */}
-            <Route path="watch" element={<Watch />} />
-            <Route path="my-streams" element={<MyStreams />} />
-            <Route path="withdraw" element={<Withdraw />} />
-            <Route path="deposit" element={<Deposit />} />
-            <Route path="missions" element={<DailyMissions />} />
-            <Route path="vpn" element={<VpnPage />} />
-          </Route>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/watch" element={<Watch />} />
+          <Route path="/dashboard/my-streams" element={<MyStreams />} />
+          <Route path="/dashboard/withdraw" element={<Withdraw />} />
+          <Route path="/dashboard/deposit" element={<Deposit />} />
+          <Route path="/dashboard/missions" element={<DailyMissions />} />
+          <Route path="/dashboard/vpn" element={<VpnPage />} />
           <Route 
             path="/dashboard/admin" 
             element={
