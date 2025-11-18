@@ -12,11 +12,11 @@ import Withdraw from "./pages/Withdraw";
 import Deposit from "./pages/Deposit";
 import Admin from "./pages/Admin";
 import { AdminRoute } from "./components/AdminRoute";
+import DailyMissionsPage from "./pages/DailyMissions"; // Importa a nova página
 import VpnPage from "./pages/Vpn";
 import { MobileHeader } from "@/components/MobileHeader";
 import { MobileNav } from "@/components/MobileNav";
 import NotFound from "./pages/NotFound";
-import DailyMissions from "./DailyMissions";
 
 const queryClient = new QueryClient();
 
@@ -38,7 +38,7 @@ const App = () => (
           <Route path="/dashboard/my-streams" element={<MyStreams />} />
           <Route path="/dashboard/withdraw" element={<Withdraw />} />
           <Route path="/dashboard/deposit" element={<Deposit />} />
-          <Route path="/dashboard/missions" element={<DailyMissions />} />
+          <Route path="/dashboard/missions" element={<DailyMissionsPage />} /> {/* Adiciona a nova rota */}
           <Route path="/dashboard/vpn" element={<VpnPage />} />
           <Route 
             path="/dashboard/admin" 
