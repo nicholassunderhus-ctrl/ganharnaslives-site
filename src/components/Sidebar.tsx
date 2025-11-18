@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Eye, Upload, Wallet, LogOut, Coins, PiggyBank, Shield, CircleDollarSign } from "lucide-react";
+import { Home, Eye, Upload, Wallet, LogOut, Coins, PiggyBank, Shield, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,7 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
   const navItems = [
     { to: "/dashboard", icon: Home, label: "Início" },
     { to: "/dashboard/watch", icon: Eye, label: "Assistir" },
-    { to: "/dashboard/missions", icon: CircleDollarSign, label: "Missões Diárias" },
+    { to: "/dashboard/missions", icon: Target, label: "Missões Diárias" },
     { to: "/dashboard/my-streams", icon: Upload, label: "Streamer" },
     { to: "/dashboard/deposit", icon: PiggyBank, label: "Depositar" },
     { to: "/dashboard/withdraw", icon: Wallet, label: "Sacar" },
