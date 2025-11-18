@@ -129,11 +129,15 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
   }, [stream.id, onClose]);
 
   const handleStartEarning = () => {
-    // Tenta abrir uma nova aba. Scripts de anúncio como o da Hilltopads
-    // geralmente interceptam essa chamada para exibir o anúncio.
-    // 'about:blank' é um placeholder seguro.
-    // O bloqueador de pop-up do navegador pode interferir se não for uma ação direta do usuário.
-    window.open('about:blank', '_blank');
+    // Cria um link invisível, clica nele para acionar o pop-under e o remove.
+    // Esta é uma técnica mais confiável para acionar scripts de anúncio.
+    const adTriggerLink = document.createElement('a');
+    adTriggerLink.href = window.location.href; // Usa a URL atual como destino.
+    adTriggerLink.target = '_blank';
+    adTriggerLink.style.display = 'none';
+    document.body.appendChild(adTriggerLink);
+    adTriggerLink.click();
+    document.body.removeChild(adTriggerLink);
 
     // Ao clicar, o usuário confirma que está logado e o ganho de pontos começa.
     setKickLoginStep('verified');
