@@ -192,7 +192,6 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
           {/* Lógica de verificação da Kick, sem os botões de iniciar/parar */}
           {stream.platform === Platform.Kick && kickLoginStep !== 'verified' && (
             <div className="w-full text-center p-4 bg-muted/50 rounded-lg space-y-4">
-              <p className="text-sm font-medium">Para ganhar pontos, você precisa estar logado na Kick.</p>
               {kickLoginStep === 'initial' && (
                 <Button onClick={handleStartEarning} className="w-full">
                   Começar a Ganhar Pontos
