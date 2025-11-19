@@ -8,7 +8,7 @@ export const MobileNav = () => {
   const { isAdmin } = useAdmin();
 
   // Define todos os itens possíveis
-  const allItems = [
+  const items = [
     {
       label: "Início",
       icon: Home,
@@ -20,12 +20,6 @@ export const MobileNav = () => {
       href: "/dashboard/watch",
     },
     {
-      label: "Streamer",
-      icon: Upload,
-      href: "/dashboard/my-streams",
-      adminOnly: true,
-    },
-    {
       label: "Missões", // Mantido para todos os usuários
       icon: CircleDollarSign,
       href: "/dashboard/missions",
@@ -35,15 +29,15 @@ export const MobileNav = () => {
       icon: Wallet,
       href: "/dashboard/withdraw", // Adicionado de volta para usuários comuns
     },
-    {
-      label: "Depositar",
-      icon: PiggyBank,
-      href: "/dashboard/deposit",
-      adminOnly: true,
-    },
   ];
 
-  const items = allItems.filter(item => !item.adminOnly || isAdmin);
+  if (isAdmin) {
+    // Para admin, substitui 'Sacar' por 'Streamer' e 'Depositar' para manter 5 itens
+    items.splice(3, 1, 
+      { label: "Streamer", icon: Upload, href: "/dashboard/my-streams" },
+      { label: "Depositar", icon: PiggyBank, href: "/dashboard/deposit" }
+    );
+  }
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">

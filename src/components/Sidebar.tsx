@@ -23,17 +23,18 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
     }
   };
   
-  const allNavItems = [
+  const navItems = [
     { to: "/dashboard", icon: Home, label: "Início" },
     { to: "/dashboard/watch", icon: Eye, label: "Assistir" },
     { to: "/dashboard/missions", icon: CircleDollarSign, label: "Missões Diárias" },
-    { to: "/dashboard/my-streams", icon: Upload, label: "Streamer", adminOnly: true },
-    { to: "/dashboard/deposit", icon: PiggyBank, label: "Depositar", adminOnly: true },
     { to: "/dashboard/withdraw", icon: Wallet, label: "Sacar" },
     { to: "/dashboard/vpn", icon: Shield, label: "VPN" },
   ];
 
-  const navItems = allNavItems.filter(item => !item.adminOnly || isAdmin);
+  if (isAdmin) {
+    navItems.splice(3, 0, { to: "/dashboard/my-streams", icon: Upload, label: "Streamer" });
+    navItems.splice(5, 0, { to: "/dashboard/deposit", icon: PiggyBank, label: "Depositar" });
+  }
 
   return (
     // Hidden on small screens. On md+ it becomes a fixed sidebar.
