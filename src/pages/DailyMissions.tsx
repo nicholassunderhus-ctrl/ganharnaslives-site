@@ -90,7 +90,9 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube
     const youtubeMissionStoredDate = localStorage.getItem('youtubeMissionWatchedDate');
     if (youtubeMissionStoredDate === today) {
-      setYoutubeMissionWatched(true);
+      // Verifica se o vídeo foi assistido E se a missão ainda não foi completada
+      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]');
+      setYoutubeMissionWatched(!missions.includes(YOUTUBE_MISSION_ID));
     } else {
       // Se for um novo dia, reseta o status de "assistido"
       setYoutubeMissionWatched(false);
