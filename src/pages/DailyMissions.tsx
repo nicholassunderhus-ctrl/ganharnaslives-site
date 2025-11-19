@@ -55,34 +55,34 @@ const DailyMissionsPage = () => {
   const WATCH_TIME_GOAL_12_HOURS = 43200; // 720 minutos em segundos
 
   // --- Estados da Missão de Vídeo ---
-  const [showYoutubePlayer, setShowYoutubePlayer] = useState(false);
+  const [showYoutubePlayer1, setShowYoutubePlayer1] = useState(false);
   const [youtubeMissionWatched, setYoutubeMissionWatched] = useState(false);
-  const YOUTUBE_MISSION_ID = 104;
+  const YOUTUBE_MISSION_1_ID = 110; // Novo ID para a primeira missão de vídeo
 
   // --- Estados da Missão de Vídeo 2 ---
   const [showYoutubePlayer2, setShowYoutubePlayer2] = useState(false);
   const [youtubeMission2Watched, setYoutubeMission2Watched] = useState(false);
-  const YOUTUBE_MISSION_2_ID = 105;
+  const YOUTUBE_MISSION_2_ID = 111; // Novo ID para a segunda missão de vídeo
 
   // --- Estados da Missão de Vídeo 3 ---
   const [showYoutubePlayer3, setShowYoutubePlayer3] = useState(false);
   const [youtubeMission3Watched, setYoutubeMission3Watched] = useState(false);
-  const YOUTUBE_MISSION_3_ID = 106;
+  const YOUTUBE_MISSION_3_ID = 112; // Novo ID para a terceira missão de vídeo
 
   // --- Estados da Missão de Vídeo 4 ---
   const [showYoutubePlayer4, setShowYoutubePlayer4] = useState(false);
   const [youtubeMission4Watched, setYoutubeMission4Watched] = useState(false);
-  const YOUTUBE_MISSION_4_ID = 107;
+  const YOUTUBE_MISSION_4_ID = 113; // Novo ID para a quarta missão de vídeo
 
   // --- Estados da Missão de Vídeo 5 ---
   const [showYoutubePlayer5, setShowYoutubePlayer5] = useState(false);
   const [youtubeMission5Watched, setYoutubeMission5Watched] = useState(false);
-  const YOUTUBE_MISSION_5_ID = 108;
+  const YOUTUBE_MISSION_5_ID = 114; // Novo ID para a quinta missão de vídeo
 
   // --- Estados da Missão de Vídeo 6 ---
   const [showYoutubePlayer6, setShowYoutubePlayer6] = useState(false);
   const [youtubeMission6Watched, setYoutubeMission6Watched] = useState(false);
-  const YOUTUBE_MISSION_6_ID = 109; // ID da sexta missão de vídeo
+  const YOUTUBE_MISSION_6_ID = 115; // Novo ID para a sexta missão de vídeo
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -122,8 +122,8 @@ const DailyMissionsPage = () => {
     const youtubeMissionStoredDate = localStorage.getItem('youtubeMissionWatchedDate');
     if (youtubeMissionStoredDate === today) {
       // Verifica se o vídeo foi assistido E se a missão ainda não foi completada
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]');
-      setYoutubeMissionWatched(!missions.includes(YOUTUBE_MISSION_ID));
+      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
+      setYoutubeMissionWatched(!missions.includes(YOUTUBE_MISSION_1_ID));
     } else {
       // Se for um novo dia, reseta o status de "assistido"
       setYoutubeMissionWatched(false);
@@ -132,7 +132,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 2
     const youtubeMission2StoredDate = localStorage.getItem('youtubeMission2WatchedDate');
     if (youtubeMission2StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]');
+      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
       setYoutubeMission2Watched(!missions.includes(YOUTUBE_MISSION_2_ID));
     } else {
       setYoutubeMission2Watched(false);
@@ -141,7 +141,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 3
     const youtubeMission3StoredDate = localStorage.getItem('youtubeMission3WatchedDate');
     if (youtubeMission3StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]');
+      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
       setYoutubeMission3Watched(!missions.includes(YOUTUBE_MISSION_3_ID));
     } else {
       setYoutubeMission3Watched(false);
@@ -150,7 +150,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 4
     const youtubeMission4StoredDate = localStorage.getItem('youtubeMission4WatchedDate');
     if (youtubeMission4StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]');
+      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
       setYoutubeMission4Watched(!missions.includes(YOUTUBE_MISSION_4_ID));
     } else {
       setYoutubeMission4Watched(false);
@@ -159,7 +159,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 5
     const youtubeMission5StoredDate = localStorage.getItem('youtubeMission5WatchedDate');
     if (youtubeMission5StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]');
+      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
       setYoutubeMission5Watched(!missions.includes(YOUTUBE_MISSION_5_ID));
     } else {
       setYoutubeMission5Watched(false);
@@ -168,7 +168,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 6
     const youtubeMission6StoredDate = localStorage.getItem('youtubeMission6WatchedDate');
     if (youtubeMission6StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]');
+      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
       setYoutubeMission6Watched(!missions.includes(YOUTUBE_MISSION_6_ID));
     } else {
       setYoutubeMission6Watched(false);
@@ -502,12 +502,12 @@ const DailyMissionsPage = () => {
                       <p className="text-sm text-primary">Recompensa: 20 pts</p>
                     </div>
                   </div>
-                  {completedMissions.includes(YOUTUBE_MISSION_ID) ? (
+                  {completedMissions.includes(YOUTUBE_MISSION_1_ID) ? (
                     <Button variant="secondary" disabled>✓ Concluído</Button>
                   ) : youtubeMissionWatched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_ID}>Coletar</Button>
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_1_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_1_ID}>Coletar</Button>
                   ) : (
-                    <Button onClick={() => setShowYoutubePlayer(true)}>Assistir</Button>
+                    <Button onClick={() => setShowYoutubePlayer1(true)}>Assistir</Button>
                   )}
                 </div>
               </CardContent>
@@ -681,7 +681,7 @@ const DailyMissionsPage = () => {
 
       {showYoutubePlayer && (
         <YouTubeMissionPlayer
-          videoId="ZKNy0BRxe84"
+          videoId="ZKNy0BRxe84" // ID do vídeo para a primeira missão
           onVideoEnd={handleVideoEnd}
           onClose={() => setShowYoutubePlayer(false)}
         />
