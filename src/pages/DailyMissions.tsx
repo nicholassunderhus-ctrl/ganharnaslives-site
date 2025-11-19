@@ -71,7 +71,12 @@ const DailyMissionsPage = () => {
   // --- Estados da Missão de Vídeo 5 ---
   const [showYoutubePlayer5, setShowYoutubePlayer5] = useState(false);
   const [youtubeMission5Watched, setYoutubeMission5Watched] = useState(false);
-  const YOUTUBE_MISSION_5_ID = 108; // ID da quinta missão de vídeo
+  const YOUTUBE_MISSION_5_ID = 108;
+
+  // --- Estados da Missão de Vídeo 6 ---
+  const [showYoutubePlayer6, setShowYoutubePlayer6] = useState(false);
+  const [youtubeMission6Watched, setYoutubeMission6Watched] = useState(false);
+  const YOUTUBE_MISSION_6_ID = 109; // ID da sexta missão de vídeo
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -152,6 +157,15 @@ const DailyMissionsPage = () => {
       setYoutubeMission5Watched(!missions.includes(YOUTUBE_MISSION_5_ID));
     } else {
       setYoutubeMission5Watched(false);
+    }
+
+    // Lógica para a missão do YouTube 6
+    const youtubeMission6StoredDate = localStorage.getItem('youtubeMission6WatchedDate');
+    if (youtubeMission6StoredDate === today) {
+      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]');
+      setYoutubeMission6Watched(!missions.includes(YOUTUBE_MISSION_6_ID));
+    } else {
+      setYoutubeMission6Watched(false);
     }
 
     // Atualiza o tempo assistido a cada 5 segundos para manter a UI sincronizada
@@ -263,6 +277,13 @@ const DailyMissionsPage = () => {
     setYoutubeMission5Watched(true);
     localStorage.setItem('youtubeMission5WatchedDate', new Date().toDateString());
     setShowYoutubePlayer5(false); // Fecha o player 5 automaticamente
+  };
+
+  const handleVideo6End = () => {
+    toast.info("Vídeo 6 concluído! Você já pode coletar sua recompensa.");
+    setYoutubeMission6Watched(true);
+    localStorage.setItem('youtubeMission6WatchedDate', new Date().toDateString());
+    setShowYoutubePlayer6(false); // Fecha o player 6 automaticamente
   };
 
   return (
@@ -517,6 +538,35 @@ const DailyMissionsPage = () => {
             </CardContent>
           </Card>
 
+          {/* Card da Missão de Vídeo do YouTube 6 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Youtube className="w-6 h-6 text-primary" />
+                Vídeo Premiado 6
+              </CardTitle>
+              <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${youtubeMission6Watched ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div>
+                    <p className="font-semibold">Assista ao sexto vídeo do dia</p>
+                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
+                  </div>
+                </div>
+                {completedMissions.includes(YOUTUBE_MISSION_6_ID) ? (
+                  <Button variant="secondary" disabled>Concluído ✓</Button>
+                ) : youtubeMission6Watched ? (
+                  <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_6_ID, 20)}>Coletar</Button>
+                ) : (
+                  <Button onClick={() => setShowYoutubePlayer6(true)}>Assistir Vídeo 6</Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Card da Missão de Vídeo do YouTube */}
           <Card>
             <CardHeader>
@@ -622,6 +672,14 @@ const DailyMissionsPage = () => {
           videoId="irJbA0QvMUg"
           onVideoEnd={handleVideo5End}
           onClose={() => setShowYoutubePlayer5(false)}
+        />
+      )}
+
+      {showYoutubePlayer6 && (
+        <YouTubeMissionPlayer
+          videoId="7KVNNS-vQog"
+          onVideoEnd={handleVideo6End}
+          onClose={() => setShowYoutubePlayer6(false)}
         />
       )}
     </div>
