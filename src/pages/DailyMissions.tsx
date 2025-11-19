@@ -727,38 +727,3 @@ const DailyMissionsPage = () => {
 };
 
 export default DailyMissionsPage;
-        <YouTubeMissionPlayer
-          videoId="-frPxUMQnhE"
-          onVideoEnd={handleVideo3End}
-          onClose={() => setShowYoutubePlayer3(false)}
-        />
-      )}
-
-      {showYoutubePlayer4 && (
-        <YouTubeMissionPlayer
-          videoId="Sck3A-XewOY"
-          onVideoEnd={handleVideo4End}
-          onClose={() => setShowYoutubePlayer4(false)}
-        />
-      )}
-
-      {showYoutubePlayer5 && (
-        <YouTubeMissionPlayer
-          videoId="irJbA0QvMUg"
-          onVideoEnd={handleVideo5End}
-          onClose={() => setShowYoutubePlayer5(false)}
-        />
-      )}
-
-      {showYoutubePlayer6 && (
-        <YouTubeMissionPlayer
-          videoId="7KVNNS-vQog"
-          onVideoEnd={handleVideo6End}
-          onClose={() => setShowYoutubePlayer6(false)}
-        />
-      )}
-    </div>
-  );
-};
-
-export default DailyMissionsPage;
