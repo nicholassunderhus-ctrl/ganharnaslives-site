@@ -29,11 +29,16 @@ export const MobileNav = () => {
       icon: Wallet,
       href: "/dashboard/withdraw", // Adicionado de volta para usuários comuns
     },
+    {
+      label: "VPN",
+      icon: Shield,
+      href: "/dashboard/vpn",
+    },
   ];
 
   if (isAdmin) {
-    // Para admin, substitui 'Sacar' por 'Streamer' e 'Depositar' para manter 5 itens
-    items.splice(3, 1, 
+    // Para admin, substitui 'Sacar' e 'VPN' por 'Streamer' e 'Depositar' para manter 5 itens
+    items.splice(3, 2, 
       { label: "Streamer", icon: Upload, href: "/dashboard/my-streams" },
       { label: "Depositar", icon: PiggyBank, href: "/dashboard/deposit" }
     );
