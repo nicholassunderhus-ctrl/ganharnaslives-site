@@ -191,7 +191,6 @@ const DailyMissionsPage = () => {
       if (urlParams.get('recompensa') === 'missao_diaria_shrtfly' && user) {
       const recompensa = urlParams.get('recompensa');
 
-      if (recompensa === 'missao_diaria_bonus_51481' && user) {
         // Remove o parâmetro da URL para evitar reprocessamento
         const newUrl = window.location.pathname;
         const newUrl = '/dashboard/missoes';
