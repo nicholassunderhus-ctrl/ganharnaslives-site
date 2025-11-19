@@ -118,12 +118,13 @@ const DailyMissionsPage = () => {
       setWatchTime(Number(localStorage.getItem('totalWatchTimeToday') || '0'));
     }
 
+    localStorage.setItem('watchTimeDate', today); // Always update the date
+
     // Lógica para a missão do YouTube
     const youtubeMissionStoredDate = localStorage.getItem('youtubeMissionWatchedDate');
     if (youtubeMissionStoredDate === today) {
-      // Verifica se o vídeo foi assistido E se a missão ainda não foi completada
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
-      setYoutubeMissionWatched(!missions.includes(YOUTUBE_MISSION_1_ID));
+      // Se for o mesmo dia, verifica se o vídeo foi assistido E se a missão ainda não foi coletada
+      setYoutubeMissionWatched(!completedMissions.includes(YOUTUBE_MISSION_1_ID));
     } else {
       // Se for um novo dia, reseta o status de "assistido"
       setYoutubeMissionWatched(false);
@@ -132,8 +133,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 2
     const youtubeMission2StoredDate = localStorage.getItem('youtubeMission2WatchedDate');
     if (youtubeMission2StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
-      setYoutubeMission2Watched(!missions.includes(YOUTUBE_MISSION_2_ID));
+      setYoutubeMission2Watched(!completedMissions.includes(YOUTUBE_MISSION_2_ID));
     } else {
       setYoutubeMission2Watched(false);
     }
@@ -141,8 +141,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 3
     const youtubeMission3StoredDate = localStorage.getItem('youtubeMission3WatchedDate');
     if (youtubeMission3StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
-      setYoutubeMission3Watched(!missions.includes(YOUTUBE_MISSION_3_ID));
+      setYoutubeMission3Watched(!completedMissions.includes(YOUTUBE_MISSION_3_ID));
     } else {
       setYoutubeMission3Watched(false);
     }
@@ -150,8 +149,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 4
     const youtubeMission4StoredDate = localStorage.getItem('youtubeMission4WatchedDate');
     if (youtubeMission4StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
-      setYoutubeMission4Watched(!missions.includes(YOUTUBE_MISSION_4_ID));
+      setYoutubeMission4Watched(!completedMissions.includes(YOUTUBE_MISSION_4_ID));
     } else {
       setYoutubeMission4Watched(false);
     }
@@ -159,8 +157,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 5
     const youtubeMission5StoredDate = localStorage.getItem('youtubeMission5WatchedDate');
     if (youtubeMission5StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
-      setYoutubeMission5Watched(!missions.includes(YOUTUBE_MISSION_5_ID));
+      setYoutubeMission5Watched(!completedMissions.includes(YOUTUBE_MISSION_5_ID));
     } else {
       setYoutubeMission5Watched(false);
     }
@@ -168,8 +165,7 @@ const DailyMissionsPage = () => {
     // Lógica para a missão do YouTube 6
     const youtubeMission6StoredDate = localStorage.getItem('youtubeMission6WatchedDate');
     if (youtubeMission6StoredDate === today) {
-      const missions = JSON.parse(localStorage.getItem('completedMissions') || '[]'); // Usar o estado atualizado
-      setYoutubeMission6Watched(!missions.includes(YOUTUBE_MISSION_6_ID));
+      setYoutubeMission6Watched(!completedMissions.includes(YOUTUBE_MISSION_6_ID));
     } else {
       setYoutubeMission6Watched(false);
     }
@@ -180,7 +176,7 @@ const DailyMissionsPage = () => {
     }, 5000);
 
     return () => clearInterval(watchTimePoller);
-  }, []);
+  }, [completedMissions, user]); // Adicionado completedMissions e user como dependências
 
   // Efeito para verificar se a missão de anúncio foi liberada
   useEffect(() => {
@@ -248,486 +244,3 @@ const DailyMissionsPage = () => {
     if (completedMissions.includes(missionId) || !user) return;
 
     setLoadingMission(missionId);
-    // Desabilita a missão imediatamente na UI para prevenir cliques duplos
-    setCompletedMissions(prev => [...prev, missionId]);
-
-    try {
-      const { error } = await supabase.rpc('increment_points', { user_id_in: user.id, points_to_add: points });
-      if (error) throw error;
-
-      // Apenas confirma a gravação no localStorage após o sucesso
-      localStorage.setItem('completedMissions', JSON.stringify([...completedMissions, missionId]));
-      toast.success(`+${points} pontos foram adicionados à sua conta!`);
-      await queryClient.invalidateQueries({ queryKey: ['userPoints', user.id] });
-    } catch (error: any) {
-      toast.error("Erro ao completar missão.", { description: error.message });
-      // Se der erro, reverte o estado da UI para permitir nova tentativa
-      setCompletedMissions(prev => prev.filter(id => id !== missionId));
-    } finally {
-      setLoadingMission(null);
-    }
-  };
-
-  const handleVideoEnd = () => {
-    toast.info("Vídeo concluído! Você já pode coletar sua recompensa.");
-    setYoutubeMissionWatched(true);
-    localStorage.setItem('youtubeMissionWatchedDate', new Date().toDateString());
-    setShowYoutubePlayer(false); // Fecha o player automaticamente
-  };
-
-  const handleVideo2End = () => {
-    toast.info("Vídeo 2 concluído! Você já pode coletar sua recompensa.");
-    setYoutubeMission2Watched(true);
-    localStorage.setItem('youtubeMission2WatchedDate', new Date().toDateString());
-    setShowYoutubePlayer2(false); // Fecha o player 2 automaticamente
-  };
-
-  const handleVideo3End = () => {
-    toast.info("Vídeo 3 concluído! Você já pode coletar sua recompensa.");
-    setYoutubeMission3Watched(true);
-    localStorage.setItem('youtubeMission3WatchedDate', new Date().toDateString());
-    setShowYoutubePlayer3(false); // Fecha o player 3 automaticamente
-  };
-
-  const handleVideo4End = () => {
-    toast.info("Vídeo 4 concluído! Você já pode coletar sua recompensa.");
-    setYoutubeMission4Watched(true);
-    localStorage.setItem('youtubeMission4WatchedDate', new Date().toDateString());
-    setShowYoutubePlayer4(false); // Fecha o player 4 automaticamente
-  };
-
-  const handleVideo5End = () => {
-    toast.info("Vídeo 5 concluído! Você já pode coletar sua recompensa.");
-    setYoutubeMission5Watched(true);
-    localStorage.setItem('youtubeMission5WatchedDate', new Date().toDateString());
-    setShowYoutubePlayer5(false); // Fecha o player 5 automaticamente
-  };
-
-  const handleVideo6End = () => {
-    toast.info("Vídeo 6 concluído! Você já pode coletar sua recompensa.");
-    setYoutubeMission6Watched(true);
-    localStorage.setItem('youtubeMission6WatchedDate', new Date().toDateString());
-    setShowYoutubePlayer6(false); // Fecha o player 6 automaticamente
-  };
-
-  return (
-    <div className="min-h-screen bg-background">
-      <Sidebar points={userPoints?.points ?? 0} />
-      <main className="md:ml-64 ml-0 pt-20 pb-24 md:pb-8 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Missões Diárias</h1>
-            <p className="text-muted-foreground">Complete tarefas e ganhe pontos todos os dias.</p>
-          </div>
-
-          {/* --- Roleta Diária --- */}
-          <Card className="bg-gradient-to-br from-primary/5 to-transparent">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Ticket className="w-6 h-6 text-primary" />
-                Roleta Diária da Sorte
-              </CardTitle>
-              <CardDescription>Gire uma vez por dia e teste sua sorte para ganhar pontos extras!</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center gap-6 text-center">
-              <div className="w-48 h-48 bg-background/50 rounded-full flex items-center justify-center border-4 border-primary/20 shadow-lg">
-                <span className={cn("text-5xl font-bold transition-all duration-100", isSpinning ? "text-muted-foreground" : "text-primary")}>
-                  {rouletteResult ?? '?'}
-                </span>
-              </div>
-              {rouletteSpun ? (
-                <p className="font-semibold text-lg">Você ganhou {rouletteResult} pontos hoje! Volte amanhã.</p>
-              ) : (
-                <Button onClick={handleSpinRoulette} disabled={isSpinning} size="lg" variant="gradient">
-                  {isSpinning ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-                  {isSpinning ? 'Girando...' : 'Girar a Roleta!'}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* --- Grid de Missões de Tempo e Vídeo --- */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* --- Missão Diária: Assistir Anúncio --- */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gift className="w-6 h-6 text-primary" />
-                  Missão Diária: Assistir Anúncio
-                </CardTitle>
-                <CardDescription>Assista anúncios para coletar. (Leva cerca de 1 minuto)</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Layout responsivo: flex-col no mobile, sm:flex-row em telas maiores */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4 w-full">
-                    <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
-                    <div>
-                      <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
-                      <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
-                    </div>
-                  </div>
-                  <div className="w-full sm:w-auto flex-shrink-0">
-                    {completedMissions.includes(SHRTFLY_MISSION_ID) ? (
-                      <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
-                    ) : anuncioAssistido ? (
-                      <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full">
-                        Coletar
-                      </Button>
-                    ) : (
-                      <a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full">
-                        <Button className="w-full">Liberar Coleta</Button>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card da Missão de Tempo Assistido (1 Hora) */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-6 h-6 text-primary" />
-                  Maratona de Lives
-                </CardTitle>
-                <CardDescription>Acumule 1 hora de tempo assistido hoje.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1_HOUR ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Assista 60 min</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
-                  </div>
-                  <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
-                    {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/60)`}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card da Missão de Tempo Assistido (3 Horas) */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Hourglass className="w-6 h-6 text-primary" />
-                  Maratona de Lives II
-                </CardTitle>
-                <CardDescription>Acumule 3 horas de tempo assistido hoje.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Assista 180 min</p>
-                      <p className="text-sm text-primary">Recompensa: 40 pts</p>
-                    </div>
-                  </div>
-                  <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_3_HOURS || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
-                    {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card da Missão de Tempo Assistido (6 Horas) */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="w-6 h-6 text-primary" />
-                  Maratona de Lives III
-                </CardTitle>
-                <CardDescription>Acumule 6 horas de tempo assistido hoje.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_6_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Assista 360 min</p>
-                      <p className="text-sm text-primary">Recompensa: 60 pts</p>
-                    </div>
-                  </div>
-                  <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
-                    {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card da Missão de Tempo Assistido (12 Horas) */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Crown className="w-6 h-6 text-primary" />
-                  Maratona Lendária
-                </CardTitle>
-                <CardDescription>Acumule 12 horas de tempo assistido hoje.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_12_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Assista 720 min</p>
-                      <p className="text-sm text-primary">Recompensa: 120 pts</p>
-                    </div>
-                  </div>
-                  <Button onClick={() => handleMissionClick(104, 120)} disabled={watchTime < WATCH_TIME_GOAL_12_HOURS || completedMissions.includes(104) || loadingMission === 104} variant={completedMissions.includes(104) ? "secondary" : "default"}>
-                    {completedMissions.includes(104) ? "✓" : `(${Math.floor(watchTime / 60)}/720)`}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Card da Missão de Vídeo do YouTube */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Youtube className="w-6 h-6 text-primary" />
-                  Vídeo Premiado
-                </CardTitle>
-                <CardDescription>Assista ao vídeo completo.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${youtubeMissionWatched ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Vídeo do dia</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
-                  </div>
-                  {completedMissions.includes(YOUTUBE_MISSION_1_ID) ? (
-                    <Button variant="secondary" disabled>✓ Concluído</Button>
-                  ) : youtubeMissionWatched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_1_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_1_ID}>Coletar</Button>
-                  ) : (
-                    <Button onClick={() => setShowYoutubePlayer1(true)}>Assistir</Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Card da Missão de Vídeo do YouTube 2 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Youtube className="w-6 h-6 text-primary" />
-                  Vídeo Premiado 2
-                </CardTitle>
-                <CardDescription>Assista a outro vídeo completo.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${youtubeMission2Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Vídeo do dia 2</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
-                  </div>
-                  {completedMissions.includes(YOUTUBE_MISSION_2_ID) ? (
-                    <Button variant="secondary" disabled>✓ Concluído</Button>
-                  ) : youtubeMission2Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_2_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_2_ID}>Coletar</Button>
-                  ) : (
-                    <Button onClick={() => setShowYoutubePlayer2(true)}>Assistir</Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card da Missão de Vídeo do YouTube 3 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Youtube className="w-6 h-6 text-primary" />
-                  Vídeo Premiado 3
-                </CardTitle>
-                <CardDescription>Assista a este vídeo especial.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${youtubeMission3Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Vídeo do dia 3</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
-                  </div>
-                  {completedMissions.includes(YOUTUBE_MISSION_3_ID) ? (
-                    <Button variant="secondary" disabled>✓ Concluído</Button>
-                  ) : youtubeMission3Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_3_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_3_ID}>Coletar</Button>
-                  ) : (
-                    <Button onClick={() => setShowYoutubePlayer3(true)}>Assistir</Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card da Missão de Vídeo do YouTube 4 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Youtube className="w-6 h-6 text-primary" />
-                  Vídeo Premiado 4
-                </CardTitle>
-                <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${youtubeMission4Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Vídeo do dia 4</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
-                  </div>
-                  {completedMissions.includes(YOUTUBE_MISSION_4_ID) ? (
-                    <Button variant="secondary" disabled>✓ Concluído</Button>
-                  ) : youtubeMission4Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_4_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_4_ID}>Coletar</Button>
-                  ) : (
-                    <Button onClick={() => setShowYoutubePlayer4(true)}>Assistir</Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card da Missão de Vídeo do YouTube 5 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Youtube className="w-6 h-6 text-primary" />
-                  Vídeo Premiado 5
-                </CardTitle>
-                <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${youtubeMission5Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Vídeo do dia 5</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
-                  </div>
-                  {completedMissions.includes(YOUTUBE_MISSION_5_ID) ? (
-                    <Button variant="secondary" disabled>✓ Concluído</Button>
-                  ) : youtubeMission5Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_5_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_5_ID}>Coletar</Button>
-                  ) : (
-                    <Button onClick={() => setShowYoutubePlayer5(true)}>Assistir</Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card da Missão de Vídeo do YouTube 6 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Youtube className="w-6 h-6 text-primary" />
-                  Vídeo Premiado 6
-                </CardTitle>
-                <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${youtubeMission6Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Vídeo do dia 6</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
-                  </div>
-                  {completedMissions.includes(YOUTUBE_MISSION_6_ID) ? (
-                    <Button variant="secondary" disabled>✓ Concluído</Button>
-                  ) : youtubeMission6Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_6_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_6_ID}>Coletar</Button>
-                  ) : (
-                    <Button onClick={() => setShowYoutubePlayer6(true)}>Assistir</Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="pt-6">
-            <h3 className="text-xl font-bold mb-2">Outras Missões</h3>
-            <p className="text-sm text-muted-foreground">As missões são renovadas a cada 24 horas.</p>
-            {MISSIONS.length > 0 && (
-              <div className="mt-4 space-y-4">
-                {MISSIONS.map((mission) => {
-                  const isCompleted = completedMissions.includes(mission.id);
-                  const isLoading = loadingMission === mission.id;
-                  return (
-                    <div key={mission.id} className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                      {/* ... (código para renderizar missões manuais) ... */}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-
-      {showYoutubePlayer && (
-        <YouTubeMissionPlayer
-          videoId="ZKNy0BRxe84" // ID do vídeo para a primeira missão
-          onVideoEnd={handleVideoEnd}
-          onClose={() => setShowYoutubePlayer(false)}
-        />
-      )}
-
-      {showYoutubePlayer2 && (
-        <YouTubeMissionPlayer
-          videoId="2hHEJ2asvY8"
-          onVideoEnd={handleVideo2End}
-          onClose={() => setShowYoutubePlayer2(false)}
-        />
-      )}
-
-      {showYoutubePlayer3 && (
-        <YouTubeMissionPlayer
-          videoId="-frPxUMQnhE"
-          onVideoEnd={handleVideo3End}
-          onClose={() => setShowYoutubePlayer3(false)}
-        />
-      )}
-
-      {showYoutubePlayer4 && (
-        <YouTubeMissionPlayer
-          videoId="Sck3A-XewOY"
-          onVideoEnd={handleVideo4End}
-          onClose={() => setShowYoutubePlayer4(false)}
-        />
-      )}
-
-      {showYoutubePlayer5 && (
-        <YouTubeMissionPlayer
-          videoId="irJbA0QvMUg"
-          onVideoEnd={handleVideo5End}
-          onClose={() => setShowYoutubePlayer5(false)}
-        />
-      )}
-
-      {showYoutubePlayer6 && (
-        <YouTubeMissionPlayer
-          videoId="7KVNNS-vQog"
-          onVideoEnd={handleVideo6End}
-          onClose={() => setShowYoutubePlayer6(false)}
-        />
-      )}
-    </div>
-  );
-};
-
-export default DailyMissionsPage;

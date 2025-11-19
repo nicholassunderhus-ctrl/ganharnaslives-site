@@ -70,7 +70,8 @@ const Withdraw = () => {
     setIsLoading(true);
 
     if (!canWithdraw) {
-      toast.error("Você já realizou um saque nas últimas 24 horas. 
+      toast.error("Você já realizou um saque nas últimas 24 horas. Tente novamente mais tarde.");
+      setIsLoading(false);
       return;
     }
 
@@ -96,7 +97,8 @@ const Withdraw = () => {
         throw new Error(error.message);
       }
 
-
+      toast.success(data.message || "Solicitação de saque enviada com sucesso! O valor será processado em até 24 horas.");
+      setCanWithdraw(false); // Bloqueia novos saques imediatamente na UI
       // O hook useUserPoints deve ser atualizado automaticamente via Realtime ou você pode chamar userPointsData.refetch()
 
     } catch (error: any) {
