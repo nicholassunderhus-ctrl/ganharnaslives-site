@@ -296,7 +296,7 @@ const DailyMissionsPage = () => {
             <p className="text-muted-foreground">Complete tarefas e ganhe pontos todos os dias.</p>
           </div>
 
-          {/* Card da Roleta Diária */}
+          {/* --- Roleta Diária --- */}
           <Card className="bg-gradient-to-br from-primary/5 to-transparent">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -322,316 +322,311 @@ const DailyMissionsPage = () => {
             </CardContent>
           </Card>
 
-          {/* Card da Missão de Tempo Assistido */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-6 h-6 text-primary" />
-                Maratona de Lives
-              </CardTitle>
-              <CardDescription>Acumule 1 hora de tempo assistido hoje para ganhar uma recompensa.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1_HOUR ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 60 minutos de lives</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
+          {/* --- Grid de Missões de Tempo e Vídeo --- */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Card da Missão de Tempo Assistido (1 Hora) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="w-6 h-6 text-primary" />
+                  Maratona de Lives
+                </CardTitle>
+                <CardDescription>Acumule 1 hora de tempo assistido hoje.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1_HOUR ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Assista 60 min</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
+                    </div>
                   </div>
+                  <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101)} variant={completedMissions.includes(101) ? "secondary" : "default"}>
+                    {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/60)`}
+                  </Button>
                 </div>
-                <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101)} variant={completedMissions.includes(101) ? "secondary" : "default"}>
-                  {completedMissions.includes(101) ? "Concluído ✓" : `Coletar (${Math.floor(watchTime / 60)}/60 min)`}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Card da Missão de Tempo Assistido (3 Horas) */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Hourglass className="w-6 h-6 text-primary" />
-                Maratona de Lives II
-              </CardTitle>
-              <CardDescription>Acumule 3 horas de tempo assistido hoje para ganhar uma recompensa extra.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 180 minutos de lives</p>
-                    <p className="text-sm text-primary">Recompensa: 40 pontos</p>
+            {/* Card da Missão de Tempo Assistido (3 Horas) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Hourglass className="w-6 h-6 text-primary" />
+                  Maratona de Lives II
+                </CardTitle>
+                <CardDescription>Acumule 3 horas de tempo assistido hoje.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Assista 180 min</p>
+                      <p className="text-sm text-primary">Recompensa: 40 pts</p>
+                    </div>
                   </div>
+                  <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_3_HOURS || completedMissions.includes(102)} variant={completedMissions.includes(102) ? "secondary" : "default"}>
+                    {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
+                  </Button>
                 </div>
-                <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_3_HOURS || completedMissions.includes(102)} variant={completedMissions.includes(102) ? "secondary" : "default"}>
-                  {completedMissions.includes(102) ? "Concluído ✓" : `Coletar (${Math.floor(watchTime / 60)}/180 min)`}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Card da Missão de Tempo Assistido (6 Horas) */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-primary" />
-                Maratona de Lives III
-              </CardTitle>
-              <CardDescription>Acumule 6 horas de tempo assistido hoje para a recompensa máxima.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_6_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 360 minutos de lives</p>
-                    <p className="text-sm text-primary">Recompensa: 60 pontos</p>
+            {/* Card da Missão de Tempo Assistido (6 Horas) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-primary" />
+                  Maratona de Lives III
+                </CardTitle>
+                <CardDescription>Acumule 6 horas de tempo assistido hoje.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_6_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Assista 360 min</p>
+                      <p className="text-sm text-primary">Recompensa: 60 pts</p>
+                    </div>
                   </div>
+                  <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103)} variant={completedMissions.includes(103) ? "secondary" : "default"}>
+                    {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
+                  </Button>
                 </div>
-                <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103)} variant={completedMissions.includes(103) ? "secondary" : "default"}>
-                  {completedMissions.includes(103) ? "Concluído ✓" : `Coletar (${Math.floor(watchTime / 60)}/360 min)`}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Card da Missão de Tempo Assistido (12 Horas) */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Crown className="w-6 h-6 text-primary" />
-                Maratona Lendária
-              </CardTitle>
-              <CardDescription>Acumule 12 horas de tempo assistido hoje para a recompensa final.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_12_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 720 minutos de lives</p>
-                    <p className="text-sm text-primary">Recompensa: 120 pontos</p>
+            {/* Card da Missão de Tempo Assistido (12 Horas) */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="w-6 h-6 text-primary" />
+                  Maratona Lendária
+                </CardTitle>
+                <CardDescription>Acumule 12 horas de tempo assistido hoje.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_12_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Assista 720 min</p>
+                      <p className="text-sm text-primary">Recompensa: 120 pts</p>
+                    </div>
                   </div>
+                  <Button onClick={() => handleMissionClick(104, 120)} disabled={watchTime < WATCH_TIME_GOAL_12_HOURS || completedMissions.includes(104)} variant={completedMissions.includes(104) ? "secondary" : "default"}>
+                    {completedMissions.includes(104) ? "✓" : `(${Math.floor(watchTime / 60)}/720)`}
+                  </Button>
                 </div>
-                <Button onClick={() => handleMissionClick(104, 120)} disabled={watchTime < WATCH_TIME_GOAL_12_HOURS || completedMissions.includes(104)} variant={completedMissions.includes(104) ? "secondary" : "default"}>
-                  {completedMissions.includes(104) ? "Concluído ✓" : `Coletar (${Math.floor(watchTime / 60)}/720 min)`}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+            
+            {/* Card da Missão de Vídeo do YouTube */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="w-6 h-6 text-primary" />
+                  Vídeo Premiado
+                </CardTitle>
+                <CardDescription>Assista ao vídeo completo.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${youtubeMissionWatched ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Vídeo do dia</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
+                    </div>
+                  </div>
+                  {completedMissions.includes(YOUTUBE_MISSION_ID) ? (
+                    <Button variant="secondary" disabled>✓</Button>
+                  ) : youtubeMissionWatched ? (
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_ID, 20)}>Coletar</Button>
+                  ) : (
+                    <Button onClick={() => setShowYoutubePlayer(true)}>Assistir</Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Card da Missão de Vídeo do YouTube 2 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="w-6 h-6 text-primary" />
+                  Vídeo Premiado 2
+                </CardTitle>
+                <CardDescription>Assista a outro vídeo completo.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${youtubeMission2Watched ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Vídeo do dia 2</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
+                    </div>
+                  </div>
+                  {completedMissions.includes(YOUTUBE_MISSION_2_ID) ? (
+                    <Button variant="secondary" disabled>✓</Button>
+                  ) : youtubeMission2Watched ? (
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_2_ID, 20)}>Coletar</Button>
+                  ) : (
+                    <Button onClick={() => setShowYoutubePlayer2(true)}>Assistir</Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Card da Missão de Vídeo do YouTube 2 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Youtube className="w-6 h-6 text-primary" />
-                Vídeo Premiado 2
-              </CardTitle>
-              <CardDescription>Assista a outro vídeo completo para mais uma recompensa.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${youtubeMission2Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista ao segundo vídeo do dia</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
+            {/* Card da Missão de Vídeo do YouTube 3 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="w-6 h-6 text-primary" />
+                  Vídeo Premiado 3
+                </CardTitle>
+                <CardDescription>Assista a este vídeo especial.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${youtubeMission3Watched ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Vídeo do dia 3</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
+                    </div>
                   </div>
+                  {completedMissions.includes(YOUTUBE_MISSION_3_ID) ? (
+                    <Button variant="secondary" disabled>✓</Button>
+                  ) : youtubeMission3Watched ? (
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_3_ID, 20)}>Coletar</Button>
+                  ) : (
+                    <Button onClick={() => setShowYoutubePlayer3(true)}>Assistir</Button>
+                  )}
                 </div>
-                {completedMissions.includes(YOUTUBE_MISSION_2_ID) ? (
-                  <Button variant="secondary" disabled>Concluído ✓</Button>
-                ) : youtubeMission2Watched ? (
-                  <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_2_ID, 20)}>Coletar</Button>
-                ) : (
-                  <Button onClick={() => setShowYoutubePlayer2(true)}>Assistir Vídeo 2</Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Card da Missão de Vídeo do YouTube 3 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Youtube className="w-6 h-6 text-primary" />
-                Vídeo Premiado 3
-              </CardTitle>
-              <CardDescription>Assista a este vídeo para uma recompensa especial.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${youtubeMission3Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista ao terceiro vídeo do dia</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
+            {/* Card da Missão de Vídeo do YouTube 4 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="w-6 h-6 text-primary" />
+                  Vídeo Premiado 4
+                </CardTitle>
+                <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${youtubeMission4Watched ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Vídeo do dia 4</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
+                    </div>
                   </div>
+                  {completedMissions.includes(YOUTUBE_MISSION_4_ID) ? (
+                    <Button variant="secondary" disabled>✓</Button>
+                  ) : youtubeMission4Watched ? (
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_4_ID, 20)}>Coletar</Button>
+                  ) : (
+                    <Button onClick={() => setShowYoutubePlayer4(true)}>Assistir</Button>
+                  )}
                 </div>
-                {completedMissions.includes(YOUTUBE_MISSION_3_ID) ? (
-                  <Button variant="secondary" disabled>Concluído ✓</Button>
-                ) : youtubeMission3Watched ? (
-                  <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_3_ID, 20)}>Coletar</Button>
-                ) : (
-                  <Button onClick={() => setShowYoutubePlayer3(true)}>Assistir Vídeo 3</Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Card da Missão de Vídeo do YouTube 4 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Youtube className="w-6 h-6 text-primary" />
-                Vídeo Premiado 4
-              </CardTitle>
-              <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${youtubeMission4Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista ao quarto vídeo do dia</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
+            {/* Card da Missão de Vídeo do YouTube 5 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="w-6 h-6 text-primary" />
+                  Vídeo Premiado 5
+                </CardTitle>
+                <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${youtubeMission5Watched ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Vídeo do dia 5</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
+                    </div>
                   </div>
+                  {completedMissions.includes(YOUTUBE_MISSION_5_ID) ? (
+                    <Button variant="secondary" disabled>✓</Button>
+                  ) : youtubeMission5Watched ? (
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_5_ID, 20)}>Coletar</Button>
+                  ) : (
+                    <Button onClick={() => setShowYoutubePlayer5(true)}>Assistir</Button>
+                  )}
                 </div>
-                {completedMissions.includes(YOUTUBE_MISSION_4_ID) ? (
-                  <Button variant="secondary" disabled>Concluído ✓</Button>
-                ) : youtubeMission4Watched ? (
-                  <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_4_ID, 20)}>Coletar</Button>
-                ) : (
-                  <Button onClick={() => setShowYoutubePlayer4(true)}>Assistir Vídeo 4</Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Card da Missão de Vídeo do YouTube 5 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Youtube className="w-6 h-6 text-primary" />
-                Vídeo Premiado 5
-              </CardTitle>
-              <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${youtubeMission5Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista ao quinto vídeo do dia</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
+            {/* Card da Missão de Vídeo do YouTube 6 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Youtube className="w-6 h-6 text-primary" />
+                  Vídeo Premiado 6
+                </CardTitle>
+                <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${youtubeMission6Watched ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Vídeo do dia 6</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
+                    </div>
                   </div>
+                  {completedMissions.includes(YOUTUBE_MISSION_6_ID) ? (
+                    <Button variant="secondary" disabled>✓</Button>
+                  ) : youtubeMission6Watched ? (
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_6_ID, 20)}>Coletar</Button>
+                  ) : (
+                    <Button onClick={() => setShowYoutubePlayer6(true)}>Assistir</Button>
+                  )}
                 </div>
-                {completedMissions.includes(YOUTUBE_MISSION_5_ID) ? (
-                  <Button variant="secondary" disabled>Concluído ✓</Button>
-                ) : youtubeMission5Watched ? (
-                  <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_5_ID, 20)}>Coletar</Button>
-                ) : (
-                  <Button onClick={() => setShowYoutubePlayer5(true)}>Assistir Vídeo 5</Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Card da Missão de Vídeo do YouTube 6 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Youtube className="w-6 h-6 text-primary" />
-                Vídeo Premiado 6
-              </CardTitle>
-              <CardDescription>Assista a este vídeo para uma recompensa.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${youtubeMission6Watched ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista ao sexto vídeo do dia</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
-                  </div>
-                </div>
-                {completedMissions.includes(YOUTUBE_MISSION_6_ID) ? (
-                  <Button variant="secondary" disabled>Concluído ✓</Button>
-                ) : youtubeMission6Watched ? (
-                  <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_6_ID, 20)}>Coletar</Button>
-                ) : (
-                  <Button onClick={() => setShowYoutubePlayer6(true)}>Assistir Vídeo 6</Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Card da Missão de Vídeo do YouTube */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Youtube className="w-6 h-6 text-primary" />
-                Vídeo Premiado
-              </CardTitle>
-              <CardDescription>Assista ao vídeo completo para desbloquear sua recompensa.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${youtubeMissionWatched ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista ao vídeo do dia</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
-                  </div>
-                </div>
-                {completedMissions.includes(YOUTUBE_MISSION_ID) ? (
-                  <Button variant="secondary" disabled>Concluído ✓</Button>
-                ) : youtubeMissionWatched ? (
-                  <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_ID, 20)}>Coletar</Button>
-                ) : (
-                  <Button onClick={() => setShowYoutubePlayer(true)}>Assistir Vídeo</Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Lista de Missões Manuais */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Outras Missões</CardTitle>
-              <CardDescription>As missões são renovadas a cada 24 horas.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {MISSIONS.length > 0 ? (
-                <div className="space-y-4">
-                  {MISSIONS.map((mission) => {
-                    const isCompleted = completedMissions.includes(mission.id);
-                    const isLoading = loadingMission === mission.id;
-                    return (
-                      <div key={mission.id} className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                        <div className="flex items-center gap-4">
-                          <Gift className={`w-6 h-6 ${isCompleted ? 'text-muted-foreground' : 'text-primary'}`} />
-                          <div>
-                            <p className={`font-semibold ${isCompleted ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{mission.text}</p>
-                            <p className={`text-sm ${isCompleted ? 'text-muted-foreground' : 'text-primary'}`}>Recompensa: {mission.points} pontos</p>
-                          </div>
+          <div className="pt-6">
+            <h3 className="text-xl font-bold mb-2">Outras Missões</h3>
+            <p className="text-sm text-muted-foreground">As missões são renovadas a cada 24 horas.</p>
+            {MISSIONS.length > 0 && (
+              <div className="mt-4 space-y-4">
+                {MISSIONS.map((mission) => {
+                  const isCompleted = completedMissions.includes(mission.id);
+                  const isLoading = loadingMission === mission.id;
+                  return (
+                    <div key={mission.id} className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                      <div className="flex items-center gap-4">
+                        <Gift className={`w-6 h-6 ${isCompleted ? 'text-muted-foreground' : 'text-primary'}`} />
+                        <div>
+                          <p className={`font-semibold ${isCompleted ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{mission.text}</p>
+                          <p className={`text-sm ${isCompleted ? 'text-muted-foreground' : 'text-primary'}`}>Recompensa: {mission.points} pontos</p>
                         </div>
-                        <Button onClick={() => handleMissionClick(mission.id, mission.points)} disabled={isCompleted || isLoading} variant={isCompleted ? "secondary" : "default"}>
-                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isCompleted ? "Concluído ✓" : "Coletar")}
-                        </Button>
                       </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-20 text-muted-foreground">
-                  <p>Nenhuma missão disponível no momento.</p>
-                  <p className="text-sm">Volte mais tarde para conferir as novas missões do dia!</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                      <Button onClick={() => handleMissionClick(mission.id, mission.points)} disabled={isCompleted || isLoading} variant={isCompleted ? "secondary" : "default"}>
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isCompleted ? "Concluído ✓" : "Coletar")}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </main>
 
