@@ -187,10 +187,12 @@ const DailyMissionsPage = () => {
   useEffect(() => {
     const handleShrtflyReward = async () => {
     const handleAnuncioReward = () => {
+    const handleAnuncioReward = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('recompensa') === 'missao_diaria_shrtfly' && user) {
       const recompensa = urlParams.get('recompensa');
 
+      if (user && recompensa) {
         // Remove o parâmetro da URL para evitar reprocessamento
         const newUrl = window.location.pathname;
         const newUrl = '/dashboard/missoes';
@@ -203,6 +205,17 @@ const DailyMissionsPage = () => {
           toast.info("Você já completou esta missão hoje!");
           setAnuncioAssistido(true);
           toast.info("Missão de anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        if (recompensa === 'missao_diaria_shrtfly') {
+          if (!completedMissions.includes(SHRTFLY_MISSION_ID)) {
+            await handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS);
+          } else {
+            toast.info("Você já completou esta missão hoje!");
+          }
+        } else if (recompensa === 'missao_diaria_bonus_51481') {
+          if (!completedMissions.includes(SHRTFLY_MISSION_ID)) {
+            setAnuncioAssistido(true);
+            toast.info("Missão de anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
+          }
         }
       }
     };
@@ -390,7 +403,11 @@ const DailyMissionsPage = () => {
                   <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} disabled={!anuncioAssistido}>
                     Coletar
                   </Button>
+                  <a href="https://stly.link/recompensadiaria" target="_blank" rel="noopener noreferrer" className={!anuncioAssistido ? '' : 'hidden'}>
+                    <Button>Liberar Coleta</Button>
+                  </a>
                 )}
+                <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className={anuncioAssistido && !completedMissions.includes(SHRTFLY_MISSION_ID) ? '' : 'hidden'}>Coletar</Button>
               </div>
             </CardContent>
           </Card>
