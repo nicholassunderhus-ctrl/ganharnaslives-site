@@ -40,12 +40,12 @@ const VpnPage = () => {
                   Nossa ferramenta para desktop foi criada para otimizar seus ganhos. Com ela, você pode gerenciar diversas contas simultaneamente, de forma segura e eficiente.
                 </p>
                 <p className="mt-4 font-semibold text-foreground">
-                  Utilizando a VPN no computador, nossos usuários mais dedicados conseguem ganhar até <span className="text-primary font-bold text-lg">R$ 30 por dia!</span>
+                  Com o potencial de ganhos diários entre <span className="text-primary font-bold text-lg">R$ 10 e R$ 50</span>, nossa VPN é a ferramenta ideal para quem leva a sério a monetização de tempo.
                 </p>
               </div>
 
               <p className="text-center text-sm text-muted-foreground pt-4">
-                Acesse nosso site pelo seu computador para baixar a ferramenta e começar a maximizar seus lucros.
+                Acesse nosso site pelo seu computador para baixar a ferramenta e começar a lucrar de verdade.
               </p>
             </CardContent>
           </Card>
