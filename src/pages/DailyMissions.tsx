@@ -100,7 +100,7 @@ const DailyMissionsPage = () => {
     }, 5000);
 
     return () => clearInterval(watchTimePoller);
-  });
+  }, []);
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
