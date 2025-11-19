@@ -35,8 +35,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           
-          {/* Rota da nova página de recompensa */}
-          <Route path="/recompensa-anuncio" element={<RecompensaAnuncioPage />} />
+          {/* Rota da página de recompensa com caminho complexo */}
+          <Route path="/recompensa/validar-anuncio-id-8491-a3b2" element={<RecompensaAnuncioPage />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/watch" element={<Watch />} />

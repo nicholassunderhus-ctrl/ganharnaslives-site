@@ -368,7 +368,7 @@ const DailyMissionsPage = () => {
                     Coletar
                   </Button>
                 ) : (
-                  <a href="https://stly.link/recompensadiaria" target="_blank" rel="noopener noreferrer" className={!anuncioAssistido ? '' : 'hidden'}>
+                  <a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className={!anuncioAssistido ? '' : 'hidden'}>
                     <Button>Liberar Coleta</Button>
                   </a>
                 )}
