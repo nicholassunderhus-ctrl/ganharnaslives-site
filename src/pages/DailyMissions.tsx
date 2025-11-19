@@ -3,7 +3,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Gift, Loader2, Ticket } from 'lucide-react';
+import { Gift, Loader2, Ticket, Clock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -40,6 +40,10 @@ const DailyMissionsPage = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rouletteResult, setRouletteResult] = useState<number | null>(null);
 
+  // --- Estados da Missão de Tempo ---
+  const [watchTime, setWatchTime] = useState(0); // Em segundos
+  const WATCH_TIME_GOAL = 3600; // 60 minutos em segundos
+
   useEffect(() => {
     const today = new Date().toDateString();
     
@@ -67,6 +71,19 @@ const DailyMissionsPage = () => {
         setRouletteResult(Number(storedResult));
       }
     }
+
+    // Lógica para o tempo assistido
+    const watchTimeStoredDate = localStorage.getItem('watchTimeDate');
+    if (watchTimeStoredDate === today) {
+      setWatchTime(Number(localStorage.getItem('totalWatchTimeToday') || '0'));
+    }
+
+    // Atualiza o tempo assistido a cada 5 segundos para manter a UI sincronizada
+    const watchTimePoller = setInterval(() => {
+      setWatchTime(Number(localStorage.getItem('totalWatchTimeToday') || '0'));
+    }, 5000);
+
+    return () => clearInterval(watchTimePoller);
   }, []);
 
   const handleSpinRoulette = async () => {
@@ -170,6 +187,31 @@ const DailyMissionsPage = () => {
                   {isSpinning ? 'Girando...' : 'Girar a Roleta!'}
                 </Button>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Card da Missão de Tempo Assistido */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-6 h-6 text-primary" />
+                Maratona de Lives
+              </CardTitle>
+              <CardDescription>Acumule 1 hora de tempo assistido hoje para ganhar uma recompensa.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div>
+                    <p className="font-semibold">Assista 60 minutos de lives</p>
+                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
+                  </div>
+                </div>
+                <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL || completedMissions.includes(101)} variant={completedMissions.includes(101) ? "secondary" : "default"}>
+                  {completedMissions.includes(101) ? "Concluído ✓" : `Coletar (${Math.floor(watchTime / 60)}/60 min)`}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

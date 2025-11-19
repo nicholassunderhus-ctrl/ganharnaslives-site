@@ -71,6 +71,28 @@ export const StreamViewer = ({ stream, onClose }: StreamViewerProps) => {
     }
   }, [stream.platform, kickLoginStep]);
 
+  // Efeito para registrar o tempo total assistido no dia
+  useEffect(() => {
+    if (!isWatching) return;
+
+    const watchTimeTracker = setInterval(() => {
+        const today = new Date().toDateString();
+        const storedDate = localStorage.getItem('watchTimeDate');
+
+        let dailyWatchTime = 0;
+        if (storedDate === today) {
+            dailyWatchTime = Number(localStorage.getItem('totalWatchTimeToday') || '0');
+        } else {
+            // Novo dia, reseta o contador
+            localStorage.setItem('watchTimeDate', today);
+        }
+
+        dailyWatchTime += 1; // Incrementa em um segundo
+        localStorage.setItem('totalWatchTimeToday', String(dailyWatchTime));
+    }, 1000);
+
+    return () => clearInterval(watchTimeTracker);
+  }, [isWatching]);
 
   useEffect(() => {
     let timeInterval: NodeJS.Timeout | undefined;
