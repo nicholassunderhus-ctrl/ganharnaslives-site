@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from "@/components/Sidebar";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { Gift, Loader2, Ticket, Clock, Hourglass, Youtube, Trophy, Crown } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { YouTubeMissionPlayer } from '@/components/YouTubeMissionPlayer';
+import { ExternalLink } from 'lucide-react';
 
 // =================================================================================
 // ATENÇÃO: Adicione as missões do dia aqui dentro desta lista (máximo 10).
@@ -28,6 +29,10 @@ const ROULETTE_PRIZES = [
   { points: 100, weight: 5 }, // 5% de chance
 ];
 const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
+
+// --- Configuração da Missão Shrtfly ---
+const SHRTFLY_MISSION_ID = 201;
+const SHRTFLY_MISSION_POINTS = 20;
 
 const DailyMissionsPage = () => {
   const { userPoints } = useUserPoints();
@@ -174,6 +179,30 @@ const DailyMissionsPage = () => {
     }, 5000);
 
     return () => clearInterval(watchTimePoller);
+  }, []);
+
+  // Efeito para lidar com a recompensa da missão do Shrtfly
+  useEffect(() => {
+    const handleShrtflyReward = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('recompensa') === 'missao_diaria_shrtfly' && user) {
+        // Remove o parâmetro da URL para evitar reprocessamento
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+
+        // Verifica se a missão já foi completada hoje para não creditar duas vezes
+        if (!completedMissions.includes(SHRTFLY_MISSION_ID)) {
+          await handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS);
+        } else {
+          toast.info("Você já completou esta missão hoje!");
+        }
+      }
+    };
+
+    // Atraso para garantir que o estado `user` e `completedMissions` esteja carregado
+    if (user) {
+      handleShrtflyReward();
+    }
   });
 
   const handleSpinRoulette = async () => {
@@ -319,6 +348,32 @@ const DailyMissionsPage = () => {
                   {isSpinning ? 'Girando...' : 'Girar a Roleta!'}
                 </Button>
               )}
+            </CardContent>
+          </Card>
+
+          {/* --- Missão Diária: Assistir Anúncio --- */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gift className="w-6 h-6 text-primary" />
+                Missão Diária: Assistir Anúncio
+              </CardTitle>
+              <CardDescription>Ganhe {SHRTFLY_MISSION_POINTS} pontos por assistir aos anúncios do nosso parceiro.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Clique no botão abaixo para acessar o site parceiro. Você precisará visualizar os anúncios até o final para ser redirecionado de volta e receber sua recompensa.
+              </p>
+              <Button 
+                asChild 
+                className="w-full md:w-auto"
+                disabled={completedMissions.includes(SHRTFLY_MISSION_ID)}
+              >
+                <a href="https://stly.link/recompensadiaria" target="_blank" rel="noopener noreferrer">
+                  {completedMissions.includes(SHRTFLY_MISSION_ID) ? 'Missão Concluída ✓' : 'Coletar Recompensa'}
+                  {!completedMissions.includes(SHRTFLY_MISSION_ID) && <ExternalLink className="w-4 h-4 ml-2" />}
+                </a>
+              </Button>
             </CardContent>
           </Card>
 

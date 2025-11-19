@@ -1,38 +1,13 @@
-import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Monitor, Coins, ShieldCheck, Gift, ExternalLink } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Shield, Monitor, Coins, AlertTriangle, ShieldCheck } from "lucide-react";
 
 const VpnPage = () => {
-  const [recompensaColetada, setRecompensaColetada] = useState(false);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('recompensa') === 'missao_diaria_shrtfly') {
-      // Aqui você adicionaria a lógica para creditar os 20 pontos ao usuário.
-      // Por exemplo: updateUserPoints(20);
-      setRecompensaColetada(true);
-
-      // Remove o parâmetro da URL para não mostrar o alerta novamente ao recarregar
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
-    }
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
       
       <main className="md:ml-64 ml-0 pt-20 pb-24 md:pb-8 p-4 md:p-8">
-        {recompensaColetada && (
-          <Alert className="bg-green-500/10 border-green-500 text-green-500 max-w-4xl mx-auto mb-6">
-            <AlertTitle className="font-bold">Parabéns!</AlertTitle>
-            <AlertDescription>Você completou a missão e ganhou 20 pontos!</AlertDescription>
-          </Alert>
-        )}
-
         <div className="max-w-4xl mx-auto space-y-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">VPN para Multicontas</h1>
@@ -75,28 +50,6 @@ const VpnPage = () => {
 
           {/* --- Conteúdo para Desktop --- */}
           <div className="hidden md:block">
-            {/* Missão Diária Card */}
-            <Card className="mb-8 border-primary/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gift className="w-6 h-6 text-primary" />
-                  Missão Diária: Ganhe 20 Pontos!
-                </CardTitle>
-                <CardDescription>Complete a missão para ganhar sua recompensa diária.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
-                  Clique no botão abaixo para acessar o site parceiro. Você precisará visualizar os anúncios até o final para ser redirecionado de volta e receber seus 20 pontos.
-                </p>
-                <Button asChild className="w-full md:w-auto">
-                  <a href="https://stly.link/recompensadiaria" target="_blank" rel="noopener noreferrer">
-                    Coletar Recompensa Diária
-                    <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
