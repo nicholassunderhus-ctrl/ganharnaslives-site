@@ -3,12 +3,13 @@ import { Sidebar } from "@/components/Sidebar";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Gift, Loader2, Ticket, Clock, Hourglass } from 'lucide-react';
+import { Gift, Loader2, Ticket, Clock, Hourglass, Youtube } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
+import { YouTubeMissionPlayer } from '@/components/YouTubeMissionPlayer';
 
 // =================================================================================
 // ATENÇÃO: Adicione as missões do dia aqui dentro desta lista (máximo 10).
@@ -45,6 +46,11 @@ const DailyMissionsPage = () => {
   const WATCH_TIME_GOAL_1_HOUR = 3600; // 60 minutos em segundos
   const WATCH_TIME_GOAL_3_HOURS = 10800; // 180 minutos em segundos
 
+  // --- Estados da Missão de Vídeo ---
+  const [showYoutubePlayer, setShowYoutubePlayer] = useState(false);
+  const [youtubeMissionWatched, setYoutubeMissionWatched] = useState(false);
+  const YOUTUBE_MISSION_ID = 103;
+
   useEffect(() => {
     const today = new Date().toDateString();
     
@@ -77,6 +83,15 @@ const DailyMissionsPage = () => {
     const watchTimeStoredDate = localStorage.getItem('watchTimeDate');
     if (watchTimeStoredDate === today) {
       setWatchTime(Number(localStorage.getItem('totalWatchTimeToday') || '0'));
+    }
+
+    // Lógica para a missão do YouTube
+    const youtubeMissionStoredDate = localStorage.getItem('youtubeMissionWatchedDate');
+    if (youtubeMissionStoredDate === today) {
+      setYoutubeMissionWatched(true);
+    } else {
+      // Se for um novo dia, reseta o status de "assistido"
+      setYoutubeMissionWatched(false);
     }
 
     // Atualiza o tempo assistido a cada 5 segundos para manter a UI sincronizada
@@ -153,6 +168,13 @@ const DailyMissionsPage = () => {
     } finally {
       setLoadingMission(null);
     }
+  };
+
+  const handleVideoEnd = () => {
+    toast.info("Vídeo concluído! Você já pode coletar sua recompensa.");
+    setYoutubeMissionWatched(true);
+    localStorage.setItem('youtubeMissionWatchedDate', new Date().toDateString());
+    setShowYoutubePlayer(false); // Fecha o player automaticamente
   };
 
   return (
@@ -241,6 +263,35 @@ const DailyMissionsPage = () => {
             </CardContent>
           </Card>
 
+          {/* Card da Missão de Vídeo do YouTube */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Youtube className="w-6 h-6 text-primary" />
+                Vídeo Premiado
+              </CardTitle>
+              <CardDescription>Assista ao vídeo completo para desbloquear sua recompensa.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${youtubeMissionWatched ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div>
+                    <p className="font-semibold">Assista ao vídeo do dia</p>
+                    <p className="text-sm text-primary">Recompensa: 20 pontos</p>
+                  </div>
+                </div>
+                {completedMissions.includes(YOUTUBE_MISSION_ID) ? (
+                  <Button variant="secondary" disabled>Concluído ✓</Button>
+                ) : youtubeMissionWatched ? (
+                  <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_ID, 20)}>Coletar</Button>
+                ) : (
+                  <Button onClick={() => setShowYoutubePlayer(true)}>Assistir Vídeo</Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Lista de Missões Manuais */}
           <Card>
             <CardHeader>
@@ -279,6 +330,14 @@ const DailyMissionsPage = () => {
           </Card>
         </div>
       </main>
+
+      {showYoutubePlayer && (
+        <YouTubeMissionPlayer
+          videoId="ZKNy0BRxe84"
+          onVideoEnd={handleVideoEnd}
+          onClose={() => setShowYoutubePlayer(false)}
+        />
+      )}
     </div>
   );
 };
