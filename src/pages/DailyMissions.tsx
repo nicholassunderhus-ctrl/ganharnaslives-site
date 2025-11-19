@@ -249,24 +249,20 @@ const DailyMissionsPage = () => {
 
     setLoadingMission(missionId);
     // Desabilita a missão imediatamente na UI para prevenir cliques duplos
-    const updatedCompletedMissions = [...completedMissions, missionId];
-    setCompletedMissions(updatedCompletedMissions);
-    localStorage.setItem('completedMissions', JSON.stringify(updatedCompletedMissions));
+    setCompletedMissions(prev => [...prev, missionId]);
 
     try {
       const { error } = await supabase.rpc('increment_points', { user_id_in: user.id, points_to_add: points });
       if (error) throw error;
 
-      const updatedCompletedMissions = [...completedMissions, missionId];
-      setCompletedMissions(updatedCompletedMissions);
+      // Apenas confirma a gravação no localStorage após o sucesso
+      localStorage.setItem('completedMissions', JSON.stringify([...completedMissions, missionId]));
       toast.success(`+${points} pontos foram adicionados à sua conta!`);
       await queryClient.invalidateQueries({ queryKey: ['userPoints', user.id] });
     } catch (error: any) {
       toast.error("Erro ao completar missão.", { description: error.message });
       // Se der erro, reverte o estado da UI para permitir nova tentativa
-      const revertedMissions = completedMissions.filter(id => id !== missionId);
-      setCompletedMissions(revertedMissions);
-      localStorage.setItem('completedMissions', JSON.stringify(revertedMissions));
+      setCompletedMissions(prev => prev.filter(id => id !== missionId));
     } finally {
       setLoadingMission(null);
     }
