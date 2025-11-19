@@ -39,6 +39,7 @@ const DailyMissionsPage = () => {
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
   const [loadingMission, setLoadingMission] = useState<number | null>(null);
   const { user } = useAuth();
+  const [anuncioAssistido, setAnuncioAssistido] = useState(false);
   const queryClient = useQueryClient();
 
   // --- Estados da Roleta ---
@@ -182,12 +183,18 @@ const DailyMissionsPage = () => {
   }, []);
 
   // Efeito para lidar com a recompensa da missão do Shrtfly
+  // Efeito para lidar com a recompensa da missão de anúncio
   useEffect(() => {
     const handleShrtflyReward = async () => {
+    const handleAnuncioReward = () => {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('recompensa') === 'missao_diaria_shrtfly' && user) {
+      const recompensa = urlParams.get('recompensa');
+
+      if (recompensa === 'missao_diaria_bonus_51481' && user) {
         // Remove o parâmetro da URL para evitar reprocessamento
         const newUrl = window.location.pathname;
+        const newUrl = '/dashboard/missoes';
         window.history.replaceState({}, document.title, newUrl);
 
         // Verifica se a missão já foi completada hoje para não creditar duas vezes
@@ -195,6 +202,8 @@ const DailyMissionsPage = () => {
           await handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS);
         } else {
           toast.info("Você já completou esta missão hoje!");
+          setAnuncioAssistido(true);
+          toast.info("Missão de anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
         }
       }
     };
@@ -204,6 +213,8 @@ const DailyMissionsPage = () => {
       handleShrtflyReward();
     }
   });
+    handleAnuncioReward();
+  }, [user, completedMissions]);
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
@@ -364,14 +375,23 @@ const DailyMissionsPage = () => {
               <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
                 <div className="flex items-center gap-4">
                   <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : 'text-primary'}`} />
+                  <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
                   <div>
                     <p className="font-semibold">Completar missão de anúncio</p>
+                    <p className="font-semibold">Clique no link, veja os anúncios e colete.</p>
                     <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
                   </div>
                 </div>
                 <Button asChild disabled={completedMissions.includes(SHRTFLY_MISSION_ID)}>
                   <a href="https://stly.link/recompensadiaria" target="_blank" rel="noopener noreferrer">{completedMissions.includes(SHRTFLY_MISSION_ID) ? "Concluído ✓" : "Coletar"}</a>
                 </Button>
+                {completedMissions.includes(SHRTFLY_MISSION_ID) ? (
+                  <Button variant="secondary" disabled>Concluído ✓</Button>
+                ) : (
+                  <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} disabled={!anuncioAssistido}>
+                    Coletar
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
