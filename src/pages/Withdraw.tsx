@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Coins, Wallet, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { Coins, Wallet, Clock, CheckCircle2, XCircle, Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { WITHDRAW_POINTS_PER_REAL, MIN_WITHDRAW_POINTS } from "@/pages/conversions"; // Importar as constantes
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const Withdraw = () => {
   const [pixKey, setPixKey] = useState("");
@@ -17,11 +18,34 @@ const Withdraw = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const { userPoints: userPointsData, loading: pointsLoading } = useUserPoints();
+  const { user } = useAuth();
   const [pixKeyType, setPixKeyType] = useState("cpf"); // Estado para o tipo de chave
   const userPoints = userPointsData?.points ?? 0;
+  const [canWithdraw, setCanWithdraw] = useState(false);
+  const [loadingWithdrawStatus, setLoadingWithdrawStatus] = useState(true);
+
   // Removemos as constantes locais e usaremos as importadas
   const pointsToReal = (points: number) => (points / WITHDRAW_POINTS_PER_REAL).toFixed(2);
   const pixLogo = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0yNTYgMEMxMTQuNiAwIDAgMTE0LjYgMCAyNTZDMCA0MjkuNCAxMTQuNiA1MTIgMjU2IDUxMkM0MjkuNCA1MTIgNTEyIDM5Ny40IDUxMiAyNTZDNTEyIDExNC42IDM5Ny40IDAgMjU2IDBaIiBmaWxsPSIjMzJCQ0FEIi8+CjxwYXRoIGQ9Ik0zNjYgMjIzTDI4OSAxNDZMMjU2IDExM0wyMjMgMTQ2TDE0NiAyMjNMMTEzIDI1NkwxNDYgMjg5TDIyMyAzNjZMMjU2IDM5OUwyODkgMzY2TDM2NiAyODlMMzk5IDI1NkwzNjYgMjIzWk0yNTYgMzI4TDI1NiAzMjhMMTg0IDI1NkwyNTYgMTg0TDMyOCAyNTZMMjU2IDMyOFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=";
+
+  useEffect(() => {
+    const checkWithdrawalStatus = async () => {
+      if (!user) return;
+      setLoadingWithdrawStatus(true);
+      try {
+        const { data, error } = await supabase.rpc('can_user_withdraw');
+        if (error) throw error;
+        setCanWithdraw(data);
+      } catch (error: any) {
+        console.error("Erro ao verificar status de saque:", error.message);
+        setCanWithdraw(false); // Bloqueia saques em caso de erro
+      } finally {
+        setLoadingWithdrawStatus(false);
+      }
+    };
+
+    checkWithdrawalStatus();
+  }, [user]);
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +68,12 @@ const Withdraw = () => {
     }
 
     setIsLoading(true);
+
+    if (!canWithdraw) {
+      toast.error("Você já realizou um saque nas últimas 24 horas.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -68,6 +98,7 @@ const Withdraw = () => {
       }
 
       toast.success(data.message || "Solicitação de saque enviada com sucesso!");
+      setCanWithdraw(false); // Bloqueia novos saques imediatamente na UI
       // O hook useUserPoints deve ser atualizado automaticamente via Realtime ou você pode chamar userPointsData.refetch()
 
     } catch (error: any) {
@@ -209,9 +240,10 @@ const Withdraw = () => {
                 variant="gradient"
                 size="lg"
                 className="w-full"
-                disabled={isLoading}
+                disabled={isLoading || !canWithdraw || loadingWithdrawStatus}
               >
-                {isLoading ? "Processando..." : "Solicitar Saque"}
+                {loadingWithdrawStatus ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {loadingWithdrawStatus ? "Verificando..." : isLoading ? "Processando..." : !canWithdraw ? "Saque diário já realizado" : "Solicitar Saque"}
               </Button>
             </form>
           </Card>

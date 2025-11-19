@@ -248,6 +248,10 @@ const DailyMissionsPage = () => {
     if (completedMissions.includes(missionId) || !user) return;
 
     setLoadingMission(missionId);
+    // Desabilita a missão imediatamente na UI para prevenir cliques duplos
+    const updatedCompletedMissions = [...completedMissions, missionId];
+    setCompletedMissions(updatedCompletedMissions);
+    localStorage.setItem('completedMissions', JSON.stringify(updatedCompletedMissions));
 
     try {
       const { error } = await supabase.rpc('increment_points', { user_id_in: user.id, points_to_add: points });
@@ -255,11 +259,14 @@ const DailyMissionsPage = () => {
 
       const updatedCompletedMissions = [...completedMissions, missionId];
       setCompletedMissions(updatedCompletedMissions);
-      localStorage.setItem('completedMissions', JSON.stringify(updatedCompletedMissions));
       toast.success(`+${points} pontos foram adicionados à sua conta!`);
       await queryClient.invalidateQueries({ queryKey: ['userPoints', user.id] });
     } catch (error: any) {
       toast.error("Erro ao completar missão.", { description: error.message });
+      // Se der erro, reverte o estado da UI para permitir nova tentativa
+      const revertedMissions = completedMissions.filter(id => id !== missionId);
+      setCompletedMissions(revertedMissions);
+      localStorage.setItem('completedMissions', JSON.stringify(revertedMissions));
     } finally {
       setLoadingMission(null);
     }
@@ -399,7 +406,7 @@ const DailyMissionsPage = () => {
                       <p className="text-sm text-primary">Recompensa: 20 pts</p>
                     </div>
                   </div>
-                  <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101)} variant={completedMissions.includes(101) ? "secondary" : "default"}>
+                  <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
                     {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/60)`}
                   </Button>
                 </div>
@@ -424,7 +431,7 @@ const DailyMissionsPage = () => {
                       <p className="text-sm text-primary">Recompensa: 40 pts</p>
                     </div>
                   </div>
-                  <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_3_HOURS || completedMissions.includes(102)} variant={completedMissions.includes(102) ? "secondary" : "default"}>
+                  <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_3_HOURS || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
                     {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
                   </Button>
                 </div>
@@ -449,7 +456,7 @@ const DailyMissionsPage = () => {
                       <p className="text-sm text-primary">Recompensa: 60 pts</p>
                     </div>
                   </div>
-                  <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103)} variant={completedMissions.includes(103) ? "secondary" : "default"}>
+                  <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
                     {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
                   </Button>
                 </div>
@@ -474,7 +481,7 @@ const DailyMissionsPage = () => {
                       <p className="text-sm text-primary">Recompensa: 120 pts</p>
                     </div>
                   </div>
-                  <Button onClick={() => handleMissionClick(104, 120)} disabled={watchTime < WATCH_TIME_GOAL_12_HOURS || completedMissions.includes(104)} variant={completedMissions.includes(104) ? "secondary" : "default"}>
+                  <Button onClick={() => handleMissionClick(104, 120)} disabled={watchTime < WATCH_TIME_GOAL_12_HOURS || completedMissions.includes(104) || loadingMission === 104} variant={completedMissions.includes(104) ? "secondary" : "default"}>
                     {completedMissions.includes(104) ? "✓" : `(${Math.floor(watchTime / 60)}/720)`}
                   </Button>
                 </div>
@@ -500,9 +507,9 @@ const DailyMissionsPage = () => {
                     </div>
                   </div>
                   {completedMissions.includes(YOUTUBE_MISSION_ID) ? (
-                    <Button variant="secondary" disabled>✓</Button>
+                    <Button variant="secondary" disabled>✓ Concluído</Button>
                   ) : youtubeMissionWatched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_ID, 20)}>Coletar</Button>
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_ID}>Coletar</Button>
                   ) : (
                     <Button onClick={() => setShowYoutubePlayer(true)}>Assistir</Button>
                   )}
@@ -529,9 +536,9 @@ const DailyMissionsPage = () => {
                     </div>
                   </div>
                   {completedMissions.includes(YOUTUBE_MISSION_2_ID) ? (
-                    <Button variant="secondary" disabled>✓</Button>
+                    <Button variant="secondary" disabled>✓ Concluído</Button>
                   ) : youtubeMission2Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_2_ID, 20)}>Coletar</Button>
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_2_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_2_ID}>Coletar</Button>
                   ) : (
                     <Button onClick={() => setShowYoutubePlayer2(true)}>Assistir</Button>
                   )}
@@ -558,9 +565,9 @@ const DailyMissionsPage = () => {
                     </div>
                   </div>
                   {completedMissions.includes(YOUTUBE_MISSION_3_ID) ? (
-                    <Button variant="secondary" disabled>✓</Button>
+                    <Button variant="secondary" disabled>✓ Concluído</Button>
                   ) : youtubeMission3Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_3_ID, 20)}>Coletar</Button>
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_3_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_3_ID}>Coletar</Button>
                   ) : (
                     <Button onClick={() => setShowYoutubePlayer3(true)}>Assistir</Button>
                   )}
@@ -587,9 +594,9 @@ const DailyMissionsPage = () => {
                     </div>
                   </div>
                   {completedMissions.includes(YOUTUBE_MISSION_4_ID) ? (
-                    <Button variant="secondary" disabled>✓</Button>
+                    <Button variant="secondary" disabled>✓ Concluído</Button>
                   ) : youtubeMission4Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_4_ID, 20)}>Coletar</Button>
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_4_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_4_ID}>Coletar</Button>
                   ) : (
                     <Button onClick={() => setShowYoutubePlayer4(true)}>Assistir</Button>
                   )}
@@ -616,9 +623,9 @@ const DailyMissionsPage = () => {
                     </div>
                   </div>
                   {completedMissions.includes(YOUTUBE_MISSION_5_ID) ? (
-                    <Button variant="secondary" disabled>✓</Button>
+                    <Button variant="secondary" disabled>✓ Concluído</Button>
                   ) : youtubeMission5Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_5_ID, 20)}>Coletar</Button>
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_5_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_5_ID}>Coletar</Button>
                   ) : (
                     <Button onClick={() => setShowYoutubePlayer5(true)}>Assistir</Button>
                   )}
@@ -645,9 +652,9 @@ const DailyMissionsPage = () => {
                     </div>
                   </div>
                   {completedMissions.includes(YOUTUBE_MISSION_6_ID) ? (
-                    <Button variant="secondary" disabled>✓</Button>
+                    <Button variant="secondary" disabled>✓ Concluído</Button>
                   ) : youtubeMission6Watched ? (
-                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_6_ID, 20)}>Coletar</Button>
+                    <Button onClick={() => handleMissionClick(YOUTUBE_MISSION_6_ID, 20)} disabled={loadingMission === YOUTUBE_MISSION_6_ID}>Coletar</Button>
                   ) : (
                     <Button onClick={() => setShowYoutubePlayer6(true)}>Assistir</Button>
                   )}
