@@ -182,26 +182,20 @@ const DailyMissionsPage = () => {
     return () => clearInterval(watchTimePoller);
   }, []);
 
-  // Efeito para lidar com a recompensa da missão de anúncio
+  // Efeito para verificar se a missão de anúncio foi liberada
   useEffect(() => {
-    const handleAnuncioReward = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const recompensa = urlParams.get('recompensa');
-
-      if (user && recompensa === 'missao_diaria_bonus_51481') {
-        // Remove o parâmetro da URL para evitar reprocessamento
-        const newUrl = '/dashboard/missoes';
-        window.history.replaceState({}, document.title, newUrl);
-
-        if (!completedMissions.includes(SHRTFLY_MISSION_ID)) {
-          setAnuncioAssistido(true);
-          toast.info("Missão de anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        }
+    const checkAnuncioLiberado = () => {
+      const liberado = localStorage.getItem('anuncio_bonus_liberado');
+      if (liberado === 'true' && !completedMissions.includes(SHRTFLY_MISSION_ID)) {
+        setAnuncioAssistido(true);
+        toast.info("Missão de anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        // Remove o indicador para que não seja acionado novamente
+        localStorage.removeItem('anuncio_bonus_liberado');
       }
     };
 
-    handleAnuncioReward();
-  }, [user, completedMissions]);
+    checkAnuncioLiberado();
+  }, [completedMissions]); // Executa quando a página carrega e as missões são checadas
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
