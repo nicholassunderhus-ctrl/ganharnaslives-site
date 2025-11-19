@@ -343,44 +343,44 @@ const DailyMissionsPage = () => {
             </CardContent>
           </Card>
 
-          {/* --- Missão Diária: Assistir Anúncio --- */}
-          <Card className="sm:col-span-2 lg:col-span-3">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Gift className="w-6 h-6 text-primary" />
-                Missão Diária: Assistir Anúncio
-              </CardTitle>
-                <CardDescription>Assista anúncios para coletar. (Leva cerca de 1 minuto)</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* Layout responsivo: flex-col no mobile, sm:flex-row em telas maiores */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4 w-full">
-                  <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
-                  <div>
-                    <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
-                    <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
-                  </div>
-                </div>
-                <div className="w-full sm:w-auto flex-shrink-0">
-                  {completedMissions.includes(SHRTFLY_MISSION_ID) ? (
-                    <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
-                  ) : anuncioAssistido ? (
-                    <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full">
-                      Coletar
-                    </Button>
-                  ) : (
-                    <a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full">
-                      <Button className="w-full">Liberar Coleta</Button>
-                    </a>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* --- Grid de Missões de Tempo e Vídeo --- */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* --- Missão Diária: Assistir Anúncio --- */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Gift className="w-6 h-6 text-primary" />
+                  Missão Diária: Assistir Anúncio
+                </CardTitle>
+                <CardDescription>Assista anúncios para coletar. (Leva cerca de 1 minuto)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Layout responsivo: flex-col no mobile, sm:flex-row em telas maiores */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4 w-full">
+                    <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
+                    <div>
+                      <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
+                      <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
+                    </div>
+                  </div>
+                  <div className="w-full sm:w-auto flex-shrink-0">
+                    {completedMissions.includes(SHRTFLY_MISSION_ID) ? (
+                      <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
+                    ) : anuncioAssistido ? (
+                      <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full">
+                        Coletar
+                      </Button>
+                    ) : (
+                      <a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full">
+                        <Button className="w-full">Liberar Coleta</Button>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Card da Missão de Tempo Assistido (1 Hora) */}
             <Card>
               <CardHeader>
