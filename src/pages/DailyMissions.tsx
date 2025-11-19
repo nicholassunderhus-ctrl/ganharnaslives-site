@@ -350,7 +350,7 @@ const DailyMissionsPage = () => {
                 <Gift className="w-6 h-6 text-primary" />
                 Missão Diária: Assistir Anúncio
               </CardTitle>
-              <CardDescription>Assista aos anúncios do nosso parceiro para ganhar sua recompensa.</CardDescription>
+              <CardDescription>Assista aos anúncios do nosso parceiro para ganhar sua recompensa. (10 anuncios para pular - Leva cerca de 1 minuto)</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
