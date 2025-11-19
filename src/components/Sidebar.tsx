@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import { toast } from "sonner";
+import { useUserPoints } from "@/hooks/useUserPoints";
 
-interface SidebarProps { points?: number; }
-
-export const Sidebar = ({ points = 0 }: SidebarProps) => {
+export const Sidebar = () => {
   const location = useLocation();
   const { signOut } = useAuth();
   const { isAdmin } = useAdmin();
+  const { userPoints } = useUserPoints();
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -54,9 +54,9 @@ export const Sidebar = ({ points = 0 }: SidebarProps) => {
             <span className="text-sm text-muted-foreground">Seus Pontos</span>
             <Coins className="w-4 h-4 text-primary" />
           </div>
-          <div className="text-2xl font-bold text-primary">{points.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-primary">{(userPoints?.points ?? 0).toLocaleString()}</div>
           <div className="text-xs text-muted-foreground mt-1">
-            ≈ R$ {(points / 1400).toFixed(2)}
+            ≈ R$ {((userPoints?.points ?? 0) / 1400).toFixed(2)}
           </div>
         </div>
       </div>
