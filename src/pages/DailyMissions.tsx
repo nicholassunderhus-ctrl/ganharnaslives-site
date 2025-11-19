@@ -116,6 +116,10 @@ const DailyMissionsPage = () => {
     const watchTimeStoredDate = localStorage.getItem('watchTimeDate');
     if (watchTimeStoredDate === today) {
       setWatchTime(Number(localStorage.getItem('totalWatchTimeToday') || '0'));
+    } else {
+      // É um novo dia, então o tempo assistido deve ser zerado tanto no estado quanto no localStorage.
+      localStorage.setItem('totalWatchTimeToday', '0');
+      setWatchTime(0);
     }
 
     localStorage.setItem('watchTimeDate', today); // Always update the date
