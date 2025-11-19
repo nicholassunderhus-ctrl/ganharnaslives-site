@@ -1,10 +1,9 @@
 import { Sidebar } from "@/components/Sidebar";
 import { useUserPoints } from "@/hooks/useUserPoints";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Monitor, Coins } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Shield, AlertTriangle, Coins } from "lucide-react";
 
 const VpnPage = () => {
-  const { userPoints } = useUserPoints();
 
   return (
     <div className="min-h-screen bg-background">
