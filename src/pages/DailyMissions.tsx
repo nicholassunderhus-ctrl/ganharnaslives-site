@@ -352,28 +352,27 @@ const DailyMissionsPage = () => {
           </Card>
 
           {/* --- Missão Diária: Assistir Anúncio --- */}
-          <Card>
+          <Card className="sm:col-span-2 lg:col-span-3">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Gift className="w-6 h-6 text-primary" />
                 Missão Diária: Assistir Anúncio
               </CardTitle>
-              <CardDescription>Ganhe {SHRTFLY_MISSION_POINTS} pontos por assistir aos anúncios do nosso parceiro.</CardDescription>
+              <CardDescription>Assista aos anúncios do nosso parceiro para ganhar sua recompensa.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Clique no botão abaixo para acessar o site parceiro. Você precisará visualizar os anúncios até o final para ser redirecionado de volta e receber sua recompensa.
-              </p>
-              <Button 
-                asChild 
-                className="w-full md:w-auto"
-                disabled={completedMissions.includes(SHRTFLY_MISSION_ID)}
-              >
-                <a href="https://stly.link/recompensadiaria" target="_blank" rel="noopener noreferrer">
-                  {completedMissions.includes(SHRTFLY_MISSION_ID) ? 'Missão Concluída ✓' : 'Coletar Recompensa'}
-                  {!completedMissions.includes(SHRTFLY_MISSION_ID) && <ExternalLink className="w-4 h-4 ml-2" />}
-                </a>
-              </Button>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : 'text-primary'}`} />
+                  <div>
+                    <p className="font-semibold">Completar missão de anúncio</p>
+                    <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
+                  </div>
+                </div>
+                <Button asChild disabled={completedMissions.includes(SHRTFLY_MISSION_ID)}>
+                  <a href="https://stly.link/recompensadiaria" target="_blank" rel="noopener noreferrer">{completedMissions.includes(SHRTFLY_MISSION_ID) ? "Concluído ✓" : "Coletar"}</a>
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
