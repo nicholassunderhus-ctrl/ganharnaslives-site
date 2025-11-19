@@ -248,3 +248,175 @@ const DailyMissionsPage = () => {
     if (completedMissions.includes(missionId) || !user) return;
 
     setLoadingMission(missionId);
+    // Otimisticamente atualiza a UI para prevenir cliques duplos
+    setCompletedMissions(prev => [...prev, missionId]);
+
+    try {
+      const { error } = await supabase.rpc('increment_points', { user_id_in: user.id, points_to_add: points });
+      if (error) throw error;
+
+      // Apenas confirma a gravação no localStorage após o sucesso
+      localStorage.setItem('completedMissions', JSON.stringify([...completedMissions, missionId]));
+      toast.success(`+${points} pontos foram adicionados à sua conta!`);
+      await queryClient.invalidateQueries({ queryKey: ['userPoints', user.id] });
+    } catch (error: any) {
+      toast.error("Erro ao completar missão.", { description: error.message });
+      // Se der erro, reverte o estado da UI para permitir nova tentativa
+      setCompletedMissions(prev => prev.filter(id => id !== missionId));
+      localStorage.setItem('completedMissions', JSON.stringify(completedMissions.filter(id => id !== missionId)));
+    } finally {
+      setLoadingMission(null);
+    }
+  };
+
+  const handleVideoEnd = (missionId: number) => {
+    const today = new Date().toDateString();
+    switch (missionId) {
+      case YOUTUBE_MISSION_1_ID:
+        setYoutubeMissionWatched(true);
+        localStorage.setItem('youtubeMissionWatchedDate', today);
+        setShowYoutubePlayer1(false);
+        break;
+      case YOUTUBE_MISSION_2_ID:
+        setYoutubeMission2Watched(true);
+        localStorage.setItem('youtubeMission2WatchedDate', today);
+        setShowYoutubePlayer2(false);
+        break;
+      case YOUTUBE_MISSION_3_ID:
+        setYoutubeMission3Watched(true);
+        localStorage.setItem('youtubeMission3WatchedDate', today);
+        setShowYoutubePlayer3(false);
+        break;
+      case YOUTUBE_MISSION_4_ID:
+        setYoutubeMission4Watched(true);
+        localStorage.setItem('youtubeMission4WatchedDate', today);
+        setShowYoutubePlayer4(false);
+        break;
+      case YOUTUBE_MISSION_5_ID:
+        setYoutubeMission5Watched(true);
+        localStorage.setItem('youtubeMission5WatchedDate', today);
+        setShowYoutubePlayer5(false);
+        break;
+      case YOUTUBE_MISSION_6_ID:
+        setYoutubeMission6Watched(true);
+        localStorage.setItem('youtubeMission6WatchedDate', today);
+        setShowYoutubePlayer6(false);
+        break;
+    }
+    toast.info("Vídeo concluído! Você já pode coletar sua recompensa.");
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Sidebar points={userPoints?.points ?? 0} />
+      <main className="md:ml-64 ml-0 pt-20 pb-24 md:pb-8 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Missões Diárias</h1>
+            <p className="text-muted-foreground">Complete tarefas e ganhe pontos todos os dias.</p>
+          </div>
+
+          {/* --- Roleta Diária --- */}
+          <Card className="bg-gradient-to-br from-primary/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ticket className="w-6 h-6 text-primary" />
+                Roleta Diária da Sorte
+              </CardTitle>
+              <CardDescription>Gire uma vez por dia e teste sua sorte para ganhar pontos extras!</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center gap-6 text-center">
+              <div className="w-48 h-48 bg-background/50 rounded-full flex items-center justify-center border-4 border-primary/20 shadow-lg">
+                <span className={cn("text-5xl font-bold transition-all duration-100", isSpinning ? "text-muted-foreground" : "text-primary")}>
+                  {rouletteResult ?? '?'}
+                </span>
+              </div>
+              {rouletteSpun ? (
+                <p className="font-semibold text-lg">Você ganhou {rouletteResult} pontos hoje! Volte amanhã.</p>
+              ) : (
+                <Button onClick={handleSpinRoulette} disabled={isSpinning} size="lg" variant="gradient">
+                  {isSpinning ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                  {isSpinning ? 'Girando...' : 'Girar a Roleta!'}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* --- Grid de Missões de Tempo e Vídeo --- */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* --- Missão Diária: Assistir Anúncio --- */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Gift className="w-6 h-6 text-primary" />
+                  Missão Diária: Assistir Anúncio
+                </CardTitle>
+                <CardDescription>Assista anúncios para coletar. (Leva cerca de 1 minuto)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Layout responsivo: flex-col no mobile, sm:flex-row em telas maiores */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4 w-full">
+                    <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
+                    <div>
+                      <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
+                      <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
+                    </div>
+                  </div>
+                  <div className="w-full sm:w-auto flex-shrink-0">
+                    {completedMissions.includes(SHRTFLY_MISSION_ID) ? (
+                      <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
+                    ) : anuncioAssistido ? (
+                      <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID}>
+                        {loadingMission === SHRTFLY_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
+                      </Button>
+                    ) : (
+                      <a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full">
+                        <Button className="w-full">Liberar Coleta</Button>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Cards de Missão de Tempo Assistido */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Clock className="w-6 h-6 text-primary" />Maratona de Lives</CardTitle>
+                <CardDescription>Acumule 1 hora de tempo assistido hoje.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4">
+                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1_HOUR ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="font-semibold">Assista 60 min</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
+                    </div>
+                  </div>
+                  <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
+                    {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/60)`}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* ... outros cards de missão ... */}
+
+          </div>
+        </div>
+      </main>
+
+      {/* Players de Vídeo do YouTube */}
+      {showYoutubePlayer1 && <YouTubeMissionPlayer videoId="ZKNy0BRxe84" onVideoEnd={() => handleVideoEnd(YOUTUBE_MISSION_1_ID)} onClose={() => setShowYoutubePlayer1(false)} />}
+      {showYoutubePlayer2 && <YouTubeMissionPlayer videoId="2hHEJ2asvY8" onVideoEnd={() => handleVideoEnd(YOUTUBE_MISSION_2_ID)} onClose={() => setShowYoutubePlayer2(false)} />}
+      {showYoutubePlayer3 && <YouTubeMissionPlayer videoId="-frPxUMQnhE" onVideoEnd={() => handleVideoEnd(YOUTUBE_MISSION_3_ID)} onClose={() => setShowYoutubePlayer3(false)} />}
+      {showYoutubePlayer4 && <YouTubeMissionPlayer videoId="Sck3A-XewOY" onVideoEnd={() => handleVideoEnd(YOUTUBE_MISSION_4_ID)} onClose={() => setShowYoutubePlayer4(false)} />}
+      {showYoutubePlayer5 && <YouTubeMissionPlayer videoId="irJbA0QvMUg" onVideoEnd={() => handleVideoEnd(YOUTUBE_MISSION_5_ID)} onClose={() => setShowYoutubePlayer5(false)} />}
+      {showYoutubePlayer6 && <YouTubeMissionPlayer videoId="7KVNNS-vQog" onVideoEnd={() => handleVideoEnd(YOUTUBE_MISSION_6_ID)} onClose={() => setShowYoutubePlayer6(false)} />}
+    </div>
+  );
+};
+
+export default DailyMissionsPage;
