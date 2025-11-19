@@ -1,6 +1,6 @@
 import { Sidebar } from "@/components/Sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Monitor, Coins, AlertTriangle } from "lucide-react";
+import { Shield, Monitor, Coins, AlertTriangle, ShieldCheck } from "lucide-react";
 
 const VpnPage = () => {
 
@@ -64,9 +64,9 @@ const VpnPage = () => {
                   <p className="text-muted-foreground leading-relaxed">As plataformas de stream, como Kick e Twitch, identificam usuários que assistem de um mesmo endereço de IP. Isso as impede de ganhar pontos em várias contas ao mesmo tempo, limitando seu potencial de lucro.</p>
                   <p className="text-muted-foreground leading-relaxed mt-2">Para contornar isso, recomendamos o uso da **VPN gratuita do navegador Opera GX**. Com ela, cada conta pode ter um IP diferente, permitindo que você ganhe pontos simultaneamente em todas elas.</p>
                 </div>
-                <div className="bg-destructive/10 border-l-4 border-destructive text-destructive p-4 rounded-md">
-                  <h3 className="font-bold mb-2 flex items-center gap-2"><AlertTriangle className="w-5 h-5" />Aviso Importante</h3>
-                  <p>Usuários utilizando o mesmo servidor de VPN (mesmo IP) não conseguirão ganhar pontos simultaneamente. É crucial que cada conta utilize um servidor de VPN diferente para garantir os ganhos.</p>
+                <div className="bg-green-500/10 border-l-4 border-green-500 text-green-500 p-4 rounded-md">
+                  <h3 className="font-bold mb-2 flex items-center gap-2"><ShieldCheck className="w-5 h-5" />Uso de Contas Múltiplas</h3>
+                  <p>Nosso site permite apenas uma conta por IP, por isso os usuários devem usar VPN, assim podendo usar contas ilimitadas!</p>
                 </div>
                 <div className="bg-primary/5 p-6 rounded-lg text-center">
                   <Coins className="w-8 h-8 text-primary mx-auto mb-3" />
