@@ -14,6 +14,7 @@ import Admin from "./pages/Admin";
 import { AdminRoute } from "./components/AdminRoute";
 import DailyMissionsPage from "./pages/DailyMissions"; // Importa a nova página
 import VpnPage from "./pages/Vpn";
+import RecompensaAnuncioPage from "./pages/RecompensaAnuncio"; // Importa a página de recompensa
 import { MobileHeader } from "@/components/MobileHeader";
 import { MobileNav } from "@/components/MobileNav";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,10 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          
+          {/* Rota da nova página de recompensa */}
+          <Route path="/recompensa-anuncio" element={<RecompensaAnuncioPage />} />
+
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/watch" element={<Watch />} />
           <Route path="/dashboard/my-streams" element={<MyStreams />} />
