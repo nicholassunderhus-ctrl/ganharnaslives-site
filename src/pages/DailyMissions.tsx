@@ -353,25 +353,28 @@ const DailyMissionsPage = () => {
               <CardDescription>Assista aos anúncios do nosso parceiro para ganhar sua recompensa. (10 anuncios para pular - Leva cerca de 1 minuto)</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
+              {/* Layout responsivo: flex-col no mobile, sm:flex-row em telas maiores */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4 w-full">
                   <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
                   <div>
-                    <p className="font-semibold">Clique no link, veja os anúncios e colete.</p>
+                    <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
                     <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
                   </div>
                 </div>
-                {completedMissions.includes(SHRTFLY_MISSION_ID) ? (
-                  <Button variant="secondary" disabled>Concluído ✓</Button>
-                ) : anuncioAssistido ? (
-                  <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)}>
-                    Coletar
-                  </Button>
-                ) : (
-                  <a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className={!anuncioAssistido ? '' : 'hidden'}>
-                    <Button>Liberar Coleta</Button>
-                  </a>
-                )}
+                <div className="w-full sm:w-auto flex-shrink-0">
+                  {completedMissions.includes(SHRTFLY_MISSION_ID) ? (
+                    <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
+                  ) : anuncioAssistido ? (
+                    <Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full">
+                      Coletar
+                    </Button>
+                  ) : (
+                    <a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full">
+                      <Button className="w-full">Liberar Coleta</Button>
+                    </a>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
