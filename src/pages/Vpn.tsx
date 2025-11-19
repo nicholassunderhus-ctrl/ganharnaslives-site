@@ -1,7 +1,6 @@
 import { Sidebar } from "@/components/Sidebar";
-import { useUserPoints } from "@/hooks/useUserPoints";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, AlertTriangle, Coins } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Monitor, Coins } from "lucide-react";
 
 const VpnPage = () => {
 
