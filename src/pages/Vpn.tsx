@@ -13,7 +13,7 @@ const VpnPage = () => {
       <main className="md:ml-64 ml-0 pt-20 pb-24 md:pb-8 p-4 md:p-8">
         <div className="max-w-4xl mx-auto space-y-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">VPN</h1>
+            <h1 className="text-3xl font-bold mb-2">VPN para Multicontas</h1>
             <p className="text-muted-foreground">Maximize seus ganhos utilizando múltiplas contas de forma segura.</p>
           </div>
 
