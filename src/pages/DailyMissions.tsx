@@ -52,7 +52,6 @@ const DailyMissionsPage = () => {
   const WATCH_TIME_GOAL_1_HOUR = 3600; // 60 minutos em segundos
   const WATCH_TIME_GOAL_3_HOURS = 10800; // 180 minutos em segundos
   const WATCH_TIME_GOAL_6_HOURS = 21600; // 360 minutos em segundos
-  const WATCH_TIME_GOAL_12_HOURS = 43200; // 720 minutos em segundos
 
   // --- Estados da Missão de Vídeo ---
   const [showYoutubePlayer1, setShowYoutubePlayer1] = useState(false);
@@ -446,28 +445,6 @@ const DailyMissionsPage = () => {
               </CardContent>
             </Card>
 
-            {/* Card da Missão de Tempo Assistido (12 Horas) */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Crown className="w-6 h-6 text-primary" />Maratona Lendária</CardTitle>
-                <CardDescription>Acumule 12 horas de tempo assistido hoje.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_12_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Assista 720 min</p>
-                      <p className="text-sm text-primary">Recompensa: 120 pts</p>
-                    </div>
-                  </div>
-                  <Button onClick={() => handleMissionClick(104, 120)} disabled={watchTime < WATCH_TIME_GOAL_12_HOURS || completedMissions.includes(104) || loadingMission === 104} variant={completedMissions.includes(104) ? "secondary" : "default"}>
-                    {completedMissions.includes(104) ? "✓" : `(${Math.floor(watchTime / 60)}/720)`}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
             {/* Card da Missão de Vídeo do YouTube */}
             <Card>
               <CardHeader>
