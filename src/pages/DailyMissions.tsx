@@ -3,7 +3,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Gift, Loader2, Ticket, Clock, Hourglass, Youtube, Trophy } from 'lucide-react';
+import { Gift, Loader2, Ticket, Clock, Hourglass, Youtube, Trophy, Crown } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -46,11 +46,12 @@ const DailyMissionsPage = () => {
   const WATCH_TIME_GOAL_1_HOUR = 3600; // 60 minutos em segundos
   const WATCH_TIME_GOAL_3_HOURS = 10800; // 180 minutos em segundos
   const WATCH_TIME_GOAL_6_HOURS = 21600; // 360 minutos em segundos
+  const WATCH_TIME_GOAL_12_HOURS = 43200; // 720 minutos em segundos
 
   // --- Estados da Missão de Vídeo ---
   const [showYoutubePlayer, setShowYoutubePlayer] = useState(false);
   const [youtubeMissionWatched, setYoutubeMissionWatched] = useState(false);
-  const YOUTUBE_MISSION_ID = 104;
+  const YOUTUBE_MISSION_ID = 105;
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -284,6 +285,31 @@ const DailyMissionsPage = () => {
                 </div>
                 <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103)} variant={completedMissions.includes(103) ? "secondary" : "default"}>
                   {completedMissions.includes(103) ? "Concluído ✓" : `Coletar (${Math.floor(watchTime / 60)}/360 min)`}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card da Missão de Tempo Assistido (12 Horas) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="w-6 h-6 text-primary" />
+                Maratona Lendária
+              </CardTitle>
+              <CardDescription>Acumule 12 horas de tempo assistido hoje para a recompensa final.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_12_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div>
+                    <p className="font-semibold">Assista 720 minutos de lives</p>
+                    <p className="text-sm text-primary">Recompensa: 120 pontos</p>
+                  </div>
+                </div>
+                <Button onClick={() => handleMissionClick(104, 120)} disabled={watchTime < WATCH_TIME_GOAL_12_HOURS || completedMissions.includes(104)} variant={completedMissions.includes(104) ? "secondary" : "default"}>
+                  {completedMissions.includes(104) ? "Concluído ✓" : `Coletar (${Math.floor(watchTime / 60)}/720 min)`}
                 </Button>
               </div>
             </CardContent>
