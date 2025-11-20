@@ -59,19 +59,27 @@ const VpnPage = () => {
                 <CardDescription>Entenda como a VPN é essencial para multiplicar seus ganhos.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div>
-                  <p className="text-muted-foreground leading-relaxed">As plataformas de stream, como Kick e Twitch, identificam usuários que assistem de um mesmo endereço de IP. Isso as impede de ganhar pontos em várias contas ao mesmo tempo, limitando seu potencial de lucro.</p>
-                  <p className="text-muted-foreground leading-relaxed mt-2">Para contornar isso, recomendamos o uso da **VPN gratuita do navegador Opera GX**. Com ela, cada conta pode ter um IP diferente, permitindo que você ganhe pontos simultaneamente em todas elas.</p>
+                <div className="space-y-2">
+                  <p className="text-muted-foreground leading-relaxed">
+                    Plataformas de stream limitam seus ganhos ao identificar que várias contas usam o mesmo IP.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed">
+                    A solução é usar uma VPN para que cada conta tenha um IP diferente. Recomendamos a **VPN gratuita do navegador Opera GX**.
+                  </p>
                 </div>
                 <div className="bg-green-500/10 border-l-4 border-green-500 text-green-500 p-4 rounded-md">
-                  <h3 className="font-bold mb-2 flex items-center gap-2"><ShieldCheck className="w-5 h-5" />Uso de Contas Múltiplas</h3>
-                  <p>Nosso site permite apenas uma conta por IP, por isso os usuários devem usar VPN, assim podendo usar contas ilimitadas!</p>
+                  <h3 className="font-bold mb-2 flex items-center gap-2"><ShieldCheck className="w-5 h-5" />Contas Ilimitadas</h3>
+                  <p>Nosso site permite apenas uma conta por IP. Com a VPN, você pode gerenciar contas ilimitadas e maximizar seus ganhos.</p>
                 </div>
                 <div className="bg-primary/5 p-6 rounded-lg text-center">
                   <Coins className="w-8 h-8 text-primary mx-auto mb-3" />
-                  <p className="font-semibold text-foreground text-lg">Com o uso correto da VPN, nossos usuários conseguem ganhar em média de <span className="text-primary font-bold text-xl">R$ 10 a R$ 50 por dia!</span></p>
+                  <p className="font-semibold text-foreground text-lg">
+                    Com a VPN, nossos usuários faturam em média de <span className="text-primary font-bold text-xl">R$ 10 a R$ 50 por dia!</span>
+                  </p>
                 </div>
-                <p className="text-center text-sm text-muted-foreground pt-4">Baixe o Opera GX no seu computador e ative a VPN gratuita para começar a maximizar seus lucros.</p>
+                <p className="text-center text-sm text-muted-foreground pt-4">
+                  Baixe o Opera GX no seu computador e ative a VPN gratuita para começar.
+                </p>
               </CardContent>
             </Card>
           </div>
