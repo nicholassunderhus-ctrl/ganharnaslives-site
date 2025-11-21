@@ -16,16 +16,16 @@ import AdminPage from './pages/Admin';
 import RecompensaAnuncioPage from './pages/RecompensaAnuncio'; // Importa a nova página
 
 // Importa as 10 novas páginas de recompensa
-import RecompensaAnuncio2Page from './pages/recompensa/RecompensaAnuncio2';
-import RecompensaAnuncio3Page from './pages/recompensa/RecompensaAnuncio3';
-import RecompensaAnuncio4Page from './pages/recompensa/RecompensaAnuncio4';
-import RecompensaAnuncio5Page from './pages/recompensa/RecompensaAnuncio5';
-import RecompensaAnuncio6Page from './pages/recompensa/RecompensaAnuncio6';
-import RecompensaAnuncio7Page from './pages/recompensa/RecompensaAnuncio7';
-import RecompensaAnuncio8Page from './pages/recompensa/RecompensaAnuncio8';
-import RecompensaAnuncio9Page from './pages/recompensa/RecompensaAnuncio9';
-import RecompensaAnuncio10Page from './pages/recompensa/RecompensaAnuncio10';
-import RecompensaAnuncio11Page from './pages/recompensa/RecompensaAnuncio11';
+import RecompensaAnuncio2Page from './RecompensaAnuncio2';
+import RecompensaAnuncio3Page from './RecompensaAnuncio3';
+import RecompensaAnuncio4Page from './RecompensaAnuncio4';
+import RecompensaAnuncio5Page from './RecompensaAnuncio5';
+import RecompensaAnuncio6Page from './RecompensaAnuncio6';
+import RecompensaAnuncio7Page from './RecompensaAnuncio7';
+import RecompensaAnuncio8Page from './RecompensaAnuncio8';
+import RecompensaAnuncio9Page from './RecompensaAnuncio9';
+import RecompensaAnuncio10Page from './RecompensaAnuncio10';
+import RecompensaAnuncio11Page from './RecompensaAnuncio11';
 import NotFoundPage from './pages/NotFound';
 
 function App() {
