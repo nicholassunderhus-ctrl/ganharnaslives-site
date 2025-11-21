@@ -254,7 +254,7 @@ const DailyMissionsPage = () => {
           <CardContent>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
               <div className="flex items-center gap-4 w-full">
-                <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
+                <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido1 ? 'text-primary' : 'text-muted-foreground')}`} />
                 <div>
                   <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
                   <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
