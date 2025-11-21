@@ -129,7 +129,7 @@ const DailyMissionsPage = () => {
     }, 5000);
 
     return () => clearInterval(watchTimePoller);
-  }, [user]); // Adicionado completedMissions e user como dependências
+  }, [user]);
 
   // Efeito para verificar se a missão de anúncio foi liberada
   useEffect(() => {
@@ -143,7 +143,7 @@ const DailyMissionsPage = () => {
     });
     // Atualiza o estado de uma vez para evitar re-renderizações desnecessárias
     setUnlockedAdMissions(prev => ({ ...prev, ...newUnlocked }));
-  }, [user]); // Roda apenas quando o usuário muda, verificando todas as missões
+  }, [user, completedMissions]); // Roda quando o usuário muda ou quando as missões completas são atualizadas
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
