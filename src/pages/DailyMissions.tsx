@@ -143,6 +143,7 @@ const DailyMissionsPage = () => {
       }
     });
     setUnlockedAdMissions(prev => ({ ...prev, ...newUnlocked }));
+  }, [completedMissions, AD_MISSIONS_CONFIG]);
   }, [completedMissions]);
 
   const handleSpinRoulette = async () => {
