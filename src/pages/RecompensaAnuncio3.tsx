@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
-const RecompensaAnuncio2Page = () => {
+const RecompensaAnuncio3Page = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.setItem('anuncio_bonus_2_liberado', 'true');
+    localStorage.setItem('anuncio_bonus_3_liberado', 'true');
     const timer = setTimeout(() => {
       navigate('/dashboard/missoes');
     }, 500);
@@ -22,4 +22,4 @@ const RecompensaAnuncio2Page = () => {
   );
 };
 
-export default RecompensaAnuncio2Page;
+export default RecompensaAnuncio3Page;

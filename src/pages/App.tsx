@@ -14,6 +14,18 @@ import DepositPage from './pages/Deposit';
 import VpnPage from './pages/Vpn';
 import AdminPage from './pages/Admin';
 import RecompensaAnuncioPage from './pages/RecompensaAnuncio'; // Importa a nova página
+
+// Importa as 10 novas páginas de recompensa
+import RecompensaAnuncio2Page from './pages/recompensa/RecompensaAnuncio2';
+import RecompensaAnuncio3Page from './pages/recompensa/RecompensaAnuncio3';
+import RecompensaAnuncio4Page from './pages/recompensa/RecompensaAnuncio4';
+import RecompensaAnuncio5Page from './pages/recompensa/RecompensaAnuncio5';
+import RecompensaAnuncio6Page from './pages/recompensa/RecompensaAnuncio6';
+import RecompensaAnuncio7Page from './pages/recompensa/RecompensaAnuncio7';
+import RecompensaAnuncio8Page from './pages/recompensa/RecompensaAnuncio8';
+import RecompensaAnuncio9Page from './pages/recompensa/RecompensaAnuncio9';
+import RecompensaAnuncio10Page from './pages/recompensa/RecompensaAnuncio10';
+import RecompensaAnuncio11Page from './pages/recompensa/RecompensaAnuncio11';
 import NotFoundPage from './pages/NotFound';
 
 function App() {
@@ -27,6 +39,18 @@ function App() {
             
             {/* Rota da nova página de recompensa */}
             <Route path="/recompensa-anuncio" element={<RecompensaAnuncioPage />} />
+
+            {/* Rotas para as 10 novas missões */}
+            <Route path="/recompensa-anuncio-2" element={<RecompensaAnuncio2Page />} />
+            <Route path="/recompensa-anuncio-3" element={<RecompensaAnuncio3Page />} />
+            <Route path="/recompensa-anuncio-4" element={<RecompensaAnuncio4Page />} />
+            <Route path="/recompensa-anuncio-5" element={<RecompensaAnuncio5Page />} />
+            <Route path="/recompensa-anuncio-6" element={<RecompensaAnuncio6Page />} />
+            <Route path="/recompensa-anuncio-7" element={<RecompensaAnuncio7Page />} />
+            <Route path="/recompensa-anuncio-8" element={<RecompensaAnuncio8Page />} />
+            <Route path="/recompensa-anuncio-9" element={<RecompensaAnuncio9Page />} />
+            <Route path="/recompensa-anuncio-10" element={<RecompensaAnuncio10Page />} />
+            <Route path="/recompensa-anuncio-11" element={<RecompensaAnuncio11Page />} />
 
             {/* Rotas do Painel */}
             <Route path="/dashboard" element={<DashboardPage />} />
