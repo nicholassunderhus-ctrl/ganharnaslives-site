@@ -261,7 +261,7 @@ const DailyMissionsPage = () => {
                 </div>
               </div>
               <div className="w-full sm:w-auto flex-shrink-0">
-                {completedMissions.includes(SHRTFLY_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : anuncioAssistido1 ? (<Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID}>{loadingMission === SHRTFLY_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="/recompensa/validar-anuncio-id-8491-a3b2" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
+                {completedMissions.includes(SHRTFLY_MISSION_ID_2) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : anuncioAssistido2 ? (<Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID_2, SHRTFLY_MISSION_POINTS_2)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID_2}>{loadingMission === SHRTFLY_MISSION_ID_2 ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="/recompensa/validar-anuncio-id-2957-c8d4" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
               </div>
             </div>
           </CardContent>
