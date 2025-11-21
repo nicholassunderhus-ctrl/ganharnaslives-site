@@ -223,6 +223,16 @@ const DailyMissionsPage = () => {
       }
     };
     checkVerAnuncio8Liberado();
+
+    const checkVerAnuncio9Liberado = () => {
+      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[8].localStorageKey);
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_9_MISSION_ID)) {
+        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_9_MISSION_ID]: true }));
+        toast.info("Missão 'Ver Anúncio 9' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[8].localStorageKey);
+      }
+    };
+    checkVerAnuncio9Liberado();
   }, [completedMissions]);
 
   const handleSpinRoulette = async () => {
