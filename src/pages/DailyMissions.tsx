@@ -29,20 +29,6 @@ const ROULETTE_PRIZES = [
 ];
 const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
 
-// --- Configuração da Roleta ---
-const ROULETTE_PRIZES = [
-  { points: 10, weight: 40 },  // 40% de chance
-  { points: 20, weight: 30 },  // 30% de chance
-  { points: 30, weight: 15 },  // 15% de chance
-  { points: 50, weight: 10 },  // 10% de chance
-  { points: 100, weight: 5 }, // 5% de chance
-];
-const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
-
-// --- Configuração da Missão Shrtfly ---
-const SHRTFLY_MISSION_ID = 201;
-const SHRTFLY_MISSION_POINTS = 20;
-
 // --- Configuração da Missão Shrtfly ---
 const SHRTFLY_MISSION_ID = 201;
 const SHRTFLY_MISSION_POINTS = 20;
@@ -146,6 +132,8 @@ const DailyMissionsPage = () => {
     };
 
     checkAnuncioLiberado();
+
+  }, [completedMissions]); // Faltava fechar o useEffect aqui
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
