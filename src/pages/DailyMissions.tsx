@@ -143,7 +143,7 @@ const DailyMissionsPage = () => {
     });
     // Atualiza o estado de uma vez para evitar re-renderizações desnecessárias
     setUnlockedAdMissions(prev => ({ ...prev, ...newUnlocked }));
-  }, [user, completedMissions]); // Roda quando o usuário muda ou quando as missões completas são atualizadas
+  }, [completedMissions]); // Roda apenas quando a lista de missões completas for atualizada
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
