@@ -46,14 +46,17 @@ const DailyMissionsPage = () => {
   const [unlockedAdMissions, setUnlockedAdMissions] = useState<Record<number, boolean>>({});
 
   // --- Configuração Unificada das Missões de Anúncio (1 a 11) ---
-  const AD_MISSIONS_CONFIG = Array.from({ length: 10 }, (_, i) => {
-    const missionNumber = i + 2;
+  const AD_MISSIONS_CONFIG = Array.from({ length: 11 }, (_, i) => { // Gera 11 missões
+    const missionNumber = i + 1; // Começa em 1
     return {
-      missionId: 201 + missionNumber, // Começando de 203
+      missionId: 200 + missionNumber, // missionId 201 para a missão 1, 202 para a 2, etc.
       missionPoints: 20,
-      title: `Missão Diária: Assistir Anúncio ${missionNumber}`,
-      description: `Assista mais anúncios para ganhar 20 pontos.`,
-      adLink: `https://stly.link/recompensadiaria${missionNumber}`, // Link de exemplo
+      title: `Missão Diária: Assistir Anúncio ${missionNumber === 1 ? '' : missionNumber}`,
+      description: `Assista anúncios para ganhar 20 pontos.`,
+      adLink:
+        missionNumber === 2
+          ? 'https://fir3.net/missaoanuncio2'
+          : `https://stly.link/recompensadiaria${missionNumber}`, // Link de exemplo
       localStorageKey: `anuncio_bonus_${missionNumber}_liberado`,
       collectLink: `/recompensa-anuncio-${missionNumber}`,
     };
@@ -121,19 +124,17 @@ const DailyMissionsPage = () => {
 
   // Efeito para verificar se a missão de anúncio foi liberada
   useEffect(() => {
-    const checkAnuncioLiberado = () => {
-      const liberado = localStorage.getItem('anuncio_bonus_liberado');
-      if (liberado === 'true' && !completedMissions.includes(SHRTFLY_MISSION_ID)) {
-        setAnuncioAssistido(true);
-        toast.info("Missão de anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        // Remove o indicador para que não seja acionado novamente
-        localStorage.removeItem('anuncio_bonus_liberado');
+    const newUnlocked: Record<number, boolean> = {};
+    AD_MISSIONS_CONFIG.forEach(config => {
+      if (localStorage.getItem(config.localStorageKey) === 'true' && !completedMissions.includes(config.missionId)) {
+        newUnlocked[config.missionId] = true;
+        toast.info(`${config.title.replace(' 1', '')} liberada! Clique em 'Coletar'.`);
+        localStorage.removeItem(config.localStorageKey);
       }
-    };
-
-    checkAnuncioLiberado();
-
-  }, [completedMissions]); // Faltava fechar o useEffect aqui
+    });
+    // Atualiza o estado de uma vez para evitar re-renderizações desnecessárias
+    setUnlockedAdMissions(prev => ({ ...prev, ...newUnlocked }));
+  }, [completedMissions, AD_MISSIONS_CONFIG]); // Roda quando a lista de missões completas for atualizada ou a configuração das missões mudar
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
@@ -245,33 +246,11 @@ const DailyMissionsPage = () => {
 
           {/* --- Grid de Missões de Tempo e Vídeo --- */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* --- Missão Diária: Assistir Anúncio (Original) --- */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />Missão Diária: Assistir Anúncio</CardTitle>
-            <CardDescription>Assista anúncios para coletar. (Leva cerca de 1 minuto)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
-              <div className="flex items-center gap-4 w-full">
-                <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
-                <div>
-                  <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
-                  <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
-                </div>
-              </div>
-              <div className="w-full sm:w-auto flex-shrink-0">
-                {completedMissions.includes(SHRTFLY_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : anuncioAssistido ? (<Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID}>{loadingMission === SHRTFLY_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* --- 10 Novas Missões de Anúncio --- */}
+            {/* --- Missões de Anúncio (1 a 11) --- */}
             {AD_MISSIONS_CONFIG.map((config) => (
               <Card key={config.missionId}>
                 <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />{config.title}</CardTitle>
+                  <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />{config.title.replace(' 1', '')}</CardTitle>
                   <CardDescription>{config.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
