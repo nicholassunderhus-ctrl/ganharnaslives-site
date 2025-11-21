@@ -322,7 +322,7 @@ const DailyMissionsPage = () => {
                 </div>
               </div>
               <div className="w-full sm:w-auto flex-shrink-0">
-                {completedMissions.includes(VER_ANUNCIOS_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : verAnunciosLiberado ? (<Button onClick={() => handleMissionClick(VER_ANUNCIOS_MISSION_ID, VER_ANUNCIOS_MISSION_POINTS)} className="w-full" disabled={loadingMission === VER_ANUNCIOS_MISSION_ID}>{loadingMission === VER_ANUNCIOS_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="/recompensa/validar-anuncio-id-8491-a3b2" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
+                {completedMissions.includes(VER_ANUNCIOS_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : verAnunciosLiberado ? (<Button onClick={() => handleMissionClick(VER_ANUNCIOS_MISSION_ID, VER_ANUNCIOS_MISSION_POINTS)} className="w-full" disabled={loadingMission === VER_ANUNCIOS_MISSION_ID}>{loadingMission === VER_ANUNCIOS_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="/recompensa/validar-anuncio-id-2957-c8d4" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
               </div>
             </div>
           </CardContent>

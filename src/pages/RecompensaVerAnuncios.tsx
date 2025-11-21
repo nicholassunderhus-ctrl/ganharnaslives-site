@@ -2,19 +2,19 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
-const RecompensaAnuncio6Page = () => {
+const RecompensaVerAnunciosPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Define um indicador no localStorage para liberar a missão
-    localStorage.setItem('anuncio_bonus_6_liberado', 'true');
+    // 1. Define um indicador específico para a missão "Ver Anuncios"
+    localStorage.setItem('anuncio_ver_anuncios_liberado', 'true');
 
-    // 2. Redireciona o usuário para a página de missões após um breve intervalo
+    // 2. Redireciona o usuário de volta para a página de missões
     const timer = setTimeout(() => {
       navigate('/dashboard/missions');
-    }, 1500); // 1.5 segundos
+    }, 1500);
 
-    return () => clearTimeout(timer); // Limpa o timer se o componente for desmontado
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   return (
@@ -26,4 +26,4 @@ const RecompensaAnuncio6Page = () => {
   );
 };
 
-export default RecompensaAnuncio6Page;
+export default RecompensaVerAnunciosPage;
