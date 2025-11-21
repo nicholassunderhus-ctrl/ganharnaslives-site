@@ -16,6 +16,7 @@ import DailyMissionsPage from "./pages/DailyMissions"; // Importa a nova página
 import VpnPage from "./pages/Vpn";
 import RecompensaVerAnuncio2Page from "./pages/RecompensaVerAnuncio2"; // Importa a página de validação para a missão 2
 import RecompensaVerAnuncio1Page from "./pages/RecompensaVerAnuncio1"; // Importa a página de validação
+import RecompensaVerAnuncio3Page from "./pages/RecompensaVerAnuncio3"; // Importa a página de validação para a missão 3
 import { MobileHeader } from "@/components/MobileHeader";
 import { MobileNav } from "@/components/MobileNav";
 import NotFound from "./pages/NotFound";
@@ -41,6 +42,9 @@ const App = () => (
 
           {/* Rota de validação para a missão "Ver Anúncio 2" */}
           <Route path="/recompensa/validar-anuncio-id-va2-d4e5f6" element={<RecompensaVerAnuncio2Page />} />
+
+          {/* Rota de validação para a missão "Ver Anúncio 3" */}
+          <Route path="/recompensa/validar-anuncio-id-va3-g7h8i9" element={<RecompensaVerAnuncio3Page />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/watch" element={<Watch />} />
