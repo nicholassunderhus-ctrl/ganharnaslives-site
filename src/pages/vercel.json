@@ -6,11 +6,6 @@
       "permanent": false
     },
     {
-      "source": "/recompensa/validar-anuncio-id-2957-c8d4",
-      "destination": "/recompensa-anuncio-2",
-      "permanent": false
-    },
-    {
       "source": "/recompensa/validar-anuncio-id-9162-f7a1",
       "destination": "/recompensa-anuncio-3",
       "permanent": false
