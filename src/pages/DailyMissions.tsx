@@ -299,13 +299,15 @@ const DailyMissionsPage = () => {
       if (error) throw error;
 
       // Apenas confirma a gravação no localStorage após o sucesso
-      localStorage.setItem('completedMissions', JSON.stringify([...completedMissions, missionId]));
+      const updatedMissions = [...completedMissions, missionId];
+      localStorage.setItem('completedMissions', JSON.stringify(updatedMissions));
+      setCompletedMissions(updatedMissions); // Garante que o estado local está sincronizado
       toast.success(`+${points} pontos foram adicionados à sua conta!`);
       await queryClient.invalidateQueries({ queryKey: ['userPoints', user.id] });
     } catch (error: any) {
       toast.error("Erro ao completar missão.", { description: error.message });
       // Se der erro, reverte o estado da UI para permitir nova tentativa
-      setCompletedMissions(prev => prev.filter(id => id !== missionId));
+      setCompletedMissions(completedMissions.filter(id => id !== missionId));
       localStorage.setItem('completedMissions', JSON.stringify(completedMissions.filter(id => id !== missionId)));
     } finally {
       setLoadingMission(null);
