@@ -38,7 +38,13 @@ const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
   validationLink: 
     i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' :
     i === 1 ? '/recompensa/validar-anuncio-id-va2-d4e5f6' :
-    i === 2 ? '/recompensa/validar-anuncio-id-va3-g7h8i9' : '#',
+    i === 2 ? '/recompensa/validar-anuncio-id-va3-g7h8i9' :
+    i === 3 ? '/recompensa/validar-anuncio-id-va4-j1k2l3' :
+    i === 4 ? '/recompensa/validar-anuncio-id-va5-m4n5o6' :
+    i === 5 ? '/recompensa/validar-anuncio-id-va6-p7q8r9' :
+    i === 6 ? '/recompensa/validar-anuncio-id-va7-s1t2u3' :
+    i === 7 ? '/recompensa/validar-anuncio-id-va8-v4w5x6' :
+    i === 8 ? '/recompensa/validar-anuncio-id-va9-y7z8a9' : '#',
   localStorageKey: `ver_anuncio_${i + 1}_liberado`,
 }));
 
@@ -46,6 +52,12 @@ const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
 const VER_ANUNCIO_1_MISSION_ID = VER_ANUNCIOS_MISSIONS[0].id;
 const VER_ANUNCIO_2_MISSION_ID = VER_ANUNCIOS_MISSIONS[1].id;
 const VER_ANUNCIO_3_MISSION_ID = VER_ANUNCIOS_MISSIONS[2].id;
+const VER_ANUNCIO_4_MISSION_ID = VER_ANUNCIOS_MISSIONS[3].id;
+const VER_ANUNCIO_5_MISSION_ID = VER_ANUNCIOS_MISSIONS[4].id;
+const VER_ANUNCIO_6_MISSION_ID = VER_ANUNCIOS_MISSIONS[5].id;
+const VER_ANUNCIO_7_MISSION_ID = VER_ANUNCIOS_MISSIONS[6].id;
+const VER_ANUNCIO_8_MISSION_ID = VER_ANUNCIOS_MISSIONS[7].id;
+const VER_ANUNCIO_9_MISSION_ID = VER_ANUNCIOS_MISSIONS[8].id;
 
 
 const DailyMissionsPage = () => {
@@ -158,6 +170,59 @@ const DailyMissionsPage = () => {
     };
 
     checkVerAnuncio3Liberado();
+  }, [completedMissions]);
+
+  // Efeitos para as missões 4 a 9
+  useEffect(() => {
+    const checkVerAnuncio4Liberado = () => {
+      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[3].localStorageKey);
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_4_MISSION_ID)) {
+        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_4_MISSION_ID]: true }));
+        toast.info("Missão 'Ver Anúncio 4' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[3].localStorageKey);
+      }
+    };
+    checkVerAnuncio4Liberado();
+
+    const checkVerAnuncio5Liberado = () => {
+      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[4].localStorageKey);
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_5_MISSION_ID)) {
+        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_5_MISSION_ID]: true }));
+        toast.info("Missão 'Ver Anúncio 5' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[4].localStorageKey);
+      }
+    };
+    checkVerAnuncio5Liberado();
+
+    const checkVerAnuncio6Liberado = () => {
+      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[5].localStorageKey);
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_6_MISSION_ID)) {
+        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_6_MISSION_ID]: true }));
+        toast.info("Missão 'Ver Anúncio 6' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[5].localStorageKey);
+      }
+    };
+    checkVerAnuncio6Liberado();
+
+    const checkVerAnuncio7Liberado = () => {
+      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[6].localStorageKey);
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_7_MISSION_ID)) {
+        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_7_MISSION_ID]: true }));
+        toast.info("Missão 'Ver Anúncio 7' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[6].localStorageKey);
+      }
+    };
+    checkVerAnuncio7Liberado();
+
+    const checkVerAnuncio8Liberado = () => {
+      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[7].localStorageKey);
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_8_MISSION_ID)) {
+        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_8_MISSION_ID]: true }));
+        toast.info("Missão 'Ver Anúncio 8' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[7].localStorageKey);
+      }
+    };
+    checkVerAnuncio8Liberado();
   }, [completedMissions]);
 
   const handleSpinRoulette = async () => {
@@ -283,8 +348,8 @@ const DailyMissionsPage = () => {
                   const isCompleted = completedMissions.includes(mission.id);
                   const isUnlocked = unlockedVerAnuncios[mission.id];
                   const isLoadingThis = loadingMission === mission.id;
-                  // Define quais missões são funcionais (0, 1 e 2)
-                  const isFunctional = i <= 2;
+                  // Define quais missões são funcionais (todas as 9)
+                  const isFunctional = i <= 8;
 
                   return (
                     <div key={mission.id} className={`p-4 bg-card-foreground/5 rounded-lg border flex flex-col items-center text-center space-y-3 ${!isFunctional && 'opacity-50'}`}>

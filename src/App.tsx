@@ -17,6 +17,12 @@ import VpnPage from "./pages/Vpn";
 import RecompensaVerAnuncio2Page from "./pages/RecompensaVerAnuncio2"; // Importa a página de validação para a missão 2
 import RecompensaVerAnuncio1Page from "./pages/RecompensaVerAnuncio1"; // Importa a página de validação
 import RecompensaVerAnuncio3Page from "./pages/RecompensaVerAnuncio3"; // Importa a página de validação para a missão 3
+import RecompensaVerAnuncio4Page from "./pages/RecompensaVerAnuncio4";
+import RecompensaVerAnuncio5Page from "./pages/RecompensaVerAnuncio5";
+import RecompensaVerAnuncio6Page from "./pages/RecompensaVerAnuncio6";
+import RecompensaVerAnuncio7Page from "./pages/RecompensaVerAnuncio7";
+import RecompensaVerAnuncio8Page from "./pages/RecompensaVerAnuncio8";
+import RecompensaVerAnuncio9Page from "./pages/RecompensaVerAnuncio9";
 import { MobileHeader } from "@/components/MobileHeader";
 import { MobileNav } from "@/components/MobileNav";
 import NotFound from "./pages/NotFound";
@@ -45,6 +51,15 @@ const App = () => (
 
           {/* Rota de validação para a missão "Ver Anúncio 3" */}
           <Route path="/recompensa/validar-anuncio-id-va3-g7h8i9" element={<RecompensaVerAnuncio3Page />} />
+
+          {/* Rotas de validação para as missões 4 a 9 */}
+          <Route path="/recompensa/validar-anuncio-id-va4-j1k2l3" element={<RecompensaVerAnuncio4Page />} />
+          <Route path="/recompensa/validar-anuncio-id-va5-m4n5o6" element={<RecompensaVerAnuncio5Page />} />
+          <Route path="/recompensa/validar-anuncio-id-va6-p7q8r9" element={<RecompensaVerAnuncio6Page />} />
+          <Route path="/recompensa/validar-anuncio-id-va7-s1t2u3" element={<RecompensaVerAnuncio7Page />} />
+          <Route path="/recompensa/validar-anuncio-id-va8-v4w5x6" element={<RecompensaVerAnuncio8Page />} />
+          <Route path="/recompensa/validar-anuncio-id-va9-y7z8a9" element={<RecompensaVerAnuncio9Page />} />
+
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/watch" element={<Watch />} />
