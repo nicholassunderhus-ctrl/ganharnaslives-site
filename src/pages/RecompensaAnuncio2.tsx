@@ -8,7 +8,7 @@ const RecompensaAnuncio2Page = () => {
   useEffect(() => {
     localStorage.setItem('anuncio_bonus_2_liberado', 'true');
     const timer = setTimeout(() => {
-      navigate('/dashboard/missoes');
+      navigate('/dashboard/missions');
     }, 500);
     return () => clearTimeout(timer);
   }, [navigate]);
