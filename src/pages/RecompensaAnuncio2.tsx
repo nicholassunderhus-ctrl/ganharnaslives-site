@@ -6,7 +6,7 @@ const RecompensaAnuncio2Page = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Define um indicador no localStorage para liberar a missão
+    // 1. Define um indicador no localStorage para liberar a missão 2
     localStorage.setItem('anuncio_bonus_2_liberado', 'true');
 
     // 2. Redireciona o usuário para a página de missões após um breve intervalo

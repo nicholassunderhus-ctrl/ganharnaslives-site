@@ -16,7 +16,7 @@ import AdminPage from './pages/Admin';
 import RecompensaAnuncioPage from './pages/RecompensaAnuncio'; // Importa a nova página
 
 // Importa as 10 novas páginas de recompensa
-import RecompensaAnuncio2Page from './RecompensaAnuncio2';
+import RecompensaAnuncio2Page from './pages/RecompensaAnuncio2'; // Importa a nova página de recompensa para o anúncio 2
 import RecompensaAnuncio3Page from './RecompensaAnuncio3';
 import RecompensaAnuncio4Page from './RecompensaAnuncio4';
 import RecompensaAnuncio5Page from './RecompensaAnuncio5';
@@ -41,7 +41,7 @@ function App() {
             <Route path="/recompensa-anuncio" element={<RecompensaAnuncioPage />} />
 
             {/* Rotas para as 10 novas missões */}
-            <Route path="/recompensa-anuncio-2" element={<RecompensaAnuncio2Page />} />
+            <Route path="/recompensa/validar-anuncio-id-2957-c8d4" element={<RecompensaAnuncio2Page />} />
             <Route path="/recompensa-anuncio-3" element={<RecompensaAnuncio3Page />} />
             <Route path="/recompensa-anuncio-4" element={<RecompensaAnuncio4Page />} />
             <Route path="/recompensa-anuncio-5" element={<RecompensaAnuncio5Page />} />
