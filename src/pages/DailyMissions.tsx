@@ -117,20 +117,21 @@ const DailyMissionsPage = () => {
     }, 5000);
 
     return () => clearInterval(watchTimePoller);
-  }, [completedMissions, user]); // Adicionado completedMissions e user como dependências
+  }, [user]); // Removida a dependência de completedMissions
 
   // Efeito para verificar se a missão de anúncio foi liberada
-  useEffect(() => { // Este useEffect agora lida com todas as missões de anúncio
+  useEffect(() => {
     const newUnlocked: Record<number, boolean> = {};
     AD_MISSIONS_CONFIG.forEach(config => {
-      if (localStorage.getItem(config.localStorageKey) === 'true' && !completedMissions.includes(config.missionId)) {
+      const isCompleted = JSON.parse(localStorage.getItem('completedMissions') || '[]').includes(config.missionId);
+      if (localStorage.getItem(config.localStorageKey) === 'true' && !isCompleted) {
         newUnlocked[config.missionId] = true;
         toast.info(`${config.title.replace(' 1', '')} liberada! Clique em 'Coletar' para ganhar seus pontos.`); // Ajuste no toast para a missão 1
         localStorage.removeItem(config.localStorageKey);
       }
     });
     setUnlockedAdMissions(prev => ({ ...prev, ...newUnlocked }));
-  }, [completedMissions, AD_MISSIONS_CONFIG]); // Depende de completedMissions e AD_MISSIONS_CONFIG
+  }, [user, AD_MISSIONS_CONFIG]); // Removida a dependência de completedMissions
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
