@@ -6,11 +6,15 @@ const RecompensaAnuncio6Page = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // 1. Define um indicador no localStorage para liberar a missão
     localStorage.setItem('anuncio_bonus_6_liberado', 'true');
+
+    // 2. Redireciona o usuário para a página de missões após um breve intervalo
     const timer = setTimeout(() => {
-      navigate('/dashboard/missoes');
-    }, 500);
-    return () => clearTimeout(timer);
+      navigate('/dashboard/missions');
+    }, 1500); // 1.5 segundos
+
+    return () => clearTimeout(timer); // Limpa o timer se o componente for desmontado
   }, [navigate]);
 
   return (

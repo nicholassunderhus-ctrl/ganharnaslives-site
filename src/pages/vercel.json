@@ -10,5 +10,50 @@
       "destination": "/recompensa-anuncio-2",
       "permanent": false
     }
+    {
+      "source": "/recompensa/validar-anuncio-id-9162-f7a1",
+      "destination": "/recompensa-anuncio-3",
+      "permanent": false
+    },
+    {
+      "source": "/recompensa/validar-anuncio-id-3825-e6c9",
+      "destination": "/recompensa-anuncio-4",
+      "permanent": false
+    }
+    {
+      "source": "/recompensa/validar-anuncio-id-7418-b5f3",
+      "destination": "/recompensa-anuncio-5",
+      "permanent": false
+    },
+    {
+      "source": "/recompensa/validar-anuncio-id-1093-d4e8",
+      "destination": "/recompensa-anuncio-6",
+      "permanent": false
+    }
+    {
+      "source": "/recompensa/validar-anuncio-id-6580-a9b2",
+      "destination": "/recompensa-anuncio-7",
+      "permanent": false
+    },
+    {
+      "source": "/recompensa/validar-anuncio-id-4271-h2j6",
+      "destination": "/recompensa-anuncio-8",
+      "permanent": false
+    }
+    {
+      "source": "/recompensa/validar-anuncio-id-8946-g1k5",
+      "destination": "/recompensa-anuncio-9",
+      "permanent": false
+    },
+    {
+      "source": "/recompensa/validar-anuncio-id-5139-i8l2",
+      "destination": "/recompensa-anuncio-10",
+      "permanent": false
+    }
+    {
+      "source": "/recompensa/validar-anuncio-id-7802-u4v9",
+      "destination": "/recompensa-anuncio-11",
+      "permanent": false
+    }
   ]
 }
