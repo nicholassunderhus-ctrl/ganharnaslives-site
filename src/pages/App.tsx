@@ -14,8 +14,6 @@ import DepositPage from './pages/Deposit';
 import VpnPage from './pages/Vpn';
 import AdminPage from './pages/Admin';
 import RecompensaAnuncioPage from './pages/RecompensaAnuncio'; // Importa a nova página
-import RecompensaAnuncio2Page from './pages/RecompensaAnuncio2'; // Importa a segunda página de recompensa
-import ValidarAnuncio2Page from './pages/recompensa/validar-anuncio-2';
 import NotFoundPage from './pages/NotFound';
 
 function App() {
@@ -29,8 +27,6 @@ function App() {
             
             {/* Rota da nova página de recompensa */}
             <Route path="/recompensa-anuncio" element={<RecompensaAnuncioPage />} />
-            <Route path="/recompensa-anuncio-2" element={<RecompensaAnuncio2Page />} />
-            <Route path="/recompensa/validar-anuncio-2" element={<ValidarAnuncio2Page />} /> 
 
             {/* Rotas do Painel */}
             <Route path="/dashboard" element={<DashboardPage />} />
