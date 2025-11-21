@@ -3,7 +3,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { useUserPoints } from "@/hooks/useUserPoints";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Gift, Loader2, Ticket, Clock, Hourglass, Trophy } from 'lucide-react';
+import { Gift, Loader2, Ticket, Clock, Hourglass, Trophy, Eye } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
