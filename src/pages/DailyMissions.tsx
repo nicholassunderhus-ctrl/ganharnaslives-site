@@ -196,6 +196,19 @@ const DailyMissionsPage = () => {
     checkAnuncioLiberado();
   }, [completedMissions]); // Executa quando a página carrega e as missões são checadas
 
+  // Efeito para verificar se a SEGUNDA missão de anúncio foi liberada
+  useEffect(() => {
+    const checkAnuncio2Liberado = () => {
+      const liberado = localStorage.getItem('anuncio_bonus_2_liberado');
+      if (liberado === 'true' && !completedMissions.includes(ENCURTANET_MISSION_ID)) {
+        setAnuncio2Assistido(true);
+        toast.info("Missão de anúncio 2 liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem('anuncio_bonus_2_liberado');
+      }
+    };
+    checkAnuncio2Liberado();
+  }, [completedMissions]);
+
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
 
@@ -371,6 +384,41 @@ const DailyMissionsPage = () => {
                       </Button>
                     ) : (
                       <a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full">
+                        <Button className="w-full">Liberar Coleta</Button>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* --- Missão Diária: Assistir Anúncio 2 (Nova) --- */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Gift className="w-6 h-6 text-primary" />
+                  Missão Diária: Assistir Anúncio 2
+                </CardTitle>
+                <CardDescription>Assista mais anúncios para ganhar 20 pontos. (Leva ~1 minuto)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
+                  <div className="flex items-center gap-4 w-full">
+                    <Gift className={`w-6 h-6 ${completedMissions.includes(ENCURTANET_MISSION_ID) ? 'text-green-500' : (anuncio2Assistido ? 'text-primary' : 'text-muted-foreground')}`} />
+                    <div>
+                      <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
+                      <p className="text-sm text-primary">Recompensa: {ENCURTANET_MISSION_POINTS} pts</p>
+                    </div>
+                  </div>
+                  <div className="w-full sm:w-auto flex-shrink-0">
+                    {completedMissions.includes(ENCURTANET_MISSION_ID) ? (
+                      <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
+                    ) : anuncio2Assistido ? (
+                      <Button onClick={() => handleMissionClick(ENCURTANET_MISSION_ID, ENCURTANET_MISSION_POINTS)} className="w-full" disabled={loadingMission === ENCURTANET_MISSION_ID}>
+                        {loadingMission === ENCURTANET_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
+                      </Button>
+                    ) : (
+                      <a href={ENCURTANET_LINK} target="_blank" rel="noopener noreferrer" className="w-full">
                         <Button className="w-full">Liberar Coleta</Button>
                       </a>
                     )}
