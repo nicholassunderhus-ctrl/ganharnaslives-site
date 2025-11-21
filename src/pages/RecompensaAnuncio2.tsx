@@ -11,7 +11,7 @@ const RecompensaAnuncio2Page = () => {
 
     // 2. Redireciona o usuário para a página de missões após um breve intervalo
     const timer = setTimeout(() => {
-      navigate('/dashboard/missions'); // Mantido como 'missions' conforme solicitado
+      navigate('/dashboard/missoes');
     }, 1500); // 1.5 segundos
 
     return () => clearTimeout(timer); // Limpa o timer se o componente for desmontado
