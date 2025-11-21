@@ -121,13 +121,13 @@ const DailyMissionsPage = () => {
 
   // Efeito para verificar se a missão de anúncio foi liberada
   useEffect(() => {
-    const checkAnuncioLiberado = () => {
-      const liberado = localStorage.getItem('anuncio_bonus_liberado');
+    const checkAnuncioLiberado = () => { // Renomeado para ser mais genérico
+      // Verifica a chave específica para a primeira missão de anúncio
+      const liberado = localStorage.getItem('anuncio_bonus_1_liberado');
       if (liberado === 'true' && !completedMissions.includes(SHRTFLY_MISSION_ID)) {
-        setAnuncioAssistido(true); // Define o estado como true se a condição for atendida
+        setAnuncioAssistido(true);
         toast.info("Missão de anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        // Remove o indicador para que não seja acionado novamente
-        localStorage.removeItem('anuncio_bonus_liberado');
+        localStorage.removeItem('anuncio_bonus_1_liberado'); // Remove o indicador para não acionar novamente
       }
     };
 
@@ -261,7 +261,7 @@ const DailyMissionsPage = () => {
                 </div>
               </div>
               <div className="w-full sm:w-auto flex-shrink-0">
-                {completedMissions.includes(SHRTFLY_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : anuncioAssistido ? (<Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID}>{loadingMission === SHRTFLY_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full"><Button className="w-full">Assistir Anúncio</Button></a>)}
+                {completedMissions.includes(SHRTFLY_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : anuncioAssistido ? (<Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID}>{loadingMission === SHRTFLY_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="/recompensa/validar-anuncio-id-8491-a3b2" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
               </div>
             </div>
           </CardContent>
