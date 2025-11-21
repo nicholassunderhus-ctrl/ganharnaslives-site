@@ -262,71 +262,7 @@ const DailyMissionsPage = () => {
 
           {/* --- Grid de Missões de Tempo e Vídeo --- */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* --- Missão Diária: Assistir Anúncio (Original) --- */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />Missão Diária: Assistir Anúncio</CardTitle>
-            <CardDescription>Assista anúncios para coletar. (Leva cerca de 1 minuto)</CardDescription>
-          </CardHeader> 
-          <CardContent>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
-              <div className="flex items-center gap-4 w-full">
-                <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido1 ? 'text-primary' : 'text-muted-foreground')}`} />
-                <div>
-                  <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
-                  <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
-                </div>
-              </div>
-              <div className="w-full sm:w-auto flex-shrink-0">
-                {completedMissions.includes(SHRTFLY_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : anuncioAssistido1 ? (<Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID}>{loadingMission === SHRTFLY_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* --- Missão Diária: Assistir Anúncio 2 --- */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />Missão Diária: Assistir Anúncio 2</CardTitle>
-            <CardDescription>Assista mais anúncios para coletar. (Leva cerca de 1 minuto)</CardDescription>
-          </CardHeader> 
-          <CardContent>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
-              <div className="flex items-center gap-4 w-full">
-                <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID_2) ? 'text-green-500' : (anuncioAssistido2 ? 'text-primary' : 'text-muted-foreground')}`} />
-                <div>
-                  <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
-                  <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS_2} pts</p>
-                </div>
-              </div>
-              <div className="w-full sm:w-auto flex-shrink-0">
-                {completedMissions.includes(SHRTFLY_MISSION_ID_2) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : anuncioAssistido2 ? (<Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID_2, SHRTFLY_MISSION_POINTS_2)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID_2}>{loadingMission === SHRTFLY_MISSION_ID_2 ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="https://fir3.net/missaoanuncio2" target="_blank" rel="noopener noreferrer" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* --- Nova Missão: Ver Anúncios --- */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />Ver Anúncios</CardTitle>
-            <CardDescription>Clique para validar e liberar sua coleta diária de 20 pontos.</CardDescription>
-          </CardHeader> 
-          <CardContent>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
-              <div className="flex items-center gap-4 w-full">
-                <Gift className={`w-6 h-6 ${completedMissions.includes(VER_ANUNCIOS_MISSION_ID) ? 'text-green-500' : (verAnunciosLiberado ? 'text-primary' : 'text-muted-foreground')}`} />
-                <div>
-                  <p className="font-semibold">Valide para liberar a coleta.</p>
-                  <p className="text-sm text-primary">Recompensa: {VER_ANUNCIOS_MISSION_POINTS} pts</p>
-                </div>
-              </div>
-              <div className="w-full sm:w-auto flex-shrink-0">
-                {completedMissions.includes(VER_ANUNCIOS_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : verAnunciosLiberado ? (<Button onClick={() => handleMissionClick(VER_ANUNCIOS_MISSION_ID, VER_ANUNCIOS_MISSION_POINTS)} className="w-full" disabled={loadingMission === VER_ANUNCIOS_MISSION_ID}>{loadingMission === VER_ANUNCIOS_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="/recompensa/validar-anuncio-id-2957-c8d4" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+  
 
 
             {/* Cards de Missão de Tempo Assistido */}
