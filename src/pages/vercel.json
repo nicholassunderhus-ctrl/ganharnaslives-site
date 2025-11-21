@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/recompensa/validar-anuncio-id-8491-a3b2",
+      "destination": "/recompensa-anuncio",
+      "permanent": false
+    },
+    {
+      "source": "/recompensa/validar-anuncio-id-2957-c8d4",
+      "destination": "/recompensa-anuncio-2",
+      "permanent": false
+    }
+  ]
+}
