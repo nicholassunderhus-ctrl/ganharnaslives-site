@@ -206,77 +206,55 @@ const DailyMissionsPage = () => {
           </Card>
 
           {/* --- Grid de Missões de Tempo e Vídeo --- */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  
-
-
-            {/* Cards de Missão de Tempo Assistido */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Clock className="w-6 h-6 text-primary" />Maratona de Lives</CardTitle>
-                <CardDescription>Acumule 1 hora de tempo assistido hoje.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1_HOUR ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Assista 60 min</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Clock className="w-6 h-6 text-primary" />Maratona de Lives</CardTitle>
+              <CardDescription>Ganhe pontos por assistir lives por um tempo acumulado hoje.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Missão de 1 Hora */}
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1_HOUR ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div>
+                    <p className="font-semibold">Assista 60 min</p>
+                    <p className="text-sm text-primary">Recompensa: 20 pts</p>
                   </div>
-                  <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
-                    {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/60)`}
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+                <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
+                  {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/60)`}
+                </Button>
+              </div>
 
-            {/* Card da Missão de Tempo Assistido (3 Horas) */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Hourglass className="w-6 h-6 text-primary" />Maratona de Lives II</CardTitle>
-                <CardDescription>Acumule 3 horas de tempo assistido hoje.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Assista 180 min</p>
-                      <p className="text-sm text-primary">Recompensa: 40 pts</p>
-                    </div>
+              {/* Missão de 3 Horas */}
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div>
+                    <p className="font-semibold">Assista 180 min</p>
+                    <p className="text-sm text-primary">Recompensa: 40 pts</p>
                   </div>
-                  <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_3_HOURS || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
-                    {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+                <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_3_HOURS || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
+                  {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
+                </Button>
+              </div>
 
-            {/* Card da Missão de Tempo Assistido (6 Horas) */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Trophy className="w-6 h-6 text-primary" />Maratona de Lives III</CardTitle>
-                <CardDescription>Acumule 6 horas de tempo assistido hoje.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                  <div className="flex items-center gap-4">
-                    <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_6_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="font-semibold">Assista 360 min</p>
-                      <p className="text-sm text-primary">Recompensa: 60 pts</p>
-                    </div>
+              {/* Missão de 6 Horas */}
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_6_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div>
+                    <p className="font-semibold">Assista 360 min</p>
+                    <p className="text-sm text-primary">Recompensa: 60 pts</p>
                   </div>
-                  <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
-                    {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-
-          </div>
+                <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
+                  {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
