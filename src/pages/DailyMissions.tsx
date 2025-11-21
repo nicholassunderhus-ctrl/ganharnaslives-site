@@ -223,7 +223,7 @@ const DailyMissionsPage = () => {
                     </div>
                     <div>
                       <p className="font-semibold">Ver Anúncio {i + 1}</p>
-                      <p className="text-sm text-primary">Recompensa: 10 pts</p>
+                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
                     </div>
                     <Button variant="outline" size="sm" className="w-full">
                       Ver Anúncio
