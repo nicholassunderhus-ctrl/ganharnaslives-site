@@ -29,6 +29,19 @@ const ROULETTE_PRIZES = [
 ];
 const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
 
+// --- Configuração das Missões "Ver Anúncios" ---
+const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
+  id: 301 + i, // IDs de 301 a 309
+  title: `Ver Anúncio ${i + 1}`,
+  points: 20,
+  // Apenas a primeira missão terá um link de validação por enquanto
+  validationLink: i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' : '#',
+  localStorageKey: `ver_anuncio_${i + 1}_liberado`,
+}));
+
+// Pega o ID da primeira missão para facilitar o uso
+const VER_ANUNCIO_1_MISSION_ID = VER_ANUNCIOS_MISSIONS[0].id;
+
 
 const DailyMissionsPage = () => {
   const { userPoints } = useUserPoints();
@@ -36,6 +49,9 @@ const DailyMissionsPage = () => {
   const [loadingMission, setLoadingMission] = useState<number | null>(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // --- Estado para as missões "Ver Anúncios" ---
+  const [unlockedVerAnuncios, setUnlockedVerAnuncios] = useState<Record<number, boolean>>({});
 
 
   // --- Estados da Roleta ---
@@ -96,6 +112,20 @@ const DailyMissionsPage = () => {
 
     return () => clearInterval(watchTimePoller);
   }, [completedMissions, user]); // Adicionado completedMissions e user como dependências
+
+  // Efeito para verificar a liberação da missão "Ver Anúncio 1"
+  useEffect(() => {
+    const checkVerAnuncio1Liberado = () => {
+      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[0].localStorageKey);
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_1_MISSION_ID)) {
+        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_1_MISSION_ID]: true }));
+        toast.info("Missão 'Ver Anúncio 1' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[0].localStorageKey);
+      }
+    };
+
+    checkVerAnuncio1Liberado();
+  }, [completedMissions]);
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
@@ -216,20 +246,36 @@ const DailyMissionsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Array.from({ length: 9 }, (_, i) => (
-                  <div key={i} className="p-4 bg-card-foreground/5 rounded-lg border flex flex-col items-center text-center space-y-3">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                      <Gift className="w-6 h-6 text-primary" />
+                {VER_ANUNCIOS_MISSIONS.map((mission, i) => {
+                  const isCompleted = completedMissions.includes(mission.id);
+                  const isUnlocked = unlockedVerAnuncios[mission.id];
+                  const isLoadingThis = loadingMission === mission.id;
+                  // Por enquanto, apenas a primeira missão é funcional
+                  const isFunctional = i === 0;
+
+                  return (
+                    <div key={mission.id} className={`p-4 bg-card-foreground/5 rounded-lg border flex flex-col items-center text-center space-y-3 ${!isFunctional && 'opacity-50'}`}>
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                        <Gift className={`w-6 h-6 ${isCompleted ? 'text-green-500' : (isUnlocked ? 'text-primary' : 'text-muted-foreground')}`} />
+                      </div>
+                      <div>
+                        <p className="font-semibold">{mission.title}</p>
+                        <p className="text-sm text-primary">Recompensa: {mission.points} pts</p>
+                      </div>
+                      {isCompleted ? (
+                        <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
+                      ) : isUnlocked ? (
+                        <Button onClick={() => handleMissionClick(mission.id, mission.points)} className="w-full" disabled={isLoadingThis}>
+                          {isLoadingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
+                        </Button>
+                      ) : (
+                        <a href={isFunctional ? mission.validationLink : '#'} className="w-full">
+                          <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional}>Ver Anúncio</Button>
+                        </a>
+                      )}
                     </div>
-                    <div>
-                      <p className="font-semibold">Ver Anúncio {i + 1}</p>
-                      <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                    </div>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Ver Anúncio
-                    </Button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

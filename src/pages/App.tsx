@@ -13,7 +13,9 @@ import WithdrawPage from './pages/Withdraw';
 import DepositPage from './pages/Deposit';
 import VpnPage from './pages/Vpn';
 import AdminPage from './pages/Admin';
-import RecompensaAnuncioPage from './pages/RecompensaAnuncio'; // Importa a nova página
+import RecompensaVerAnuncio1Page from './pages/RecompensaVerAnuncio1'; // Importa a página de validação
+import NotFoundPage from './pages/NotFound';
+
 function App() {
   return (
     <AuthProvider>
@@ -22,6 +24,9 @@ function App() {
           <Routes>
             <Route path="/" element={<IndexPage />} />
             <Route path="/auth" element={<AuthPage />} />
+
+            {/* Rota de validação para a missão "Ver Anúncio 1" */}
+            <Route path="/recompensa/validar-anuncio-id-va1-a1b2c3" element={<RecompensaVerAnuncio1Page />} />
      
             {/* Rotas do Painel */}
             <Route path="/dashboard" element={<DashboardPage />} />
