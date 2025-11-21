@@ -205,6 +205,35 @@ const DailyMissionsPage = () => {
             </CardContent>
           </Card>
 
+          {/* --- Categoria Missão: Ver Anúncios --- */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="w-6 h-6 text-primary" />
+                Missão: Ver Anúncios
+              </CardTitle>
+              <CardDescription>Complete tarefas de anúncio para ganhar pontos extras.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 9 }, (_, i) => (
+                  <div key={i} className="p-4 bg-card-foreground/5 rounded-lg border flex flex-col items-center text-center space-y-3">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                      <Gift className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Ver Anúncio {i + 1}</p>
+                      <p className="text-sm text-primary">Recompensa: 10 pts</p>
+                    </div>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Ver Anúncio
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* --- Grid de Missões de Tempo e Vídeo --- */}
           <Card>
             <CardHeader>
