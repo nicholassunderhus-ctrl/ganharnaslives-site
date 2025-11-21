@@ -33,6 +33,8 @@ const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0
 const SHRTFLY_MISSION_ID = 201;
 const SHRTFLY_MISSION_POINTS = 20;
 const SHRTFLY_MISSION_ID_2 = 202; // Novo ID para a segunda missão de anúncio
+const VER_ANUNCIOS_MISSION_ID = 203; // ID para a nova missão "Ver Anuncios"
+const VER_ANUNCIOS_MISSION_POINTS = 20; // Pontos para a nova missão
 const SHRTFLY_MISSION_POINTS_2 = 20; // Pontos para a segunda missão de anúncio
 
 
@@ -43,6 +45,7 @@ const DailyMissionsPage = () => {
   const { user } = useAuth();
   const [anuncioAssistido1, setAnuncioAssistido1] = useState(false); // Estado para a primeira missão de anúncio
   const [anuncioAssistido2, setAnuncioAssistido2] = useState(false); // Novo estado para a segunda missão de anúncio
+  const [verAnunciosLiberado, setVerAnunciosLiberado] = useState(false); // Estado para a nova missão
   const queryClient = useQueryClient();
 
 
@@ -133,6 +136,20 @@ const DailyMissionsPage = () => {
     };
 
     checkAnuncioLiberado2();
+  }, [completedMissions]);
+
+  // Efeito para a nova missão "Ver Anuncios"
+  useEffect(() => {
+    const checkVerAnunciosLiberado = () => {
+      const liberado = localStorage.getItem('anuncio_ver_anuncios_liberado');
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIOS_MISSION_ID)) {
+        setVerAnunciosLiberado(true);
+        toast.info("Missão 'Ver Anúncios' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem('anuncio_ver_anuncios_liberado');
+      }
+    };
+
+    checkVerAnunciosLiberado();
   }, [completedMissions]);
 
   const handleSpinRoulette = async () => {
@@ -288,6 +305,29 @@ const DailyMissionsPage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* --- Nova Missão: Ver Anúncios --- */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />Ver Anúncios</CardTitle>
+            <CardDescription>Clique para validar e liberar sua coleta diária de 20 pontos.</CardDescription>
+          </CardHeader> 
+          <CardContent>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
+              <div className="flex items-center gap-4 w-full">
+                <Gift className={`w-6 h-6 ${completedMissions.includes(VER_ANUNCIOS_MISSION_ID) ? 'text-green-500' : (verAnunciosLiberado ? 'text-primary' : 'text-muted-foreground')}`} />
+                <div>
+                  <p className="font-semibold">Valide para liberar a coleta.</p>
+                  <p className="text-sm text-primary">Recompensa: {VER_ANUNCIOS_MISSION_POINTS} pts</p>
+                </div>
+              </div>
+              <div className="w-full sm:w-auto flex-shrink-0">
+                {completedMissions.includes(VER_ANUNCIOS_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : verAnunciosLiberado ? (<Button onClick={() => handleMissionClick(VER_ANUNCIOS_MISSION_ID, VER_ANUNCIOS_MISSION_POINTS)} className="w-full" disabled={loadingMission === VER_ANUNCIOS_MISSION_ID}>{loadingMission === VER_ANUNCIOS_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="/recompensa/validar-anuncio-id-8491-a3b2" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
 
             {/* Cards de Missão de Tempo Assistido */}
             <Card>

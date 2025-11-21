@@ -24,7 +24,7 @@ function App() {
             <Route path="/auth" element={<AuthPage />} />
             
             {/* Rota da nova página de recompensa */}
-            <Route path="/recompensa/validar-anuncio-id-8491-a3b2" element={<RecompensaAnuncioPage />} />
+            <Route path="/recompensa/validar-anuncio-id-8491-a3b2" element={<RecompensaAnuncioPage />} /> {/* Link personalizado para a nova missão */}
 
             {/* Rotas para as 10 novas missões */}
             <Route path="/recompensa/validar-anuncio-id-2957-c8d4" element={<RecompensaAnuncio2Page />} />

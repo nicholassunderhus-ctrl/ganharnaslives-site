@@ -7,7 +7,7 @@ const RecompensaAnuncioPage = () => {
 
   useEffect(() => {
     // 1. Define um indicador no localStorage para liberar a missão
-    localStorage.setItem('anuncio_bonus_1_liberado', 'true');
+    localStorage.setItem('anuncio_ver_anuncios_liberado', 'true');
 
     // 2. Redireciona o usuário para a página de missões após um breve intervalo
     const timer = setTimeout(() => {
