@@ -55,7 +55,7 @@ function App() {
             {/* Rotas do Painel */}
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/dashboard/watch" element={<WatchPage />} />
-            <Route path="/dashboard/missoes" element={<DailyMissionsPage />} />
+            <Route path="/dashboard/missions" element={<DailyMissionsPage />} />
             <Route path="/dashboard/stream" element={<MyStreamsPage />} />
             <Route path="/dashboard/sacar" element={<WithdrawPage />} />
             <Route path="/dashboard/depositar" element={<DepositPage />} />
