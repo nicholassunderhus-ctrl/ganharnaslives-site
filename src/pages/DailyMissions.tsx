@@ -269,7 +269,7 @@ const DailyMissionsPage = () => {
                           {isLoadingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
                         </Button>
                       ) : (
-                        <a href={isFunctional ? mission.validationLink : '#'} className="w-full">
+                        <a href={isFunctional ? VER_ANUNCIOS_MISSIONS[0].validationLink : '#'} className="w-full">
                           <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional}>Ver Anúncio</Button>
                         </a>
                       )}

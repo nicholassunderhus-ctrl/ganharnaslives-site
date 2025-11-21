@@ -13,7 +13,7 @@ import WithdrawPage from './pages/Withdraw';
 import DepositPage from './pages/Deposit';
 import VpnPage from './pages/Vpn';
 import AdminPage from './pages/Admin';
-import RecompensaVerAnuncio1Page from './pages/RecompensaVerAnuncio1'; // Importa a página de validação
+import RecompensaVerAnuncio1Page from './RecompensaVerAnuncio1'; // Importa a página de validação
 import NotFoundPage from './pages/NotFound';
 
 function App() {
