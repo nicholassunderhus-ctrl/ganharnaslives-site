@@ -34,13 +34,16 @@ const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
   id: 301 + i, // IDs de 301 a 309
   title: `Ver Anúncio ${i + 1}`,
   points: 20,
-  // Apenas a primeira missão terá um link de validação por enquanto
-  validationLink: i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' : '#',
+  // Links de validação para as missões
+  validationLink: 
+    i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' :
+    i === 1 ? '/recompensa/validar-anuncio-id-va2-d4e5f6' : '#',
   localStorageKey: `ver_anuncio_${i + 1}_liberado`,
 }));
 
-// Pega o ID da primeira missão para facilitar o uso
+// Pega os IDs das missões para facilitar o uso
 const VER_ANUNCIO_1_MISSION_ID = VER_ANUNCIOS_MISSIONS[0].id;
+const VER_ANUNCIO_2_MISSION_ID = VER_ANUNCIOS_MISSIONS[1].id;
 
 
 const DailyMissionsPage = () => {
@@ -125,6 +128,20 @@ const DailyMissionsPage = () => {
     };
 
     checkVerAnuncio1Liberado();
+  }, [completedMissions]);
+
+  // Efeito para verificar a liberação da missão "Ver Anúncio 2"
+  useEffect(() => {
+    const checkVerAnuncio2Liberado = () => {
+      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[1].localStorageKey);
+      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_2_MISSION_ID)) {
+        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_2_MISSION_ID]: true }));
+        toast.info("Missão 'Ver Anúncio 2' liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[1].localStorageKey);
+      }
+    };
+
+    checkVerAnuncio2Liberado();
   }, [completedMissions]);
 
   const handleSpinRoulette = async () => {
@@ -250,8 +267,8 @@ const DailyMissionsPage = () => {
                   const isCompleted = completedMissions.includes(mission.id);
                   const isUnlocked = unlockedVerAnuncios[mission.id];
                   const isLoadingThis = loadingMission === mission.id;
-                  // Por enquanto, apenas a primeira missão é funcional
-                  const isFunctional = i === 0;
+                  // Define quais missões são funcionais
+                  const isFunctional = i === 0 || i === 1;
 
                   return (
                     <div key={mission.id} className={`p-4 bg-card-foreground/5 rounded-lg border flex flex-col items-center text-center space-y-3 ${!isFunctional && 'opacity-50'}`}>
