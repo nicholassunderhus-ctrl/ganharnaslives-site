@@ -14,6 +14,7 @@ import Admin from "./pages/Admin";
 import { AdminRoute } from "./components/AdminRoute";
 import DailyMissionsPage from "./pages/DailyMissions"; // Importa a nova página
 import VpnPage from "./pages/Vpn";
+import RecompensaVerAnuncio1Page from "./pages/RecompensaVerAnuncio1"; // Importa a página de validação
 import { MobileHeader } from "@/components/MobileHeader";
 import { MobileNav } from "@/components/MobileNav";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+
+          {/* Rota de validação para a missão "Ver Anúncio 1" */}
+          <Route path="/recompensa/validar-anuncio-id-va1-a1b2c3" element={<RecompensaVerAnuncio1Page />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/watch" element={<Watch />} />
