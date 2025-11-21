@@ -16,7 +16,7 @@ import AdminPage from './pages/Admin';
 import RecompensaAnuncioPage from './pages/RecompensaAnuncio'; // Importa a nova página
 
 // Importa as 10 novas páginas de recompensa
-import RecompensaAnuncio2Page from './pages/recompensa/RecompensaAnuncio2';
+import RecompensaAnuncio2Page from './pages/RecompensaAnuncio2';
 import RecompensaAnuncio3Page from './pages/recompensa/RecompensaAnuncio3';
 import RecompensaAnuncio4Page from './pages/recompensa/RecompensaAnuncio4';
 import RecompensaAnuncio5Page from './pages/recompensa/RecompensaAnuncio5';
