@@ -14,20 +14,6 @@ import DepositPage from './pages/Deposit';
 import VpnPage from './pages/Vpn';
 import AdminPage from './pages/Admin';
 import RecompensaAnuncioPage from './pages/RecompensaAnuncio'; // Importa a nova página
-
-// Importa as 10 novas páginas de recompensa
-import RecompensaAnuncio2Page from './pages/RecompensaAnuncio2'; // Importa a nova página de recompensa para o anúncio 2
-import RecompensaAnuncio3Page from './RecompensaAnuncio3';
-import RecompensaAnuncio4Page from './RecompensaAnuncio4';
-import RecompensaAnuncio5Page from './RecompensaAnuncio5';
-import RecompensaAnuncio6Page from './RecompensaAnuncio6';
-import RecompensaAnuncio7Page from './RecompensaAnuncio7';
-import RecompensaAnuncio8Page from './RecompensaAnuncio8';
-import RecompensaAnuncio9Page from './RecompensaAnuncio9';
-import RecompensaAnuncio10Page from './RecompensaAnuncio10';
-import RecompensaAnuncio11Page from './RecompensaAnuncio11';
-import NotFoundPage from './pages/NotFound';
-
 function App() {
   return (
     <AuthProvider>
