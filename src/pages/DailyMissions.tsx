@@ -29,23 +29,12 @@ const ROULETTE_PRIZES = [
 ];
 const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
 
-// --- Configuração da Missão Shrtfly ---
-const SHRTFLY_MISSION_ID = 201;
-const SHRTFLY_MISSION_POINTS = 20;
-const SHRTFLY_MISSION_ID_2 = 202; // Novo ID para a segunda missão de anúncio
-const VER_ANUNCIOS_MISSION_ID = 203; // ID para a nova missão "Ver Anuncios"
-const VER_ANUNCIOS_MISSION_POINTS = 20; // Pontos para a nova missão
-const SHRTFLY_MISSION_POINTS_2 = 20; // Pontos para a segunda missão de anúncio
-
 
 const DailyMissionsPage = () => {
   const { userPoints } = useUserPoints();
   const [completedMissions, setCompletedMissions] = useState<number[]>([]);
   const [loadingMission, setLoadingMission] = useState<number | null>(null);
   const { user } = useAuth();
-  const [anuncioAssistido1, setAnuncioAssistido1] = useState(false); // Estado para a primeira missão de anúncio
-  const [anuncioAssistido2, setAnuncioAssistido2] = useState(false); // Novo estado para a segunda missão de anúncio
-  const [verAnunciosLiberado, setVerAnunciosLiberado] = useState(false); // Estado para a nova missão
   const queryClient = useQueryClient();
 
 
@@ -107,50 +96,6 @@ const DailyMissionsPage = () => {
 
     return () => clearInterval(watchTimePoller);
   }, [completedMissions, user]); // Adicionado completedMissions e user como dependências
-
-  // Efeito para verificar se a missão de anúncio foi liberada
-  useEffect(() => {
-    const checkAnuncioLiberado = () => { // Renomeado para ser mais genérico
-      // Verifica a chave específica para a primeira missão de anúncio
-      const liberado = localStorage.getItem('anuncio_bonus_1_liberado');
-      if (liberado === 'true' && !completedMissions.includes(SHRTFLY_MISSION_ID)) { // Verifica a missão 1
-        setAnuncioAssistido1(true);
-        toast.info("Missão Diária: Assistir Anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem('anuncio_bonus_1_liberado'); // Remove o indicador
-      }
-    };
-
-    checkAnuncioLiberado();
-    
-  }, [completedMissions]);
-
-  // Novo useEffect para verificar se a segunda missão de anúncio foi liberada
-  useEffect(() => {
-    const checkAnuncioLiberado2 = () => {
-      const liberado = localStorage.getItem('anuncio_bonus_2_liberado');
-      if (liberado === 'true' && !completedMissions.includes(SHRTFLY_MISSION_ID_2)) {
-        setAnuncioAssistido2(true);
-        toast.info("Missão Diária: Assistir Anúncio 2 liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem('anuncio_bonus_2_liberado');
-      }
-    };
-
-    checkAnuncioLiberado2();
-  }, [completedMissions]);
-
-  // Efeito para a nova missão "Ver Anuncios"
-  useEffect(() => {
-    const checkVerAnunciosLiberado = () => {
-      const liberado = localStorage.getItem('anuncio_ver_anuncios_liberado');
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIOS_MISSION_ID)) {
-        setVerAnunciosLiberado(true);
-        toast.info("Missão 'Ver Anúncios' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem('anuncio_ver_anuncios_liberado');
-      }
-    };
-
-    checkVerAnunciosLiberado();
-  }, [completedMissions]);
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;

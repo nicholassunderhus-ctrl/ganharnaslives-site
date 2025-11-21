@@ -14,7 +14,6 @@ import Admin from "./pages/Admin";
 import { AdminRoute } from "./components/AdminRoute";
 import DailyMissionsPage from "./pages/DailyMissions"; // Importa a nova página
 import VpnPage from "./pages/Vpn";
-import RecompensaAnuncioPage from "./pages/RecompensaAnuncio"; // Importa a página de recompensa
 import { MobileHeader } from "@/components/MobileHeader";
 import { MobileNav } from "@/components/MobileNav";
 import NotFound from "./pages/NotFound";
@@ -34,9 +33,6 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          
-          {/* Rota da página de recompensa com caminho complexo */}
-          <Route path="/recompensa/validar-anuncio-id-8491-a3b2" element={<RecompensaAnuncioPage />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/watch" element={<Watch />} />
