@@ -129,7 +129,7 @@ const DailyMissionsPage = () => {
     }, 5000);
 
     return () => clearInterval(watchTimePoller);
-  }, [completedMissions, user]); // Adicionado completedMissions e user como dependências
+  }, [user]); // Adicionado completedMissions e user como dependências
 
   // Efeito para verificar se a missão de anúncio foi liberada
   useEffect(() => {
