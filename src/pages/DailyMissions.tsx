@@ -29,6 +29,20 @@ const ROULETTE_PRIZES = [
 ];
 const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
 
+// --- Configuração da Roleta ---
+const ROULETTE_PRIZES = [
+  { points: 10, weight: 40 },  // 40% de chance
+  { points: 20, weight: 30 },  // 30% de chance
+  { points: 30, weight: 15 },  // 15% de chance
+  { points: 50, weight: 10 },  // 10% de chance
+  { points: 100, weight: 5 }, // 5% de chance
+];
+const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
+
+// --- Configuração da Missão Shrtfly ---
+const SHRTFLY_MISSION_ID = 201;
+const SHRTFLY_MISSION_POINTS = 20;
+
 // --- Configuração da Missão Shrtfly ---
 const SHRTFLY_MISSION_ID = 201;
 const SHRTFLY_MISSION_POINTS = 20;
@@ -46,13 +60,13 @@ const DailyMissionsPage = () => {
   const [unlockedAdMissions, setUnlockedAdMissions] = useState<Record<number, boolean>>({});
 
   // --- Configuração Unificada das Missões de Anúncio (1 a 11) ---
-  const AD_MISSIONS_CONFIG = Array.from({ length: 11 }, (_, i) => { // Gerar 11 missões (1 a 11)
-    const missionNumber = i + 1; // Começa em 1
+  const AD_MISSIONS_CONFIG = Array.from({ length: 10 }, (_, i) => {
+    const missionNumber = i + 2;
     return {
-      missionId: 200 + missionNumber, // missionId 201 para a missão 1, 202 para a 2, etc.
+      missionId: 201 + missionNumber, // Começando de 203
       missionPoints: 20,
-      title: `Missão Diária: Assistir Anúncio ${missionNumber === 1 ? '' : missionNumber}`, // Título para "Missão Diária: Assistir Anúncio" e "Missão Diária: Assistir Anúncio 2", etc.
-      description: `Assista anúncios para ganhar 20 pontos.`,
+      title: `Missão Diária: Assistir Anúncio ${missionNumber}`,
+      description: `Assista mais anúncios para ganhar 20 pontos.`,
       adLink: `https://stly.link/recompensadiaria${missionNumber}`, // Link de exemplo
       localStorageKey: `anuncio_bonus_${missionNumber}_liberado`,
       collectLink: `/recompensa-anuncio-${missionNumber}`,
@@ -117,21 +131,21 @@ const DailyMissionsPage = () => {
     }, 5000);
 
     return () => clearInterval(watchTimePoller);
-  }, [user]); // Removida a dependência de completedMissions
+  }, [completedMissions, user]); // Adicionado completedMissions e user como dependências
 
   // Efeito para verificar se a missão de anúncio foi liberada
   useEffect(() => {
-    const newUnlocked: Record<number, boolean> = {};
-    AD_MISSIONS_CONFIG.forEach(config => {
-      const isCompleted = JSON.parse(localStorage.getItem('completedMissions') || '[]').includes(config.missionId);
-      if (localStorage.getItem(config.localStorageKey) === 'true' && !isCompleted) {
-        newUnlocked[config.missionId] = true;
-        toast.info(`${config.title.replace(' 1', '')} liberada! Clique em 'Coletar' para ganhar seus pontos.`); // Ajuste no toast para a missão 1
-        localStorage.removeItem(config.localStorageKey);
+    const checkAnuncioLiberado = () => {
+      const liberado = localStorage.getItem('anuncio_bonus_liberado');
+      if (liberado === 'true' && !completedMissions.includes(SHRTFLY_MISSION_ID)) {
+        setAnuncioAssistido(true);
+        toast.info("Missão de anúncio liberada! Clique em 'Coletar' para ganhar seus pontos.");
+        // Remove o indicador para que não seja acionado novamente
+        localStorage.removeItem('anuncio_bonus_liberado');
       }
-    });
-    setUnlockedAdMissions(prev => ({ ...prev, ...newUnlocked }));
-  }, [user, AD_MISSIONS_CONFIG]); // Removida a dependência de completedMissions
+    };
+
+    checkAnuncioLiberado();
 
   const handleSpinRoulette = async () => {
     if (rouletteSpun || !user) return;
@@ -243,11 +257,33 @@ const DailyMissionsPage = () => {
 
           {/* --- Grid de Missões de Tempo e Vídeo --- */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* --- Missões de Anúncio (1 a 11) --- */}
+        {/* --- Missão Diária: Assistir Anúncio (Original) --- */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />Missão Diária: Assistir Anúncio</CardTitle>
+            <CardDescription>Assista anúncios para coletar. (Leva cerca de 1 minuto)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-card-foreground/5 rounded-lg border">
+              <div className="flex items-center gap-4 w-full">
+                <Gift className={`w-6 h-6 ${completedMissions.includes(SHRTFLY_MISSION_ID) ? 'text-green-500' : (anuncioAssistido ? 'text-primary' : 'text-muted-foreground')}`} />
+                <div>
+                  <p className="font-semibold">Veja os anúncios para liberar a coleta.</p>
+                  <p className="text-sm text-primary">Recompensa: {SHRTFLY_MISSION_POINTS} pts</p>
+                </div>
+              </div>
+              <div className="w-full sm:w-auto flex-shrink-0">
+                {completedMissions.includes(SHRTFLY_MISSION_ID) ? (<Button variant="secondary" disabled className="w-full">✓ Concluído</Button>) : anuncioAssistido ? (<Button onClick={() => handleMissionClick(SHRTFLY_MISSION_ID, SHRTFLY_MISSION_POINTS)} className="w-full" disabled={loadingMission === SHRTFLY_MISSION_ID}>{loadingMission === SHRTFLY_MISSION_ID ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}</Button>) : (<a href="https://stly.link/recompensadiaria1" target="_blank" rel="noopener noreferrer" className="w-full"><Button className="w-full">Liberar Coleta</Button></a>)}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* --- 10 Novas Missões de Anúncio --- */}
             {AD_MISSIONS_CONFIG.map((config) => (
               <Card key={config.missionId}>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />{config.title.replace(' 1', '')}</CardTitle>
+              <CardTitle className="flex items-center gap-2"><Gift className="w-6 h-6 text-primary" />{config.title}</CardTitle>
                   <CardDescription>{config.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
