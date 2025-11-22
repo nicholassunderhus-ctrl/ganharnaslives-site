@@ -89,9 +89,9 @@ const DailyMissionsPage = () => {
 
   // --- Estados da Missão de Tempo ---
   const [watchTime, setWatchTime] = useState(0); // Em segundos
-  const WATCH_TIME_GOAL_1_HOUR = 3600; // 60 minutos em segundos
-  const WATCH_TIME_GOAL_3_HOURS = 10800; // 180 minutos em segundos
-  const WATCH_TIME_GOAL_6_HOURS = 21600; // 360 minutos em segundos
+  const WATCH_TIME_GOAL_1 = 10800; // 180 minutos em segundos
+  const WATCH_TIME_GOAL_2 = 21600; // 360 minutos em segundos
+  const WATCH_TIME_GOAL_3 = 43200; // 720 minutos em segundos
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -357,45 +357,45 @@ const DailyMissionsPage = () => {
               <CardDescription>Ganhe pontos por assistir lives por um tempo acumulado hoje.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Missão de 1 Hora */}
+              {/* Missão 1: 180 min */}
               <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
                 <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1_HOUR ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 60 min</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                  </div>
-                </div>
-                <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1_HOUR || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
-                  {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/60)`}
-                </Button>
-              </div>
-
-              {/* Missão de 3 Horas */}
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1 ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div>
                     <p className="font-semibold">Assista 180 min</p>
-                    <p className="text-sm text-primary">Recompensa: 40 pts</p>
+                    <p className="text-sm text-primary">Recompensa: 80 pts</p>
                   </div>
                 </div>
-                <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_3_HOURS || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
-                  {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
+                <Button onClick={() => handleMissionClick(101, 80)} disabled={watchTime < WATCH_TIME_GOAL_1 || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
+                  {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
                 </Button>
               </div>
 
-              {/* Missão de 6 Horas */}
+              {/* Missão 2: 360 min */}
               <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
                 <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_6_HOURS ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_2 ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div>
                     <p className="font-semibold">Assista 360 min</p>
-                    <p className="text-sm text-primary">Recompensa: 60 pts</p>
+                    <p className="text-sm text-primary">Recompensa: 120 pts</p>
                   </div>
                 </div>
-                <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
-                  {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
+                <Button onClick={() => handleMissionClick(102, 120)} disabled={watchTime < WATCH_TIME_GOAL_2 || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
+                  {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
+                </Button>
+              </div>
+
+              {/* Missão 3: 720 min */}
+              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
+                <div className="flex items-center gap-4">
+                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3 ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div>
+                    <p className="font-semibold">Assista 720 min</p>
+                    <p className="text-sm text-primary">Recompensa: 200 pts</p>
+                  </div>
+                </div>
+                <Button onClick={() => handleMissionClick(103, 200)} disabled={watchTime < WATCH_TIME_GOAL_3 || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
+                  {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/720)`}
                 </Button>
               </div>
             </CardContent>
