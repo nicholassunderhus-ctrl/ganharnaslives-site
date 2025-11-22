@@ -33,7 +33,7 @@ const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0
 const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
   id: 301 + i, // IDs de 301 a 309
   title: `Ver Anúncio ${i + 1}`,
-  points: 20,
+  points: 15,
   // Link externo do anúncio (seu encurtador)
   adLink:
     i === 0 ? 'https://stly.link/missao1' :
