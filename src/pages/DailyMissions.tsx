@@ -33,7 +33,7 @@ const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0
 const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
   id: 301 + i, // IDs de 301 a 309
   title: `Ver Anúncio ${i + 1}`,
-  points: 15,
+  points: 10,
   // Link externo do anúncio (seu encurtador)
   adLink:
     i === 0 ? 'https://stly.link/missao1' :
@@ -289,10 +289,10 @@ const DailyMissionsPage = () => {
                   <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1 ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div>
                     <p className="font-semibold">Assista 180 min</p>
-                    <p className="text-sm text-primary">Recompensa: 80 pts</p>
+                    <p className="text-sm text-primary">Recompensa: 70 pts</p>
                   </div>
                 </div>
-                <Button onClick={() => handleMissionClick(101, 80)} disabled={watchTime < WATCH_TIME_GOAL_1 || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
+                <Button onClick={() => handleMissionClick(101, 70)} disabled={watchTime < WATCH_TIME_GOAL_1 || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
                   {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
                 </Button>
               </div>
@@ -303,10 +303,10 @@ const DailyMissionsPage = () => {
                   <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_2 ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div>
                     <p className="font-semibold">Assista 360 min</p>
-                    <p className="text-sm text-primary">Recompensa: 120 pts</p>
+                    <p className="text-sm text-primary">Recompensa: 80 pts</p>
                   </div>
                 </div>
-                <Button onClick={() => handleMissionClick(102, 120)} disabled={watchTime < WATCH_TIME_GOAL_2 || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
+                <Button onClick={() => handleMissionClick(102, 80)} disabled={watchTime < WATCH_TIME_GOAL_2 || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
                   {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
                 </Button>
               </div>
@@ -317,10 +317,10 @@ const DailyMissionsPage = () => {
                   <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3 ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div>
                     <p className="font-semibold">Assista 720 min</p>
-                    <p className="text-sm text-primary">Recompensa: 200 pts</p>
+                    <p className="text-sm text-primary">Recompensa: 150 pts</p>
                   </div>
                 </div>
-                <Button onClick={() => handleMissionClick(103, 200)} disabled={watchTime < WATCH_TIME_GOAL_3 || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
+                <Button onClick={() => handleMissionClick(103, 150)} disabled={watchTime < WATCH_TIME_GOAL_3 || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
                   {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/720)`}
                 </Button>
               </div>
