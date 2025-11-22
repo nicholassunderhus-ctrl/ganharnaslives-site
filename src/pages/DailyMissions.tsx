@@ -306,6 +306,15 @@ const DailyMissionsPage = () => {
     }
   };
 
+  const handleOpenAdAndClose = (adLink: string) => {
+    if (adLink && adLink !== '#') {
+      // Abre o link do anúncio em uma nova aba
+      window.open(adLink, '_blank');
+      // Tenta fechar a aba atual. Pode ser bloqueado pelo navegador.
+      window.close();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Sidebar points={userPoints?.points ?? 0} />
@@ -376,9 +385,9 @@ const DailyMissionsPage = () => {
                           {isLoadingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
                         </Button>
                       ) : (
-                        <a href={isFunctional ? (i === 0 ? 'https://stly.link/missao1' : i === 1 ? 'https://fir3.net/missao2' : i === 2 ? 'https://tpi.li/missao3' : mission.validationLink) : '#'} target="_blank" rel="noopener noreferrer" className="w-full">
-                           <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional}>Ver Anúncio</Button>
-                        </a>
+                        <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional} onClick={() => handleOpenAdAndClose(mission.adLink)}>
+                          Ver Anúncio
+                        </Button>
                       )}
                     </div>
                   );
