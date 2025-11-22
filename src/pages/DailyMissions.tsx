@@ -21,11 +21,10 @@ const MISSIONS: { id: number; text: string; points: number }[] = [
 
 // --- Configuração da Roleta ---
 const ROULETTE_PRIZES = [
-  { points: 10, weight: 40 },  // 40% de chance
+  { points: 10, weight: 50 },  // 50% de chance
   { points: 20, weight: 30 },  // 30% de chance
-  { points: 30, weight: 15 },  // 15% de chance
-  { points: 50, weight: 10 },  // 10% de chance
-  { points: 100, weight: 5 }, // 5% de chance
+  { points: 30, weight: 18 },  // 18% de chance
+  { points: 50, weight: 2 },   // 2% de chance (muito raro)
 ];
 const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
 
