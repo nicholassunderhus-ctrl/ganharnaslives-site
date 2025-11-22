@@ -34,6 +34,11 @@ const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
   id: 301 + i, // IDs de 301 a 309
   title: `Ver Anúncio ${i + 1}`,
   points: 20,
+  // Link externo do anúncio
+  adLink: 
+    i === 0 ? 'https://stly.link/missao1' :
+    i === 1 ? 'https://fir3.net/missao2' :
+    '#',
   // Links de validação para as missões
   validationLink: 
     i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' :
@@ -376,8 +381,8 @@ const DailyMissionsPage = () => {
                           {isLoadingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
                         </Button>
                       ) : (
-                        <a href={isFunctional ? mission.validationLink : '#'} className="w-full">
-                          <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional}>Ver Anúncio</Button>
+                        <a href={isFunctional ? mission.adLink : '#'} target="_blank" rel="noopener noreferrer" className="w-full">
+                           <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional}>Ver Anúncio</Button>
                         </a>
                       )}
                     </div>
