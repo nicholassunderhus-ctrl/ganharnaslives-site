@@ -329,8 +329,8 @@ const DailyMissionsPage = () => {
 
           {/* --- Roleta Diária --- */}
           <Card className="bg-gradient-to-br from-primary/5 to-transparent">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+            <CardHeader className="items-center text-center">
+              <CardTitle className="flex items-center justify-center gap-2 text-xl font-bold uppercase md:text-2xl">
                 <Ticket className="w-6 h-6 text-primary" />
                 Roleta Diária da Sorte
               </CardTitle>
@@ -399,8 +399,10 @@ const DailyMissionsPage = () => {
 
           {/* --- Grid de Missões de Tempo e Vídeo --- */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Clock className="w-6 h-6 text-primary" />Maratona de Lives</CardTitle>
+            <CardHeader className="items-center text-center">
+              <CardTitle className="flex items-center justify-center gap-2 text-xl font-bold uppercase md:text-2xl">
+                <Clock className="w-6 h-6 text-primary" />Maratona de Lives
+              </CardTitle>
               <CardDescription>Ganhe pontos por assistir lives por um tempo acumulado hoje.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
