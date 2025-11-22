@@ -355,12 +355,11 @@ const DailyMissionsPage = () => {
 
           {/* --- Categoria Missão: Ver Anúncios --- */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Eye className="w-6 h-6 text-primary" />
-                Missão: Ver Anúncios
+            <CardHeader className="items-center text-center">
+              <CardTitle className="text-xl font-bold md:text-2xl">
+                GANHAR VENDO ANÚNCIOS
               </CardTitle>
-              <CardDescription>Complete tarefas de anúncio para ganhar pontos extras.</CardDescription>
+              <CardDescription>Você assiste em média 10 anúncios / Média 1min</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
