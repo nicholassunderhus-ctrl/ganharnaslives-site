@@ -38,7 +38,13 @@ const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
   adLink:
     i === 0 ? 'https://stly.link/missao1' :
     i === 1 ? 'https://fir3.net/missao2' :
-    i === 2 ? 'https://tpi.li/missao3' : '#',
+    i === 2 ? 'https://tpi.li/missao3' : 
+    i === 3 ? 'https://gplinks.co/missao4' :
+    i === 4 ? 'https://sox.link/KdV0M8' :
+    i === 5 ? 'https://cuty.io/missao6' :
+    i === 6 ? 'https://exe.io/missao7' :
+    i === 7 ? 'https://fbol.top/missao8' :
+    i === 8 ? 'https://encurtandourl.com/missao9' : '#',
   // Links de validação para as missões
   validationLink: 
     i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' :
