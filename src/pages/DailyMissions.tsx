@@ -34,6 +34,11 @@ const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
   id: 301 + i, // IDs de 301 a 309
   title: `Ver Anúncio ${i + 1}`,
   points: 20,
+  // Link externo do anúncio (seu encurtador)
+  adLink:
+    i === 0 ? 'https://stly.link/missao1' :
+    i === 1 ? 'https://fir3.net/missao2' :
+    i === 2 ? 'https://tpi.li/missao3' : '#',
   // Links de validação para as missões
   validationLink: 
     i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' :
