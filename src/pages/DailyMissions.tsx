@@ -348,50 +348,6 @@ const DailyMissionsPage = () => {
             </CardContent>
           </Card>
 
-          {/* --- Categoria Missão: Ver Anúncios --- */}
-          <Card>
-            <CardHeader className="items-center text-center">
-              <CardTitle className="text-xl font-bold md:text-2xl">
-                GANHAR VENDO ANÚNCIOS
-              </CardTitle>
-              <CardDescription>Você assiste em média 10 anúncios / Média 1min</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {VER_ANUNCIOS_MISSIONS.map((mission, i) => {
-                  const isCompleted = completedMissions.includes(mission.id);
-                  const isUnlocked = unlockedVerAnuncios[mission.id];
-                  const isLoadingThis = loadingMission === mission.id;
-                  // Define quais missões são funcionais (todas as 9)
-                  const isFunctional = i <= 8;
-
-                  return (
-                    <div key={mission.id} className={`p-4 bg-card-foreground/5 rounded-lg border flex flex-col items-center text-center space-y-3 ${!isFunctional && 'opacity-50'}`}>
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <Gift className={`w-6 h-6 ${isCompleted ? 'text-green-500' : (isUnlocked ? 'text-primary' : 'text-muted-foreground')}`} />
-                      </div>
-                      <div>
-                        <p className="font-semibold">{mission.title}</p>
-                        <p className="text-sm text-primary">Recompensa: {mission.points} pts</p>
-                      </div>
-                      {isCompleted ? (
-                        <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
-                      ) : isUnlocked ? (
-                        <Button onClick={() => handleMissionClick(mission.id, mission.points)} className="w-full" disabled={isLoadingThis}>
-                          {isLoadingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
-                        </Button>
-                      ) : (
-                        <a href={isFunctional ? mission.adLink : '#'} target="_blank" rel="noopener noreferrer" className="w-full">
-                           <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional}>Ver Anúncio</Button>
-                        </a>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* --- Grid de Missões de Tempo e Vídeo --- */}
           <Card>
             <CardHeader className="items-center text-center">
@@ -441,6 +397,50 @@ const DailyMissionsPage = () => {
                 <Button onClick={() => handleMissionClick(103, 60)} disabled={watchTime < WATCH_TIME_GOAL_6_HOURS || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
                   {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* --- Categoria Missão: Ver Anúncios --- */}
+          <Card>
+            <CardHeader className="items-center text-center">
+              <CardTitle className="text-xl font-bold md:text-2xl">
+                GANHAR VENDO ANÚNCIOS
+              </CardTitle>
+              <CardDescription>Você assiste em média 10 anúncios / Média 1min</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {VER_ANUNCIOS_MISSIONS.map((mission, i) => {
+                  const isCompleted = completedMissions.includes(mission.id);
+                  const isUnlocked = unlockedVerAnuncios[mission.id];
+                  const isLoadingThis = loadingMission === mission.id;
+                  // Define quais missões são funcionais (todas as 9)
+                  const isFunctional = i <= 8;
+
+                  return (
+                    <div key={mission.id} className={`p-4 bg-card-foreground/5 rounded-lg border flex flex-col items-center text-center space-y-3 ${!isFunctional && 'opacity-50'}`}>
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                        <Gift className={`w-6 h-6 ${isCompleted ? 'text-green-500' : (isUnlocked ? 'text-primary' : 'text-muted-foreground')}`} />
+                      </div>
+                      <div>
+                        <p className="font-semibold">{mission.title}</p>
+                        <p className="text-sm text-primary">Recompensa: {mission.points} pts</p>
+                      </div>
+                      {isCompleted ? (
+                        <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
+                      ) : isUnlocked ? (
+                        <Button onClick={() => handleMissionClick(mission.id, mission.points)} className="w-full" disabled={isLoadingThis}>
+                          {isLoadingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
+                        </Button>
+                      ) : (
+                        <a href={isFunctional ? mission.adLink : '#'} target="_blank" rel="noopener noreferrer" className="w-full">
+                           <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional}>Ver Anúncio</Button>
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
