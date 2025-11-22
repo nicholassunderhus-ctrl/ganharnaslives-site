@@ -78,10 +78,6 @@ const DailyMissionsPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // --- Estado para as missões "Ver Anúncios" ---
-  const [unlockedVerAnuncios, setUnlockedVerAnuncios] = useState<Record<number, boolean>>({});
-
-
   // --- Estados da Roleta ---
   const [rouletteSpun, setRouletteSpun] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
@@ -93,6 +89,9 @@ const DailyMissionsPage = () => {
   const WATCH_TIME_GOAL_2 = 21600; // 360 minutos em segundos
   const WATCH_TIME_GOAL_3 = 43200; // 720 minutos em segundos
 
+  // --- Estado para as missões "Ver Anúncios" ---
+  const [unlockedVerAnuncios, setUnlockedVerAnuncios] = useState<Record<number, boolean>>({});
+
   useEffect(() => {
     const today = new Date().toDateString();
     
@@ -101,7 +100,10 @@ const DailyMissionsPage = () => {
     if (missionsStoredDate !== today) {
       localStorage.setItem('completedMissions', '[]');
       localStorage.setItem('missionsLastResetDate', today);
+      // Limpa também as missões liberadas no novo dia
+      localStorage.setItem('unlockedMissions', '{}');
       setCompletedMissions([]);
+      setUnlockedVerAnuncios({});
     } else {
       const storedCompleted = JSON.parse(localStorage.getItem('completedMissions') || '[]');
       setCompletedMissions(storedCompleted);
@@ -141,109 +143,33 @@ const DailyMissionsPage = () => {
     return () => clearInterval(watchTimePoller);
   }, [completedMissions, user]); // Adicionado completedMissions e user como dependências
 
-  // Efeito para verificar a liberação da missão "Ver Anúncio 1"
+  // Efeito para verificar a liberação de TODAS as missões "Ver Anúncio"
   useEffect(() => {
-    const checkVerAnuncio1Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[0].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_1_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_1_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 1' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[0].localStorageKey);
+    // Carrega as missões já liberadas do localStorage ao iniciar
+    const storedUnlocked = JSON.parse(localStorage.getItem('unlockedMissions') || '{}');
+    setUnlockedVerAnuncios(storedUnlocked);
+
+    const checkUnlockedMissions = () => {
+      let newUnlocked: Record<number, boolean> = { ...storedUnlocked };
+      let hasNewUnlock = false;
+
+      VER_ANUNCIOS_MISSIONS.forEach(mission => {
+        const liberado = localStorage.getItem(mission.localStorageKey);
+        if (liberado === 'true' && !completedMissions.includes(mission.id) && !newUnlocked[mission.id]) {
+          newUnlocked[mission.id] = true;
+          hasNewUnlock = true;
+          toast.info(`Missão '${mission.title}' liberada! Clique em 'Coletar' para ganhar seus pontos.`);
+          localStorage.removeItem(mission.localStorageKey); // Remove a chave de liberação individual
+        }
+      });
+
+      if (hasNewUnlock) {
+        localStorage.setItem('unlockedMissions', JSON.stringify(newUnlocked));
+        setUnlockedVerAnuncios(newUnlocked);
       }
     };
 
-    checkVerAnuncio1Liberado();
-  }, [completedMissions]);
-
-  // Efeito para verificar a liberação da missão "Ver Anúncio 2"
-  useEffect(() => {
-    const checkVerAnuncio2Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[1].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_2_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_2_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 2' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[1].localStorageKey);
-      }
-    };
-
-    checkVerAnuncio2Liberado();
-  }, [completedMissions]);
-
-  // Efeito para verificar a liberação da missão "Ver Anúncio 3"
-  useEffect(() => {
-    const checkVerAnuncio3Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[2].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_3_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_3_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 3' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[2].localStorageKey);
-      }
-    };
-
-    checkVerAnuncio3Liberado();
-  }, [completedMissions]);
-
-  // Efeitos para as missões 4 a 9
-  useEffect(() => {
-    const checkVerAnuncio4Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[3].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_4_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_4_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 4' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[3].localStorageKey);
-      }
-    };
-    checkVerAnuncio4Liberado();
-
-    const checkVerAnuncio5Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[4].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_5_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_5_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 5' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[4].localStorageKey);
-      }
-    };
-    checkVerAnuncio5Liberado();
-
-    const checkVerAnuncio6Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[5].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_6_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_6_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 6' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[5].localStorageKey);
-      }
-    };
-    checkVerAnuncio6Liberado();
-
-    const checkVerAnuncio7Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[6].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_7_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_7_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 7' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[6].localStorageKey);
-      }
-    };
-    checkVerAnuncio7Liberado();
-
-    const checkVerAnuncio8Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[7].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_8_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_8_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 8' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[7].localStorageKey);
-      }
-    };
-    checkVerAnuncio8Liberado();
-
-    const checkVerAnuncio9Liberado = () => {
-      const liberado = localStorage.getItem(VER_ANUNCIOS_MISSIONS[8].localStorageKey);
-      if (liberado === 'true' && !completedMissions.includes(VER_ANUNCIO_9_MISSION_ID)) {
-        setUnlockedVerAnuncios(prev => ({ ...prev, [VER_ANUNCIO_9_MISSION_ID]: true }));
-        toast.info("Missão 'Ver Anúncio 9' liberada! Clique em 'Coletar' para ganhar seus pontos.");
-        localStorage.removeItem(VER_ANUNCIOS_MISSIONS[8].localStorageKey);
-      }
-    };
-    checkVerAnuncio9Liberado();
+    checkUnlockedMissions();
   }, [completedMissions]);
 
   const handleSpinRoulette = async () => {
