@@ -48,8 +48,12 @@ const Auth = () => {
       await signIn(email, password);
       navigate("/dashboard");
     } catch (err: any) {
-      // Exibe a mensagem de erro vinda da nossa Edge Function (ex: "Este IP já foi usado hoje...")
-      toast.error("Erro ao criar conta", { description: err.message });
+      // CORREÇÃO: A mensagem de erro da Edge Function vem dentro de `err.context.json.error`.
+      // Se essa mensagem existir, a usamos. Caso contrário, usamos a mensagem de erro padrão.
+      const errorMessage = err?.context?.json?.error || err.message || "Ocorreu um erro desconhecido.";
+      toast.error("Erro ao criar conta", { 
+        description: errorMessage
+      });
     } finally {
       setIsLoading(false);
     }

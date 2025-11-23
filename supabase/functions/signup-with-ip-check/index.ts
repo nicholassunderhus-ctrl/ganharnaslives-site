@@ -41,7 +41,7 @@ serve(async (req: Request, connInfo: ConnInfo) => { // Adicionado connInfo
     // Se o IP já foi usado hoje, bloqueia o cadastro com a mensagem personalizada.
     if (existingIp) {
       return new Response(
-        JSON.stringify({ error: 'Este IP já foi usado hoje. Para criar múltiplas contas, use a VPN gratuita do navegador Opera GX.' }),
+        JSON.stringify({ error: 'Detectamos que este IP já foi usado hoje. Para criar uma nova conta, por favor, utilize a VPN gratuita do navegador Opera GX.' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 429 } // 429: Too Many Requests
       )
     }
