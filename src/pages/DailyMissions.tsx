@@ -309,7 +309,7 @@ const DailyMissionsPage = () => {
                   <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3 ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div>
                     <p className="font-semibold">Assista 180 min</p>
-                    <p className="text-sm text-primary">Recompensa: 70 pts</p>
+                    <p className="text-sm text-primary">Recompensa: 60 pts</p>
                   </div>
                 </div>
                 <Button onClick={() => handleMissionClick(103, 70)} disabled={watchTime < WATCH_TIME_GOAL_3 || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
@@ -337,7 +337,7 @@ const DailyMissionsPage = () => {
                   <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_5 ? 'text-primary' : 'text-muted-foreground'}`} />
                   <div>
                     <p className="font-semibold">Assista 720 min</p>
-                    <p className="text-sm text-primary">Recompensa: 150 pts</p>
+                    <p className="text-sm text-primary">Recompensa: 120 pts</p>
                   </div>
                 </div>
                 <Button onClick={() => handleMissionClick(105, 150)} disabled={watchTime < WATCH_TIME_GOAL_5 || completedMissions.includes(105) || loadingMission === 105} variant={completedMissions.includes(105) ? "secondary" : "default"}>
