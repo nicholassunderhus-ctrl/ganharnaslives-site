@@ -32,18 +32,24 @@ const Auth = () => {
     const username = formData.get("username") as string;
 
     try {
-      // AGORA USAMOS A FUNÇÃO PADRÃO. O gatilho no banco de dados fará o bloqueio.
-      const { error } = await signUp(email, password, { username });
-      if (error) {
-        // O erro de bloqueio de IP virá diretamente do banco de dados.
-        throw error;
+      // Voltamos a chamar a Edge Function, que é o método correto e seguro.
+      const { data, error } = await supabase.functions.invoke('signup-with-ip-check', {
+        body: { email, password, username },
+      });
+
+      if (error) throw new Error(error.message); // Erros de rede ou da própria função
+
+      if (data.error) {
+        // Erros de lógica de negócio retornados pela função (IP bloqueado, email existente)
+        throw new Error(data.error);
       }
 
       toast.success("Conta criada com sucesso!");
       await signIn(email, password);
       navigate("/dashboard");
     } catch (err: any) {
-      toast.error("Erro ao criar conta", { description: err.message || "Ocorreu um erro desconhecido." });
+      // Exibe a mensagem de erro vinda da nossa Edge Function (ex: "Este IP já foi usado hoje...")
+      toast.error("Erro ao criar conta", { description: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -70,8 +76,11 @@ const Auth = () => {
 
       // Chama uma função para registrar o IP do usuário no backend, sem bloquear o fluxo.
       // Usamos 'invoke' com a opção 'no-wait' para não atrasar o login do usuário.
+      // A autenticação é passada no header para que a Edge Function possa ser chamada.
       supabase.functions.invoke('log-ip-on-signin', {
-        headers: { "Content-Type": "application/json" }
+        headers: { 
+          'Authorization': `Bearer ${data.session.access_token}`
+        }
       }).catch(console.error);
 
       // Lógica para aviso de multicontas no mesmo IP/Navegador
