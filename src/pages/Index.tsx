@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Link } from "react-router-dom";
-import { Coins, Eye, TrendingUp, Wallet, Play, Users, Clock } from "lucide-react";
+import { Coins, Eye, Wallet, Play, Users } from "lucide-react";
 import heroImage from "@/assets/hero-bg.png";
-import Popunder from "@/components/Popunder"; // 1. Importe o novo componente
+import Popunder from "./Popunder"; // Caminho de importação corrigido
 import { PlatformIcon } from "@/components/PlatformIcon";
 import { Platform } from "@/types";
 
