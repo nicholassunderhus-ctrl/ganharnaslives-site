@@ -53,7 +53,7 @@ const Auth = () => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const { error } = await signIn(email, password);
+    const { data, error } = await signIn(email, password);
     
     if (error) {
       if (error.message.includes("Invalid login credentials")) {
@@ -65,15 +65,13 @@ const Auth = () => {
       toast.success("Login realizado com sucesso!");
 
       // Lógica para aviso de multicontas no mesmo IP/Navegador
-      const { data: { user } } = await signUp(email, password, { username }, true); // Usando signUp para pegar o user object
-      if (user) {
+      if (data.user) {
         try {
           const loggedInUsersKey = 'loggedInUserIds';
           const storedUsers = localStorage.getItem(loggedInUsersKey);
           let userIds: string[] = storedUsers ? JSON.parse(storedUsers) : [];
-
-          if (!userIds.includes(user.id)) {
-            userIds.push(user.id);
+          if (!userIds.includes(data.user.id)) {
+            userIds.push(data.user.id);
             localStorage.setItem(loggedInUsersKey, JSON.stringify(userIds));
           }
 
