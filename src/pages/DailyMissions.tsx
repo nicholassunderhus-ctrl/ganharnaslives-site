@@ -29,32 +29,26 @@ const ROULETTE_PRIZES = [
 const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
 
 // --- Configuração das Missões "Ver Anúncios" ---
-const VER_ANUNCIOS_MISSIONS = Array.from({ length: 9 }, (_, i) => ({
-  id: 301 + i, // IDs de 301 a 309
+const VER_ANUNCIOS_MISSIONS = Array.from({ length: 6 }, (_, i) => ({
+  id: 301 + i, // IDs de 301 a 306
   title: `Ver Anúncio ${i + 1}`,
   points: 10,
   // Link externo do anúncio (seu encurtador)
   adLink:
-    i === 0 ? 'https://stly.link/missao1' :
-    i === 1 ? 'https://fir3.net/missao2' :
-    i === 2 ? 'https://tpi.li/missao3' : 
-    i === 3 ? 'https://gplinks.co/missao4' :
-    i === 4 ? 'https://sox.link/KdV0M8' :
-    i === 5 ? 'https://cuty.io/missao6' :
-    i === 6 ? 'https://exe.io/missao7' :
-    i === 7 ? 'https://fbol.top/missao8' :
-    i === 8 ? 'https://encurtandourl.com/missao9' : '#',
+    i === 0 ? 'https://cuty.io/missao1' :
+    i === 1 ? 'https://stly.link/missao2' :
+    i === 2 ? 'https://encurtandourl.com/missao3' :
+    i === 3 ? 'https://4br.me/missao4' :
+    i === 4 ? 'https://tpi.li/missao5' :
+    i === 5 ? 'https://liink.uk/missao6' : '#',
   // Links de validação para as missões
-  validationLink: 
+  validationLink:
     i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' :
     i === 1 ? '/recompensa/validar-anuncio-id-va2-d4e5f6' :
     i === 2 ? '/recompensa/validar-anuncio-id-va3-g7h8i9' :
     i === 3 ? '/recompensa/validar-anuncio-id-va4-j1k2l3' :
     i === 4 ? '/recompensa/validar-anuncio-id-va5-m4n5o6' :
-    i === 5 ? '/recompensa/validar-anuncio-id-va6-p7q8r9' :
-    i === 6 ? '/recompensa/validar-anuncio-id-va7-s1t2u3' :
-    i === 7 ? '/recompensa/validar-anuncio-id-va8-v4w5x6' :
-    i === 8 ? '/recompensa/validar-anuncio-id-va9-y7z8a9' : '#',
+    i === 5 ? '/recompensa/validar-anuncio-id-va6-p7q8r9' : '#',
   localStorageKey: `ver_anuncio_${i + 1}_liberado`,
 }));
 
@@ -65,10 +59,6 @@ const VER_ANUNCIO_3_MISSION_ID = VER_ANUNCIOS_MISSIONS[2].id;
 const VER_ANUNCIO_4_MISSION_ID = VER_ANUNCIOS_MISSIONS[3].id;
 const VER_ANUNCIO_5_MISSION_ID = VER_ANUNCIOS_MISSIONS[4].id;
 const VER_ANUNCIO_6_MISSION_ID = VER_ANUNCIOS_MISSIONS[5].id;
-const VER_ANUNCIO_7_MISSION_ID = VER_ANUNCIOS_MISSIONS[6].id;
-const VER_ANUNCIO_8_MISSION_ID = VER_ANUNCIOS_MISSIONS[7].id;
-const VER_ANUNCIO_9_MISSION_ID = VER_ANUNCIOS_MISSIONS[8].id;
-
 
 const DailyMissionsPage = () => {
   const { userPoints } = useUserPoints();
