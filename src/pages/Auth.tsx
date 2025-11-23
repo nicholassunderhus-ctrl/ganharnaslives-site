@@ -253,6 +253,9 @@ const Auth = () => {
                     Termos de Uso
                   </a>
                 </p>
+                <p className="text-xs text-center text-muted-foreground mt-2">
+                  (Para criar multicontas use o VPN do OperaGX)
+                </p>
               </form>
             </TabsContent>
           </Tabs>
