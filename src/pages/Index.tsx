@@ -2,19 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Link } from "react-router-dom";
-import { Coins, Eye, Wallet, Play, Users } from "lucide-react";
+import { Coins, Eye, TrendingUp, Wallet, Play, Users, Clock } from "lucide-react";
 import heroImage from "@/assets/hero-bg.png";
-import Popunder from "./Popunder"; // Caminho de importação corrigido
 import { PlatformIcon } from "@/components/PlatformIcon";
 import { Platform } from "@/types";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      {/* 2. Adicione o componente Popunder aqui. Ele não renderiza nada visual. */}
-      {/* ATENÇÃO: Use com extrema cautela. Isto pode ser muito irritante para os usuários. */}
-      <Popunder url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
-
       <Navbar />
       
       {/* Hero Section */}
