@@ -249,7 +249,7 @@ const DailyMissionsPage = () => {
               </CardTitle>
               <CardDescription>
                 Ganhe pontos por assistir lives por um tempo acumulado hoje. <br />
-                Ao atingir a meta, assista ao anúncio para liberar a coleta dos pontos.
+                (Ao atingir a meta, assista ao anúncio para liberar a coleta dos pontos)
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -63,6 +63,30 @@ const Auth = () => {
       }
     } else {
       toast.success("Login realizado com sucesso!");
+
+      // Lógica para aviso de multicontas no mesmo IP/Navegador
+      const { data: { user } } = await signUp(email, password, { username }, true); // Usando signUp para pegar o user object
+      if (user) {
+        try {
+          const loggedInUsersKey = 'loggedInUserIds';
+          const storedUsers = localStorage.getItem(loggedInUsersKey);
+          let userIds: string[] = storedUsers ? JSON.parse(storedUsers) : [];
+
+          if (!userIds.includes(user.id)) {
+            userIds.push(user.id);
+            localStorage.setItem(loggedInUsersKey, JSON.stringify(userIds));
+          }
+
+          if (userIds.length > 1) {
+            toast.warning("Aviso de Múltiplas Contas", {
+              description: "Detectamos o uso de mais de uma conta neste navegador. Para garantir que você consiga sacar seus pontos, é essencial o uso de uma VPN. Sem ela, seus saques poderão ser bloqueados por segurança.",
+              duration: Infinity, // Mantém o aviso na tela até ser fechado pelo usuário
+            });
+          }
+        } catch (e) {
+          console.error("Erro ao verificar múltiplas contas:", e);
+        }
+      }
     }
     
     setIsLoading(false);
