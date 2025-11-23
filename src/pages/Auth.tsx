@@ -32,24 +32,18 @@ const Auth = () => {
     const username = formData.get("username") as string;
 
     try {
-      // Chama a Edge Function para o cadastro com verificação de IP
-      const { data, error } = await supabase.functions.invoke('signup-with-ip-check', {
-        body: { email, password, username },
-      });
-
-      if (error) throw new Error(error.message); // Erros de rede ou da própria função
-
-      if (data.error) {
-        // Erros de lógica de negócio retornados pela função (IP bloqueado, email existente)
-        throw new Error(data.error);
+      // AGORA USAMOS A FUNÇÃO PADRÃO. O gatilho no banco de dados fará o bloqueio.
+      const { error } = await signUp(email, password, { username });
+      if (error) {
+        // O erro de bloqueio de IP virá diretamente do banco de dados.
+        throw error;
       }
 
       toast.success("Conta criada com sucesso!");
-      // Opcional: Fazer login automático após o cadastro bem-sucedido
       await signIn(email, password);
       navigate("/dashboard");
     } catch (err: any) {
-      toast.error("Erro ao criar conta", { description: err.message });
+      toast.error("Erro ao criar conta", { description: err.message || "Ocorreu um erro desconhecido." });
     } finally {
       setIsLoading(false);
     }
