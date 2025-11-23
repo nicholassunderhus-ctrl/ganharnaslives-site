@@ -76,12 +76,8 @@ const Auth = () => {
 
       // Chama uma função para registrar o IP do usuário no backend, sem bloquear o fluxo.
       // Usamos 'invoke' com a opção 'no-wait' para não atrasar o login do usuário.
-      // A autenticação é passada no header para que a Edge Function possa ser chamada.
-      supabase.functions.invoke('log-ip-on-signin', {
-        headers: { 
-          'Authorization': `Bearer ${data.session.access_token}`
-        }
-      }).catch(console.error);
+      // A função agora é pública e não precisa mais do header de autorização.
+      supabase.functions.invoke('log-ip-on-signin').catch(console.error);
 
       // Lógica para aviso de multicontas no mesmo IP/Navegador
       if (data.user) {

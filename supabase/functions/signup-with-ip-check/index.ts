@@ -2,7 +2,7 @@ import { serve, ConnInfo } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
-serve(async (req: Request, connInfo: ConnInfo) => {
+serve(async (req: Request, connInfo: ConnInfo) => { // Adicionado connInfo
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -10,7 +10,7 @@ serve(async (req: Request, connInfo: ConnInfo) => {
   try {
     const { email, password, username } = await req.json()
 
-    const ip_address = (connInfo.remoteAddr as Deno.NetAddr).hostname;
+    const ip_address = req.headers.get('x-forwarded-for')?.split(',')[0].trim();
     if (!ip_address) {
       // Se não conseguir identificar o IP, retorna a mensagem solicitada.
       return new Response(

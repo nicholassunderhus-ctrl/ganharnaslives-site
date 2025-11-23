@@ -2,14 +2,19 @@ import { serve, ConnInfo } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
-serve(async (req: Request, connInfo: ConnInfo) => {
+serve(async (req: Request, connInfo: ConnInfo) => { // Adicionado connInfo
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Forma mais robusta de obter o IP do usuário
-    const ip_address = (connInfo.remoteAddr as Deno.NetAddr).hostname;
+    // Validação do token do usuário não é mais necessária aqui.
+    // A função será chamada publicamente, apenas para registrar o IP.
+
+    // Pega o IP do usuário da conexão.
+    // O cabeçalho 'x-forwarded-for' é o padrão usado pela infraestrutura do Supabase.
+    const ip_address = req.headers.get('x-forwarded-for')?.split(',')[0].trim();
+
     if (!ip_address) {
       // Se não conseguir pegar o IP, apenas retorna sem erro para não bloquear o login.
       return new Response(JSON.stringify({ message: 'IP not found' }), {
