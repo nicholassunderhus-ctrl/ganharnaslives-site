@@ -247,7 +247,10 @@ const DailyMissionsPage = () => {
               <CardTitle className="flex items-center justify-center gap-2 text-xl font-bold uppercase md:text-2xl">
                 <Clock className="w-6 h-6 text-primary" />Maratona de Lives
               </CardTitle>
-              <CardDescription>Ganhe pontos por assistir lives por um tempo acumulado hoje.</CardDescription>
+              <CardDescription>
+                Ganhe pontos por assistir lives por um tempo acumulado hoje. <br />
+                Ao atingir a meta, assista ao anúncio para liberar a coleta dos pontos.
+              </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {MARATHON_MISSIONS.map((mission) => {
