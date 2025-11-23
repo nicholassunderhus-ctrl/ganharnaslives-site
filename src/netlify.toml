@@ -1,0 +1,7 @@
+# Configuração de redirecionamento para Single-Page Applications (SPA)
+# Isso garante que ao recarregar qualquer página, o app React continue funcionando.
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
