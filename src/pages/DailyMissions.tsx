@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from "@/components/Sidebar";
 import { useUserPoints } from "@/hooks/useUserPoints";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Gift, Loader2, Ticket, Clock, Hourglass, Trophy, Eye } from 'lucide-react';
+import { Gift, Loader2, Ticket, Clock, Eye } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
-
-import { AdMissionCard } from '@/components/AdMissionCard';
 // =================================================================================
 // ATENÇÃO: Adicione as missões do dia aqui dentro desta lista (máximo 10).
 // A roleta diária já está configurada e não precisa ser adicionada aqui.
@@ -28,37 +26,20 @@ const ROULETTE_PRIZES = [
 ];
 const totalWeight = ROULETTE_PRIZES.reduce((sum, prize) => sum + prize.weight, 0);
 
-// --- Configuração das Missões "Ver Anúncios" ---
-const VER_ANUNCIOS_MISSIONS = Array.from({ length: 6 }, (_, i) => ({
-  id: 301 + i, // IDs de 301 a 306
-  title: `Ver Anúncio ${i + 1}`,
-  points: 10,
-  // Link externo do anúncio (seu encurtador)
-  adLink:
-    i === 0 ? 'https://cuty.io/missao1' :
-    i === 1 ? 'https://stly.link/missao2' :
-    i === 2 ? 'https://encurtandourl.com/missao3' :
-    i === 3 ? 'https://4br.me/missao4' :
-    i === 4 ? 'https://tpi.li/missao5' :
-    i === 5 ? 'https://liink.uk/missao6' : '#',
-  // Links de validação para as missões
-  validationLink:
-    i === 0 ? '/recompensa/validar-anuncio-id-va1-a1b2c3' :
-    i === 1 ? '/recompensa/validar-anuncio-id-va2-d4e5f6' :
-    i === 2 ? '/recompensa/validar-anuncio-id-va3-g7h8i9' :
-    i === 3 ? '/recompensa/validar-anuncio-id-va4-j1k2l3' :
-    i === 4 ? '/recompensa/validar-anuncio-id-va5-m4n5o6' :
-    i === 5 ? '/recompensa/validar-anuncio-id-va6-p7q8r9' : '#',
-  localStorageKey: `ver_anuncio_${i + 1}_liberado`,
+// --- Configuração das Missões Unificadas (Maratona + Anúncios) ---
+const MARATHON_MISSIONS = [
+  { id: 101, watchTimeGoal: 3600,  displayTime: 60,  points: 20,  adLink: 'https://cuty.io/missao1',         localStorageKey: 'ver_anuncio_1_liberado' },
+  { id: 102, watchTimeGoal: 7200,  displayTime: 120, points: 40,  adLink: 'https://stly.link/missao2',        localStorageKey: 'ver_anuncio_2_liberado' },
+  { id: 103, watchTimeGoal: 10800, displayTime: 180, points: 60,  adLink: 'https://encurtandourl.com/missao3', localStorageKey: 'ver_anuncio_3_liberado' },
+  { id: 104, watchTimeGoal: 21600, displayTime: 360, points: 80,  adLink: 'https://4br.me/missao4',           localStorageKey: 'ver_anuncio_4_liberado' },
+  { id: 105, watchTimeGoal: 43200, displayTime: 720, points: 120, adLink: 'https://tpi.li/missao5',           localStorageKey: 'ver_anuncio_5_liberado' },
+  { id: 106, watchTimeGoal: 54000, displayTime: 900, points: 180, adLink: 'https://liink.uk/missao6',         localStorageKey: 'ver_anuncio_6_liberado' },
+].map((mission, i) => ({
+  ...mission,
+  title: `Assista ${mission.displayTime} min e veja um anúncio`,
+  // Gera o link de validação dinamicamente
+  validationLink: `/recompensa/validar-anuncio-id-va${i + 1}-${Math.random().toString(36).substring(2, 8)}`,
 }));
-
-// Pega os IDs das missões para facilitar o uso
-const VER_ANUNCIO_1_MISSION_ID = VER_ANUNCIOS_MISSIONS[0].id;
-const VER_ANUNCIO_2_MISSION_ID = VER_ANUNCIOS_MISSIONS[1].id;
-const VER_ANUNCIO_3_MISSION_ID = VER_ANUNCIOS_MISSIONS[2].id;
-const VER_ANUNCIO_4_MISSION_ID = VER_ANUNCIOS_MISSIONS[3].id;
-const VER_ANUNCIO_5_MISSION_ID = VER_ANUNCIOS_MISSIONS[4].id;
-const VER_ANUNCIO_6_MISSION_ID = VER_ANUNCIOS_MISSIONS[5].id;
 
 const DailyMissionsPage = () => {
   const { userPoints } = useUserPoints();
@@ -74,15 +55,9 @@ const DailyMissionsPage = () => {
 
   // --- Estados da Missão de Tempo ---
   const [watchTime, setWatchTime] = useState(0); // Em segundos
-  const WATCH_TIME_GOAL_1 = 3600;  // 60 minutos em segundos
-  const WATCH_TIME_GOAL_2 = 7200;  // 120 minutos em segundos
-  const WATCH_TIME_GOAL_3 = 10800; // 180 minutos em segundos
-  const WATCH_TIME_GOAL_4 = 21600; // 360 minutos em segundos
-  const WATCH_TIME_GOAL_5 = 43200; // 720 minutos em segundos
-  const WATCH_TIME_GOAL_6 = 54000; // 900 minutos em segundos
 
   // --- Estado para as missões "Ver Anúncios" ---
-  const [unlockedVerAnuncios, setUnlockedVerAnuncios] = useState<Record<number, boolean>>({});
+  const [unlockedMissions, setUnlockedMissions] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -95,7 +70,7 @@ const DailyMissionsPage = () => {
       // Limpa também as missões liberadas no novo dia
       localStorage.setItem('unlockedMissions', '{}');
       setCompletedMissions([]);
-      setUnlockedVerAnuncios({});
+      setUnlockedMissions({});
     } else {
       const storedCompleted = JSON.parse(localStorage.getItem('completedMissions') || '[]');
       setCompletedMissions(storedCompleted);
@@ -139,25 +114,25 @@ const DailyMissionsPage = () => {
   useEffect(() => {
     // Carrega as missões já liberadas do localStorage ao iniciar
     const storedUnlocked = JSON.parse(localStorage.getItem('unlockedMissions') || '{}');
-    setUnlockedVerAnuncios(storedUnlocked);
+    setUnlockedMissions(storedUnlocked);
 
     const checkUnlockedMissions = () => {
       let newUnlocked: Record<number, boolean> = { ...storedUnlocked };
       let hasNewUnlock = false;
 
-      VER_ANUNCIOS_MISSIONS.forEach(mission => {
+      MARATHON_MISSIONS.forEach(mission => {
         const liberado = localStorage.getItem(mission.localStorageKey);
         if (liberado === 'true' && !completedMissions.includes(mission.id) && !newUnlocked[mission.id]) {
           newUnlocked[mission.id] = true;
           hasNewUnlock = true;
-          toast.info(`Missão '${mission.title}' liberada! Clique em 'Coletar' para ganhar seus pontos.`);
+          toast.info(`Missão liberada! Clique em 'Coletar' para ganhar seus pontos.`);
           localStorage.removeItem(mission.localStorageKey); // Remove a chave de liberação individual
         }
       });
 
       if (hasNewUnlock) {
         localStorage.setItem('unlockedMissions', JSON.stringify(newUnlocked));
-        setUnlockedVerAnuncios(newUnlocked);
+        setUnlockedMissions(newUnlocked);
       }
     };
 
@@ -274,119 +249,28 @@ const DailyMissionsPage = () => {
               </CardTitle>
               <CardDescription>Ganhe pontos por assistir lives por um tempo acumulado hoje.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Missão 1: 60 min */}
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_1 ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 60 min</p>
-                    <p className="text-sm text-primary">Recompensa: 20 pts</p>
-                  </div>
-                </div>
-                <Button onClick={() => handleMissionClick(101, 20)} disabled={watchTime < WATCH_TIME_GOAL_1 || completedMissions.includes(101) || loadingMission === 101} variant={completedMissions.includes(101) ? "secondary" : "default"}>
-                  {completedMissions.includes(101) ? "✓" : `(${Math.floor(watchTime / 60)}/60)`}
-                </Button>
-              </div>
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {MARATHON_MISSIONS.map((mission) => {
+                const isCompleted = completedMissions.includes(mission.id);
+                const isUnlocked = unlockedMissions[mission.id];
+                const timeGoalMet = watchTime >= mission.watchTimeGoal;
+                const isLoadingThis = loadingMission === mission.id;
 
-              {/* Missão 2: 120 min */}
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_2 ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 120 min</p>
-                    <p className="text-sm text-primary">Recompensa: 40 pts</p>
-                  </div>
-                </div>
-                <Button onClick={() => handleMissionClick(102, 40)} disabled={watchTime < WATCH_TIME_GOAL_2 || completedMissions.includes(102) || loadingMission === 102} variant={completedMissions.includes(102) ? "secondary" : "default"}>
-                  {completedMissions.includes(102) ? "✓" : `(${Math.floor(watchTime / 60)}/120)`}
-                </Button>
-              </div>
-
-              {/* Missão 3: 180 min */}
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_3 ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 180 min</p>
-                    <p className="text-sm text-primary">Recompensa: 60 pts</p>
-                  </div>
-                </div>
-                <Button onClick={() => handleMissionClick(103, 70)} disabled={watchTime < WATCH_TIME_GOAL_3 || completedMissions.includes(103) || loadingMission === 103} variant={completedMissions.includes(103) ? "secondary" : "default"}>
-                  {completedMissions.includes(103) ? "✓" : `(${Math.floor(watchTime / 60)}/180)`}
-                </Button>
-              </div>
-
-              {/* Missão 4: 360 min */}
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_4 ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 360 min</p>
-                    <p className="text-sm text-primary">Recompensa: 80 pts</p>
-                  </div>
-                </div>
-                <Button onClick={() => handleMissionClick(104, 80)} disabled={watchTime < WATCH_TIME_GOAL_4 || completedMissions.includes(104) || loadingMission === 104} variant={completedMissions.includes(104) ? "secondary" : "default"}>
-                  {completedMissions.includes(104) ? "✓" : `(${Math.floor(watchTime / 60)}/360)`}
-                </Button>
-              </div>
-
-              {/* Missão 5: 720 min */}
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_5 ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 720 min</p>
-                    <p className="text-sm text-primary">Recompensa: 120 pts</p>
-                  </div>
-                </div>
-                <Button onClick={() => handleMissionClick(105, 150)} disabled={watchTime < WATCH_TIME_GOAL_5 || completedMissions.includes(105) || loadingMission === 105} variant={completedMissions.includes(105) ? "secondary" : "default"}>
-                  {completedMissions.includes(105) ? "✓" : `(${Math.floor(watchTime / 60)}/720)`}
-                </Button>
-              </div>
-
-              {/* Missão 6: 900 min */}
-              <div className="flex items-center justify-between p-4 bg-card-foreground/5 rounded-lg border">
-                <div className="flex items-center gap-4">
-                  <Gift className={`w-6 h-6 ${watchTime >= WATCH_TIME_GOAL_6 ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <div>
-                    <p className="font-semibold">Assista 900 min</p>
-                    <p className="text-sm text-primary">Recompensa: 180 pts</p>
-                  </div>
-                </div>
-                <Button onClick={() => handleMissionClick(106, 180)} disabled={watchTime < WATCH_TIME_GOAL_6 || completedMissions.includes(106) || loadingMission === 106} variant={completedMissions.includes(106) ? "secondary" : "default"}>
-                  {completedMissions.includes(106) ? "✓" : `(${Math.floor(watchTime / 60)}/900)`}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* --- Categoria Missão: Ver Anúncios --- */}
-          <Card>
-            <CardHeader className="items-center text-center">
-              <CardTitle className="text-xl font-bold md:text-2xl">
-                GANHAR VENDO ANÚNCIOS
-              </CardTitle>
-              <CardDescription>Você assiste em média 10 anúncios / Média 1min</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {VER_ANUNCIOS_MISSIONS.map((mission, i) => {
-                  const isCompleted = completedMissions.includes(mission.id);
-                  const isUnlocked = unlockedVerAnuncios[mission.id];
-                  const isLoadingThis = loadingMission === mission.id;
-                  // Define quais missões são funcionais (todas as 9)
-                  const isFunctional = i <= 8;
-
-                  return (
-                    <div key={mission.id} className={`p-4 bg-card-foreground/5 rounded-lg border flex flex-col items-center text-center space-y-3 ${!isFunctional && 'opacity-50'}`}>
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                        <Gift className={`w-6 h-6 ${isCompleted ? 'text-green-500' : (isUnlocked ? 'text-primary' : 'text-muted-foreground')}`} />
+                return (
+                  <Card key={mission.id} className="flex flex-col text-center">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mx-auto">
+                        <Gift className={`w-6 h-6 ${isCompleted ? 'text-green-500' : (isUnlocked || timeGoalMet ? 'text-primary' : 'text-muted-foreground')}`} />
                       </div>
-                      <div>
-                        <p className="font-semibold">{mission.title}</p>
-                        <p className="text-sm text-primary">Recompensa: {mission.points} pts</p>
-                      </div>
+                      <p className="font-semibold pt-2">{mission.title}</p>
+                      <p className="text-sm text-primary">Recompensa: {mission.points} pts</p>
+                    </CardHeader>
+                    <CardContent className="flex-grow flex items-center justify-center">
+                      <p className="text-muted-foreground text-sm">
+                        Progresso: {Math.floor(watchTime / 60)} / {mission.displayTime} min
+                      </p>
+                    </CardContent>
+                    <CardFooter>
                       {isCompleted ? (
                         <Button variant="secondary" disabled className="w-full">✓ Concluído</Button>
                       ) : isUnlocked ? (
@@ -394,14 +278,16 @@ const DailyMissionsPage = () => {
                           {isLoadingThis ? <Loader2 className="w-4 h-4 animate-spin" /> : "Coletar"}
                         </Button>
                       ) : (
-                        <a href={isFunctional ? mission.adLink : '#'} target="_blank" rel="noopener noreferrer" className="w-full">
-                           <Button variant="outline" size="sm" className="w-full" disabled={!isFunctional}>Ver Anúncio</Button>
+                        <a href={timeGoalMet ? mission.adLink : undefined} target="_blank" rel="noopener noreferrer" className="w-full">
+                          <Button variant="outline" className="w-full gap-2" disabled={!timeGoalMet}>
+                            <Eye className="w-4 h-4" /> Ver Anúncio
+                          </Button>
                         </a>
                       )}
-                    </div>
-                  );
-                })}
-              </div>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </CardContent>
           </Card>
         </div>
