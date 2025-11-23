@@ -74,6 +74,12 @@ const Auth = () => {
     } else {
       toast.success("Login realizado com sucesso!");
 
+      // Chama uma função para registrar o IP do usuário no backend, sem bloquear o fluxo.
+      // Usamos 'invoke' com a opção 'no-wait' para não atrasar o login do usuário.
+      supabase.functions.invoke('log-ip-on-signin', {
+        headers: { "Content-Type": "application/json" }
+      }).catch(console.error);
+
       // Lógica para aviso de multicontas no mesmo IP/Navegador
       if (data.user) {
         try {
