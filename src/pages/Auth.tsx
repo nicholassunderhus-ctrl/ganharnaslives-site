@@ -9,6 +9,7 @@ import logo from "@/assets/logo.png";
 import { Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,19 +31,28 @@ const Auth = () => {
     const password = formData.get("password") as string;
     const username = formData.get("username") as string;
 
-    const { error } = await signUp(email, password, { username });
-    
-    if (error) {
-      if (error.message.includes("already registered")) {
-        toast.error("Este email já está cadastrado. Faça login!");
-      } else {
-        toast.error(error.message);
+    try {
+      // Chama a Edge Function para o cadastro com verificação de IP
+      const { data, error } = await supabase.functions.invoke('signup-with-ip-check', {
+        body: { email, password, username },
+      });
+
+      if (error) throw new Error(error.message); // Erros de rede ou da própria função
+
+      if (data.error) {
+        // Erros de lógica de negócio retornados pela função (IP bloqueado, email existente)
+        throw new Error(data.error);
       }
-    } else {
+
       toast.success("Conta criada com sucesso!");
+      // Opcional: Fazer login automático após o cadastro bem-sucedido
+      await signIn(email, password);
+      navigate("/dashboard");
+    } catch (err: any) {
+      toast.error("Erro ao criar conta", { description: err.message });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
